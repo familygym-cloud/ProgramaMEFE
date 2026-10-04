@@ -65,12 +65,14 @@ export function csvResumoSaude(relatorio: RelatorioGeral): string {
     { indicador: "Alunos com avaliação", valor: saude.comAvaliacao },
     {
       indicador: "Alunos sem avaliação há mais de 90 dias",
-      valor: saude.semAvaliacaoHa90d },
+      valor: saude.semAvaliacaoHa90d,
+    },
     { indicador: "Assinaturas de relatório (total)", valor: assinaturas.total },
     { indicador: "Alunos com assinatura", valor: assinaturas.alunos },
     {
       indicador: "Assinaturas nos últimos 30 dias",
-      valor: assinaturas.ultimos30d },
+      valor: assinaturas.ultimos30d,
+    },
   ];
   return gerarCsv<LinhaResumo>(
     [

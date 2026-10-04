@@ -45,7 +45,10 @@ export function resumirTreinos(serie: readonly PontoTreinos[]): ResumoTreinos {
   const fechados = serie.filter((p) => !p.emAndamento);
   let melhorMes: PontoTreinos | null = null;
   for (const p of fechados) {
-    if (p.frequenciaMedia > 0 && (melhorMes === null || p.frequenciaMedia > melhorMes.frequenciaMedia)) {
+    if (
+      p.frequenciaMedia > 0 &&
+      (melhorMes === null || p.frequenciaMedia > melhorMes.frequenciaMedia)
+    ) {
       melhorMes = p;
     }
   }
@@ -119,7 +122,10 @@ export function resumirTurnos(porTurno: RelatorioGeral["porTurno"]): ResumoTurno
   }));
   let maisMovimentado: TurnoDetalhado | null = null;
   for (const t of turnos) {
-    if (t.treinos30d > 0 && (maisMovimentado === null || t.treinos30d > maisMovimentado.treinos30d)) {
+    if (
+      t.treinos30d > 0 &&
+      (maisMovimentado === null || t.treinos30d > maisMovimentado.treinos30d)
+    ) {
       maisMovimentado = t;
     }
   }

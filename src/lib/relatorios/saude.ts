@@ -62,7 +62,9 @@ export function detalharFaixasImc(imc: RelatorioGeral["saude"]["imc"], ativos: n
   for (const f of faixas) {
     if (f.alunos > 0 && (predominante === null || f.alunos > predominante.alunos)) predominante = f;
   }
-  const acima = faixas.filter((f) => FAIXAS_ACIMA_DO_PESO.has(f.faixa)).reduce((s, f) => s + f.alunos, 0);
+  const acima = faixas
+    .filter((f) => FAIXAS_ACIMA_DO_PESO.has(f.faixa))
+    .reduce((s, f) => s + f.alunos, 0);
   return {
     faixas,
     comImc,
@@ -93,7 +95,10 @@ export type ResumoAvaliacoes = {
   pctEmDia: number;
 };
 
-export function resumirAvaliacoes(saude: RelatorioGeral["saude"], ativos: number): ResumoAvaliacoes {
+export function resumirAvaliacoes(
+  saude: RelatorioGeral["saude"],
+  ativos: number,
+): ResumoAvaliacoes {
   const comAvaliacao = Math.min(saude.comAvaliacao, ativos);
   const atrasadas = Math.min(saude.semAvaliacaoHa90d, ativos);
   const emDia = ativos - atrasadas;
