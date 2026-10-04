@@ -13,11 +13,15 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as ModalidadesRouteImport } from './routes/modalidades'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as ValoresRouteImport } from './routes/valores'
 import { Route as AuthenticatedAulasRouteImport } from './routes/_authenticated/aulas'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedFinanceiroRouteImport } from './routes/_authenticated/financeiro'
 import { Route as AuthenticatedPlanosRouteImport } from './routes/_authenticated/planos'
+import { Route as AuthenticatedPrescricaoTreinosRouteImport } from './routes/_authenticated/prescricao-treinos'
+import { Route as AuthenticatedRegistrarAvaliacaoRouteImport } from './routes/_authenticated/registrar-avaliacao'
 import { Route as AuthenticatedTermosRouteImport } from './routes/_authenticated/termos'
 import { Route as AuthenticatedVinculosRouteImport } from './routes/_authenticated/vinculos'
 import { Route as AppIndexRouteImport } from './routes/app/index'
@@ -49,9 +53,19 @@ const AuthRoute = AuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ModalidadesRoute = ModalidadesRouteImport.update({
+  id: '/modalidades',
+  path: '/modalidades',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ValoresRoute = ValoresRouteImport.update({
+  id: '/valores',
+  path: '/valores',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAulasRoute = AuthenticatedAulasRouteImport.update({
@@ -74,6 +88,18 @@ const AuthenticatedPlanosRoute = AuthenticatedPlanosRouteImport.update({
   path: '/planos',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedPrescricaoTreinosRoute =
+  AuthenticatedPrescricaoTreinosRouteImport.update({
+    id: '/prescricao-treinos',
+    path: '/prescricao-treinos',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedRegistrarAvaliacaoRoute =
+  AuthenticatedRegistrarAvaliacaoRouteImport.update({
+    id: '/registrar-avaliacao',
+    path: '/registrar-avaliacao',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedTermosRoute = AuthenticatedTermosRouteImport.update({
   id: '/termos',
   path: '/termos',
@@ -134,11 +160,15 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
   '/auth': typeof AuthRoute
+  '/modalidades': typeof ModalidadesRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/valores': typeof ValoresRoute
   '/aulas': typeof AuthenticatedAulasRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/financeiro': typeof AuthenticatedFinanceiroRoute
   '/planos': typeof AuthenticatedPlanosRoute
+  '/prescricao-treinos': typeof AuthenticatedPrescricaoTreinosRoute
+  '/registrar-avaliacao': typeof AuthenticatedRegistrarAvaliacaoRoute
   '/termos': typeof AuthenticatedTermosRoute
   '/vinculos': typeof AuthenticatedVinculosRoute
   '/app/aulas': typeof AppAulasRoute
@@ -154,11 +184,15 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/modalidades': typeof ModalidadesRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/valores': typeof ValoresRoute
   '/aulas': typeof AuthenticatedAulasRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/financeiro': typeof AuthenticatedFinanceiroRoute
   '/planos': typeof AuthenticatedPlanosRoute
+  '/prescricao-treinos': typeof AuthenticatedPrescricaoTreinosRoute
+  '/registrar-avaliacao': typeof AuthenticatedRegistrarAvaliacaoRoute
   '/termos': typeof AuthenticatedTermosRoute
   '/vinculos': typeof AuthenticatedVinculosRoute
   '/app/aulas': typeof AppAulasRoute
@@ -177,11 +211,15 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/app': typeof AppRouteWithChildren
   '/auth': typeof AuthRoute
+  '/modalidades': typeof ModalidadesRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/valores': typeof ValoresRoute
   '/_authenticated/aulas': typeof AuthenticatedAulasRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/financeiro': typeof AuthenticatedFinanceiroRoute
   '/_authenticated/planos': typeof AuthenticatedPlanosRoute
+  '/_authenticated/prescricao-treinos': typeof AuthenticatedPrescricaoTreinosRoute
+  '/_authenticated/registrar-avaliacao': typeof AuthenticatedRegistrarAvaliacaoRoute
   '/_authenticated/termos': typeof AuthenticatedTermosRoute
   '/_authenticated/vinculos': typeof AuthenticatedVinculosRoute
   '/app/aulas': typeof AppAulasRoute
@@ -200,11 +238,15 @@ export interface FileRouteTypes {
     | '/'
     | '/app'
     | '/auth'
+    | '/modalidades'
     | '/reset-password'
+    | '/valores'
     | '/aulas'
     | '/dashboard'
     | '/financeiro'
     | '/planos'
+    | '/prescricao-treinos'
+    | '/registrar-avaliacao'
     | '/termos'
     | '/vinculos'
     | '/app/aulas'
@@ -220,11 +262,15 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/modalidades'
     | '/reset-password'
+    | '/valores'
     | '/aulas'
     | '/dashboard'
     | '/financeiro'
     | '/planos'
+    | '/prescricao-treinos'
+    | '/registrar-avaliacao'
     | '/termos'
     | '/vinculos'
     | '/app/aulas'
@@ -242,11 +288,15 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/app'
     | '/auth'
+    | '/modalidades'
     | '/reset-password'
+    | '/valores'
     | '/_authenticated/aulas'
     | '/_authenticated/dashboard'
     | '/_authenticated/financeiro'
     | '/_authenticated/planos'
+    | '/_authenticated/prescricao-treinos'
+    | '/_authenticated/registrar-avaliacao'
     | '/_authenticated/termos'
     | '/_authenticated/vinculos'
     | '/app/aulas'
@@ -265,7 +315,9 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AppRoute: typeof AppRouteWithChildren
   AuthRoute: typeof AuthRoute
+  ModalidadesRoute: typeof ModalidadesRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  ValoresRoute: typeof ValoresRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -298,11 +350,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/modalidades': {
+      id: '/modalidades'
+      path: '/modalidades'
+      fullPath: '/modalidades'
+      preLoaderRoute: typeof ModalidadesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/reset-password': {
       id: '/reset-password'
       path: '/reset-password'
       fullPath: '/reset-password'
       preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/valores': {
+      id: '/valores'
+      path: '/valores'
+      fullPath: '/valores'
+      preLoaderRoute: typeof ValoresRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/aulas': {
@@ -331,6 +397,20 @@ declare module '@tanstack/react-router' {
       path: '/planos'
       fullPath: '/planos'
       preLoaderRoute: typeof AuthenticatedPlanosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/prescricao-treinos': {
+      id: '/_authenticated/prescricao-treinos'
+      path: '/prescricao-treinos'
+      fullPath: '/prescricao-treinos'
+      preLoaderRoute: typeof AuthenticatedPrescricaoTreinosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/registrar-avaliacao': {
+      id: '/_authenticated/registrar-avaliacao'
+      path: '/registrar-avaliacao'
+      fullPath: '/registrar-avaliacao'
+      preLoaderRoute: typeof AuthenticatedRegistrarAvaliacaoRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/termos': {
@@ -418,6 +498,8 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedFinanceiroRoute: typeof AuthenticatedFinanceiroRoute
   AuthenticatedPlanosRoute: typeof AuthenticatedPlanosRoute
+  AuthenticatedPrescricaoTreinosRoute: typeof AuthenticatedPrescricaoTreinosRoute
+  AuthenticatedRegistrarAvaliacaoRoute: typeof AuthenticatedRegistrarAvaliacaoRoute
   AuthenticatedTermosRoute: typeof AuthenticatedTermosRoute
   AuthenticatedVinculosRoute: typeof AuthenticatedVinculosRoute
 }
@@ -427,6 +509,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedFinanceiroRoute: AuthenticatedFinanceiroRoute,
   AuthenticatedPlanosRoute: AuthenticatedPlanosRoute,
+  AuthenticatedPrescricaoTreinosRoute: AuthenticatedPrescricaoTreinosRoute,
+  AuthenticatedRegistrarAvaliacaoRoute: AuthenticatedRegistrarAvaliacaoRoute,
   AuthenticatedTermosRoute: AuthenticatedTermosRoute,
   AuthenticatedVinculosRoute: AuthenticatedVinculosRoute,
 }
@@ -465,7 +549,9 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AppRoute: AppRouteWithChildren,
   AuthRoute: AuthRoute,
+  ModalidadesRoute: ModalidadesRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  ValoresRoute: ValoresRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
