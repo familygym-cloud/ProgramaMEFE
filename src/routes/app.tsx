@@ -18,7 +18,8 @@ import {
 export const Route = createFileRoute("/app")({
   ssr: false,
   validateSearch: (search: Record<string, unknown>): { demo?: boolean | undefined } => ({
-    demo: search["demo"] === true || search["demo"] === "1" || search["demo"] === 1 ? true : undefined,
+    demo:
+      search["demo"] === true || search["demo"] === "1" || search["demo"] === 1 ? true : undefined,
   }),
   head: () => ({
     meta: [
@@ -39,7 +40,11 @@ export const Route = createFileRoute("/app")({
 
 function Carregando() {
   return (
-    <div className="grid min-h-screen place-items-center bg-background" role="status" aria-live="polite">
+    <div
+      className="grid min-h-screen place-items-center bg-background"
+      role="status"
+      aria-live="polite"
+    >
       <div className="flex flex-col items-center gap-5">
         <BrandLogo variante="marca" className="h-16 animate-pulse" />
         <span className="text-xs font-semibold uppercase tracking-[0.3em] text-muted-foreground">

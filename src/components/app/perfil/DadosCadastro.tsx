@@ -28,19 +28,21 @@ function Dado({
   largo?: boolean;
 }) {
   return (
-    <div className={cn("flex items-start gap-3.5", largo && "sm:col-span-2")}>
-      <span
-        aria-hidden
-        className="grid size-10 shrink-0 place-items-center rounded-xl bg-white/[0.06] text-muted-foreground [&_svg]:size-[1.15rem]"
-      >
-        {icone}
-      </span>
-      <div className="min-w-0 space-y-1">
-        <dt className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
-          {rotulo}
-        </dt>
-        <dd className="break-words text-base font-medium leading-snug">{children}</dd>
-      </div>
+    // dt e dd precisam ser filhos diretos do div (HTML válido e leitura correta por leitores de tela):
+    // o ícone fica dentro do dt e o valor alinha com o rótulo pelo recuo do dd.
+    <div className={cn("min-w-0", largo && "sm:col-span-2")}>
+      <dt className="flex items-center gap-3.5 text-xs font-medium uppercase tracking-widest text-muted-foreground">
+        <span
+          aria-hidden
+          className="grid size-10 shrink-0 place-items-center rounded-xl bg-white/[0.06] [&_svg]:size-[1.15rem]"
+        >
+          {icone}
+        </span>
+        {rotulo}
+      </dt>
+      <dd className="mt-1.5 break-words pl-[3.375rem] text-base font-medium leading-snug">
+        {children}
+      </dd>
     </div>
   );
 }

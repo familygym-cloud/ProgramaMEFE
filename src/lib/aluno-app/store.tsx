@@ -82,7 +82,13 @@ export function useAreaAlunoReal() {
   });
 }
 
-export function AlunoAppProviderReal({ dados, children }: { dados: AreaAlunoDados; children: ReactNode }) {
+export function AlunoAppProviderReal({
+  dados,
+  children,
+}: {
+  dados: AreaAlunoDados;
+  children: ReactNode;
+}) {
   const queryClient = useQueryClient();
   const recarregar = useCallback(() => {
     void queryClient.invalidateQueries({ queryKey: ["area-aluno"] });
@@ -130,7 +136,11 @@ export function AlunoAppProviderReal({ dados, children }: { dados: AreaAlunoDado
     [recarregar],
   );
 
-  return <AlunoAppContext.Provider value={{ dados, acoes, recarregar }}>{children}</AlunoAppContext.Provider>;
+  return (
+    <AlunoAppContext.Provider value={{ dados, acoes, recarregar }}>
+      {children}
+    </AlunoAppContext.Provider>
+  );
 }
 
 // ----------------------------------------------------------- modo demonstração
@@ -144,7 +154,9 @@ export function AlunoAppProviderDemo({ children }: { children: ReactNode }) {
         setDados((d) => ({
           ...d,
           agenda: d.agenda.map((a) =>
-            a.id === aulaId && !a.reservada ? { ...a, reservada: true, ocupadas: a.ocupadas + 1 } : a,
+            a.id === aulaId && !a.reservada
+              ? { ...a, reservada: true, ocupadas: a.ocupadas + 1 }
+              : a,
           ),
         }));
         toast.success("Aula reservada! (demonstração)");
@@ -153,7 +165,9 @@ export function AlunoAppProviderDemo({ children }: { children: ReactNode }) {
         setDados((d) => ({
           ...d,
           agenda: d.agenda.map((a) =>
-            a.id === aulaId && a.reservada ? { ...a, reservada: false, ocupadas: Math.max(0, a.ocupadas - 1) } : a,
+            a.id === aulaId && a.reservada
+              ? { ...a, reservada: false, ocupadas: Math.max(0, a.ocupadas - 1) }
+              : a,
           ),
         }));
         toast.success("Reserva cancelada. (demonstração)");
@@ -161,12 +175,18 @@ export function AlunoAppProviderDemo({ children }: { children: ReactNode }) {
       registrarTreino: async ({ atividade, duracaoMin }) => {
         setDados((d) => ({
           ...d,
-          checkIns: [{ id: `demo-ci-${Date.now()}`, data: hojeISO(), atividade, duracaoMin }, ...d.checkIns],
+          checkIns: [
+            { id: `demo-ci-${Date.now()}`, data: hojeISO(), atividade, duracaoMin },
+            ...d.checkIns,
+          ],
         }));
         toast.success("Treino registrado. Bom trabalho! (demonstração)");
       },
       atualizarContato: async ({ telefone, email }) => {
-        setDados((d) => ({ ...d, perfil: { ...d.perfil, telefone: telefone || null, email: email || null } }));
+        setDados((d) => ({
+          ...d,
+          perfil: { ...d.perfil, telefone: telefone || null, email: email || null },
+        }));
         toast.success("Dados de contato atualizados. (demonstração)");
       },
       salvarMeta: async (meta) => {

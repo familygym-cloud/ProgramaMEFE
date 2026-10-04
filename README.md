@@ -4,7 +4,7 @@ Aplicação web da Academia Family Gym, com três frentes no mesmo projeto:
 
 - **Site público**: início, modalidades e valores (`/`, `/modalidades`, `/valores`).
 - **Área do aluno** (`/app`): treinos, aulas e reservas, avaliações, resultados, plano e mensalidades, perfil e segurança (verificação em duas etapas).
-- **Painel da equipe** (perfil `staff`): dashboard, alunos e vínculos com contas de acesso, termos, planos, aulas e presenças, financeiro, prescrição de treinos e registro de avaliações.
+- **Painel da equipe** (perfil `staff`): Central de Relatórios com dados reais (visão geral, financeiro, frequência, saúde, termos e alunos, com exportação CSV e impressão/PDF, mais o relatório individual do aluno), vínculos com contas de acesso, planos, aulas e presenças, financeiro, prescrição de treinos e registro de avaliações.
 
 O projeto nasceu no [Lovable](https://lovable.dev) (editor do projeto: <https://lovable.dev/projects/daeb8427-631f-465e-becb-3230320eb0d8>; app publicado: <https://familygym-healthhub.lovable.app>) e este repositório é a fonte do código. Ele também roda fora do Lovable, seguindo este guia.
 
@@ -207,6 +207,8 @@ O build gera o Worker em `.output/` (preset `cloudflare-module` do Nitro, com `n
 ## Modo demonstração
 
 `/app?demo=1` abre a área do aluno com dados de exemplo, sem login e sem acessar o banco. O modo fica ativo na aba (`sessionStorage`) até clicar em **Sair da demonstração**. Serve para apresentar o produto sem expor dados reais.
+
+A Central de Relatórios da equipe também tem demonstração pública, com alunos e valores fictícios: `/equipe-demo` (e `/equipe-demo/aluno/<id>` para o relatório individual). Nada ali vem do banco.
 
 ## Testes
 

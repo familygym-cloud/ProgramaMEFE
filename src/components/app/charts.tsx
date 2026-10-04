@@ -1,4 +1,14 @@
-import { Area, AreaChart, Bar, BarChart, CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts";
+import {
+  Area,
+  AreaChart,
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Line,
+  LineChart,
+  XAxis,
+  YAxis,
+} from "recharts";
 import {
   ChartContainer,
   ChartTooltip,
@@ -59,7 +69,10 @@ export function GraficoTendencia({
             <ChartTooltipContent
               formatter={(valor) => (
                 <span className="font-semibold">
-                  {Number(valor).toLocaleString("pt-BR", { minimumFractionDigits: casas, maximumFractionDigits: casas })}
+                  {Number(valor).toLocaleString("pt-BR", {
+                    minimumFractionDigits: casas,
+                    maximumFractionDigits: casas,
+                  })}
                   {unidade ? ` ${unidade}` : ""}
                 </span>
               )}
@@ -72,7 +85,12 @@ export function GraficoTendencia({
           stroke="var(--brand-yellow)"
           strokeWidth={3}
           fill={`url(#${id})`}
-          dot={{ r: 4, fill: "var(--brand-yellow)", stroke: "oklch(0.215 0.003 90)", strokeWidth: 2 }}
+          dot={{
+            r: 4,
+            fill: "var(--brand-yellow)",
+            stroke: "oklch(0.215 0.003 90)",
+            strokeWidth: 2,
+          }}
           activeDot={{ r: 6 }}
         />
       </AreaChart>

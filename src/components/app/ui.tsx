@@ -56,8 +56,12 @@ export function PageHeader({
     <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
       <div className="space-y-2">
         {eyebrow ? <Eyebrow>{eyebrow}</Eyebrow> : null}
-        <h1 className="font-display text-3xl font-bold leading-tight tracking-tight sm:text-4xl">{titulo}</h1>
-        {descricao ? <p className="max-w-2xl text-sm text-muted-foreground sm:text-base">{descricao}</p> : null}
+        <h1 className="font-display text-3xl font-bold leading-tight tracking-tight sm:text-4xl">
+          {titulo}
+        </h1>
+        {descricao ? (
+          <p className="max-w-2xl text-sm text-muted-foreground sm:text-base">{descricao}</p>
+        ) : null}
       </div>
       {acao ? <div className="flex shrink-0 flex-wrap gap-2">{acao}</div> : null}
     </header>
@@ -112,7 +116,10 @@ export function StatCard({
   const numerico = typeof valor === "number";
   const animado = useContagem(numerico ? valor : 0);
   const texto = numerico
-    ? animado.toLocaleString("pt-BR", { minimumFractionDigits: casas, maximumFractionDigits: casas })
+    ? animado.toLocaleString("pt-BR", {
+        minimumFractionDigits: casas,
+        maximumFractionDigits: casas,
+      })
     : valor;
   return (
     <Superficie
@@ -120,12 +127,16 @@ export function StatCard({
       className={cn(destaque && "border-brand-yellow/40 bg-brand-yellow/10", className)}
     >
       <div className="flex items-start justify-between gap-3">
-        <span className="text-xs font-medium uppercase tracking-widest text-muted-foreground">{rotulo}</span>
+        <span className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
+          {rotulo}
+        </span>
         {icone ? <span className="text-brand-yellow [&_svg]:size-5">{icone}</span> : null}
       </div>
       <p className="mt-3 font-display text-4xl font-bold leading-none tracking-tight">
         {texto}
-        {sufixo ? <span className="ml-1 text-lg font-semibold text-muted-foreground">{sufixo}</span> : null}
+        {sufixo ? (
+          <span className="ml-1 text-lg font-semibold text-muted-foreground">{sufixo}</span>
+        ) : null}
       </p>
       {detalhe ? <div className="mt-2 text-xs text-muted-foreground">{detalhe}</div> : null}
     </Superficie>
@@ -159,7 +170,14 @@ export function ProgressRing({
       aria-label={rotulo ?? `${Math.round(v)}% concluído`}
     >
       <svg width={tamanho} height={tamanho} className="-rotate-90">
-        <circle cx={tamanho / 2} cy={tamanho / 2} r={raio} fill="none" strokeWidth={espessura} className="stroke-white/10" />
+        <circle
+          cx={tamanho / 2}
+          cy={tamanho / 2}
+          r={raio}
+          fill="none"
+          strokeWidth={espessura}
+          className="stroke-white/10"
+        />
         <circle
           cx={tamanho / 2}
           cy={tamanho / 2}

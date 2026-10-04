@@ -39,7 +39,11 @@ async function buscarAluno(
   >,
   userId: string,
 ) {
-  const { data, error } = await supabase.from("alunos").select("*").eq("user_id", userId).maybeSingle();
+  const { data, error } = await supabase
+    .from("alunos")
+    .select("*")
+    .eq("user_id", userId)
+    .maybeSingle();
   if (error) throw error;
   return data;
 }
@@ -51,7 +55,10 @@ export const carregarAreaAluno = createServerFn({ method: "GET" })
 
     const aluno = await buscarAluno(supabase, userId);
     if (!aluno) {
-      const { data: papeis } = await supabase.from("user_roles").select("role").eq("user_id", userId);
+      const { data: papeis } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", userId);
       const perfilAcesso = (papeis ?? []).some((p) => p.role === "staff")
         ? "staff"
         : (papeis ?? []).some((p) => p.role === "aluno")
@@ -61,28 +68,57 @@ export const carregarAreaAluno = createServerFn({ method: "GET" })
     }
 
     const hoje = hojeISO();
-    const [avaliacoesRes, checkInsRes, pagamentosRes, treinosRes, medidasRes, metasRes, aulasRes, reservasRes] =
-      await Promise.all([
-        supabase.from("avaliacoes").select("*").eq("aluno_id", aluno.id).order("referencia", { ascending: true }),
-        supabase.from("check_ins").select("*").eq("aluno_id", aluno.id).order("data", { ascending: false }).limit(400),
-        supabase.from("pagamentos").select("*").eq("aluno_id", aluno.id).order("vencimento", { ascending: true }),
-        supabase
-          .from("treinos")
-          .select("*, treino_exercicios(*)")
-          .eq("aluno_id", aluno.id)
-          .eq("ativo", true)
-          .order("dia_semana", { ascending: true, nullsFirst: false }),
-        supabase.from("medidas_corporais").select("*").eq("aluno_id", aluno.id).order("data", { ascending: true }),
-        supabase.from("metas_aluno").select("*").eq("aluno_id", aluno.id).order("created_at", { ascending: true }),
-        supabase
-          .from("aulas")
-          .select("id, data, horario, modalidade, professor, observacoes, vagas")
-          .gte("data", hoje)
-          .order("data", { ascending: true })
-          .order("horario", { ascending: true })
-          .limit(80),
-        supabase.from("reservas_aula").select("aula_id, status").eq("aluno_id", aluno.id),
-      ]);
+    const [
+      avaliacoesRes,
+      checkInsRes,
+      pagamentosRes,
+      treinosRes,
+      medidasRes,
+      metasRes,
+      aulasRes,
+      reservasRes,
+    ] = await Promise.all([
+      supabase
+        .from("avaliacoes")
+        .select("*")
+        .eq("aluno_id", aluno.id)
+        .order("referencia", { ascending: true }),
+      supabase
+        .from("check_ins")
+        .select("*")
+        .eq("aluno_id", aluno.id)
+        .order("data", { ascending: false })
+        .limit(400),
+      supabase
+        .from("pagamentos")
+        .select("*")
+        .eq("aluno_id", aluno.id)
+        .order("vencimento", { ascending: true }),
+      supabase
+        .from("treinos")
+        .select("*, treino_exercicios(*)")
+        .eq("aluno_id", aluno.id)
+        .eq("ativo", true)
+        .order("dia_semana", { ascending: true, nullsFirst: false }),
+      supabase
+        .from("medidas_corporais")
+        .select("*")
+        .eq("aluno_id", aluno.id)
+        .order("data", { ascending: true }),
+      supabase
+        .from("metas_aluno")
+        .select("*")
+        .eq("aluno_id", aluno.id)
+        .order("created_at", { ascending: true }),
+      supabase
+        .from("aulas")
+        .select("id, data, horario, modalidade, professor, observacoes, vagas")
+        .gte("data", hoje)
+        .order("data", { ascending: true })
+        .order("horario", { ascending: true })
+        .limit(80),
+      supabase.from("reservas_aula").select("aula_id, status").eq("aluno_id", aluno.id),
+    ]);
 
     if (avaliacoesRes.error) throw avaliacoesRes.error;
     if (checkInsRes.error) throw checkInsRes.error;
@@ -244,7 +280,9 @@ export const carregarAreaAluno = createServerFn({ method: "GET" })
 export const registrarTreinoFeito = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: { atividade: string; duracaoMin: number; data?: string }) => {
-    const atividade = String(input?.atividade ?? "").trim().slice(0, 80);
+    const atividade = String(input?.atividade ?? "")
+      .trim()
+      .slice(0, 80);
     const duracaoMin = Math.round(Number(input?.duracaoMin));
     if (!atividade) throw new Error("Informe a atividade.");
     if (!Number.isFinite(duracaoMin) || duracaoMin < 1 || duracaoMin > 600) {
@@ -324,8 +362,12 @@ export const cancelarReservaAula = createServerFn({ method: "POST" })
 export const atualizarMeuContato = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: { telefone: string; email: string }) => {
-    const telefone = String(input?.telefone ?? "").trim().slice(0, 30);
-    const email = String(input?.email ?? "").trim().slice(0, 160);
+    const telefone = String(input?.telefone ?? "")
+      .trim()
+      .slice(0, 30);
+    const email = String(input?.email ?? "")
+      .trim()
+      .slice(0, 160);
     if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new Error("E-mail inválido.");
     if (telefone && !/^[0-9()+\-.\s]{8,30}$/.test(telefone)) throw new Error("Telefone inválido.");
     return { telefone, email };
@@ -344,8 +386,10 @@ export const salvarMeta = createServerFn({ method: "POST" })
   .inputValidator((input: NovaMeta) => {
     const tipo = input?.tipo;
     const alvo = Number(input?.alvo);
-    if (tipo !== "peso" && tipo !== "frequencia" && tipo !== "imc") throw new Error("Tipo de meta inválido.");
-    if (!Number.isFinite(alvo) || alvo <= 0 || alvo > 1000) throw new Error("Valor da meta inválido.");
+    if (tipo !== "peso" && tipo !== "frequencia" && tipo !== "imc")
+      throw new Error("Tipo de meta inválido.");
+    if (!Number.isFinite(alvo) || alvo <= 0 || alvo > 1000)
+      throw new Error("Valor da meta inválido.");
     const prazo = input?.prazo && /^\d{4}-\d{2}-\d{2}$/.test(input.prazo) ? input.prazo : null;
     return { tipo, alvo, prazo };
   })

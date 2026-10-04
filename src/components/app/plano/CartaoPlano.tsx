@@ -21,8 +21,14 @@ function Fato({
       <dt className="text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
         {rotulo}
       </dt>
-      <dd className="mt-1.5 font-display text-lg font-semibold leading-tight">{children}</dd>
-      {detalhe ? <p className="mt-0.5 text-xs text-muted-foreground">{detalhe}</p> : null}
+      <dd className="mt-1.5 font-display text-lg font-semibold leading-tight">
+        {children}
+        {detalhe ? (
+          <span className="mt-0.5 block font-sans text-xs font-normal text-muted-foreground">
+            {detalhe}
+          </span>
+        ) : null}
+      </dd>
     </div>
   );
 }

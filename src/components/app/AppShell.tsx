@@ -65,7 +65,15 @@ function useAtivo() {
     item.exato ? caminho === item.to || caminho === `${item.to}/` : caminho.startsWith(item.to);
 }
 
-function ItemLateral({ item, ativo, aoClicar }: { item: ItemNav; ativo: boolean; aoClicar?: () => void }) {
+function ItemLateral({
+  item,
+  ativo,
+  aoClicar,
+}: {
+  item: ItemNav;
+  ativo: boolean;
+  aoClicar?: () => void;
+}) {
   return (
     <Link
       to={item.to}
@@ -95,7 +103,9 @@ function CartaoUsuario({ perfil, demo }: { perfil: PerfilAluno; demo: boolean })
       </span>
       <div className="min-w-0">
         <p className="truncate text-sm font-semibold">{primeiroNome(perfil.nome)}</p>
-        <p className="truncate text-xs text-muted-foreground">{demo ? "Modo demonstração" : perfil.plano}</p>
+        <p className="truncate text-xs text-muted-foreground">
+          {demo ? "Modo demonstração" : perfil.plano}
+        </p>
       </div>
     </div>
   );
@@ -190,7 +200,12 @@ export function AppShell({
 
       {/* Menu completo (mobile) */}
       {aberto ? (
-        <div className="fixed inset-0 z-50 lg:hidden" role="dialog" aria-modal="true" aria-label="Menu">
+        <div
+          className="fixed inset-0 z-50 lg:hidden"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Menu"
+        >
           <button
             type="button"
             aria-label="Fechar menu"
@@ -236,7 +251,10 @@ export function AppShell({
             </button>
           </div>
         ) : null}
-        <main id="conteudo" className="mx-auto w-full max-w-6xl px-4 pb-28 pt-6 sm:px-6 lg:px-10 lg:pb-16 lg:pt-10">
+        <main
+          id="conteudo"
+          className="mx-auto w-full max-w-6xl px-4 pb-28 pt-6 sm:px-6 lg:px-10 lg:pb-16 lg:pt-10"
+        >
           {children}
         </main>
       </div>

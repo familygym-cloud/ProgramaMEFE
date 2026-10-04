@@ -39,7 +39,6 @@ import { AlunoPagamentos } from "@/components/AlunoPagamentos";
 import { AlunoMatricula } from "@/components/AlunoMatricula";
 import type { Membro } from "@/lib/familygym-data";
 
-
 const statusVariant = {
   Ativo: "default",
   Risco: "secondary",
@@ -117,7 +116,6 @@ export function AlunoDetalhe({ aluno }: { aluno: Membro }) {
   const conteudo = (
     <section className="grid gap-4 lg:grid-cols-3">
       <Card className="p-5 lg:col-span-2 gap-6">
-
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <Avatar className="size-12 bg-secondary text-primary">
@@ -143,7 +141,12 @@ export function AlunoDetalhe({ aluno }: { aluno: Membro }) {
           <MetricCard icon={Calendar} label="Idade" value={`${aluno.idade} anos`} />
           <MetricCard icon={Ruler} label="Altura" value={`${aluno.altura} cm`} />
           <MetricCard icon={Weight} label="Peso" value={`${aluno.peso.toFixed(1)} kg`} />
-          <MetricCard icon={Activity} label="IMC" value={aluno.imc.toFixed(1)} sub={imcLabelFor(aluno.imc)} />
+          <MetricCard
+            icon={Activity}
+            label="IMC"
+            value={aluno.imc.toFixed(1)}
+            sub={imcLabelFor(aluno.imc)}
+          />
           <MetricCard icon={TrendingUp} label="Progresso" value={`${aluno.progresso}%`} />
           <MetricCard icon={Target} label="Frequência" value={`${aluno.frequencia} treinos/mês`} />
           <MetricCard icon={FileText} label="Plano" value={aluno.plano} />
@@ -190,7 +193,6 @@ export function AlunoDetalhe({ aluno }: { aluno: Membro }) {
             </div>
           </div>
         ) : null}
-
 
         <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-1.5">
@@ -244,10 +246,29 @@ export function AlunoDetalhe({ aluno }: { aluno: Membro }) {
           <div className="h-44">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={aluno.evolucaoPeso}>
-                <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" vertical={false} />
-                <XAxis dataKey="mes" stroke="var(--color-muted-foreground)" fontSize={11} tickLine={false} axisLine={false} />
-                <YAxis stroke="var(--color-muted-foreground)" fontSize={11} tickLine={false} axisLine={false} domain={["dataMin - 2", "dataMax + 2"]} />
-                <Tooltip contentStyle={tooltipStyle} formatter={(v: number) => [`${v.toFixed(1)} kg`, "Peso"]} />
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  stroke="var(--color-border)"
+                  vertical={false}
+                />
+                <XAxis
+                  dataKey="mes"
+                  stroke="var(--color-muted-foreground)"
+                  fontSize={11}
+                  tickLine={false}
+                  axisLine={false}
+                />
+                <YAxis
+                  stroke="var(--color-muted-foreground)"
+                  fontSize={11}
+                  tickLine={false}
+                  axisLine={false}
+                  domain={["dataMin - 2", "dataMax + 2"]}
+                />
+                <Tooltip
+                  contentStyle={tooltipStyle}
+                  formatter={(v: number) => [`${v.toFixed(1)} kg`, "Peso"]}
+                />
                 <Line
                   type="monotone"
                   dataKey="peso"
@@ -278,15 +299,21 @@ export function AlunoDetalhe({ aluno }: { aluno: Membro }) {
               <TableBody>
                 {aluno.atividadesRecentes.map((a, idx) => (
                   <TableRow key={idx}>
-                    <TableCell className="text-xs text-muted-foreground">{formatDateBR(a.data)}</TableCell>
+                    <TableCell className="text-xs text-muted-foreground">
+                      {formatDateBR(a.data)}
+                    </TableCell>
                     <TableCell className="text-xs font-medium">{a.atividade}</TableCell>
-                    <TableCell className="text-right text-xs tabular-nums">{a.duracaoMin} min</TableCell>
+                    <TableCell className="text-right text-xs tabular-nums">
+                      {a.duracaoMin} min
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
             </Table>
           ) : (
-            <p className="text-sm text-muted-foreground">Nenhuma atividade registrada recentemente.</p>
+            <p className="text-sm text-muted-foreground">
+              Nenhuma atividade registrada recentemente.
+            </p>
           )}
         </Card>
       </div>
@@ -312,4 +339,3 @@ export function AlunoDetalhe({ aluno }: { aluno: Membro }) {
     </Tabs>
   );
 }
-

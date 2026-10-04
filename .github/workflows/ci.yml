@@ -35,6 +35,9 @@ jobs:
       - name: Tipos
         run: bun run typecheck
 
+      - name: Lint e formatação
+        run: bun run lint
+
       - name: Testes
         run: bun run test
 
