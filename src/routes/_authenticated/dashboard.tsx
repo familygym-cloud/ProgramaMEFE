@@ -1,6 +1,16 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { queryOptions, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
-import { CalendarCheck, Link2, LogOut, ShieldAlert, ShieldCheck, Tags, Wallet } from "lucide-react";
+import {
+  CalendarCheck,
+  Dumbbell,
+  Link2,
+  LogOut,
+  Ruler,
+  ShieldAlert,
+  ShieldCheck,
+  Tags,
+  Wallet,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FamilyGymDashboard } from "@/components/FamilyGymDashboard";
 import { listarAlunos } from "@/lib/alunos.functions";
@@ -59,11 +69,11 @@ function Painel() {
 
   return (
     <div className="relative">
-      <div className="sticky top-0 z-30 flex items-center justify-between gap-3 border-b border-brand-yellow/20 bg-brand-black/90 px-4 py-3 backdrop-blur">
+      <div className="sticky top-0 z-30 flex flex-wrap items-center justify-between gap-3 border-b border-brand-yellow/20 bg-brand-black/90 px-4 py-3 backdrop-blur">
         <span className="text-[0.65rem] font-bold uppercase tracking-[0.3em] text-brand-yellow">
           {data.perfil === "staff" ? "Perfil staff" : data.perfil === "aluno" ? "Perfil aluno" : "Sem perfil"}
         </span>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           {data.perfil === "staff" ? (
             <>
               <Button
@@ -114,6 +124,26 @@ function Painel() {
               >
                 <Link to="/vinculos">
                   <Link2 className="size-3.5" /> Vínculos
+                </Link>
+              </Button>
+              <Button
+                asChild
+                variant="outline"
+                size="sm"
+                className="gap-2 rounded-full border-brand-yellow/40 bg-transparent text-xs uppercase tracking-widest text-brand-onblack hover:bg-brand-yellow hover:text-brand-black"
+              >
+                <Link to="/prescricao-treinos">
+                  <Dumbbell className="size-3.5" /> Treinos
+                </Link>
+              </Button>
+              <Button
+                asChild
+                variant="outline"
+                size="sm"
+                className="gap-2 rounded-full border-brand-yellow/40 bg-transparent text-xs uppercase tracking-widest text-brand-onblack hover:bg-brand-yellow hover:text-brand-black"
+              >
+                <Link to="/registrar-avaliacao">
+                  <Ruler className="size-3.5" /> Avaliação
                 </Link>
               </Button>
             </>

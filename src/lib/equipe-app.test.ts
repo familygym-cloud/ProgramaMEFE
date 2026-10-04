@@ -68,7 +68,8 @@ describe("treinoCamposSchema", () => {
   it("exige ao menos um exercício", () => {
     const r = treinoCamposSchema.safeParse({ ...treinoValido, exercicios: [] });
     expect(r.success).toBe(false);
-    if (!r.success) expect(errosPorCampo(r.error)["exercicios"]).toBe("Inclua ao menos um exercício.");
+    if (!r.success)
+      expect(errosPorCampo(r.error)["exercicios"]).toBe("Inclua ao menos um exercício.");
   });
 
   it("aponta o campo exato do exercício com problema", () => {
@@ -131,7 +132,11 @@ describe("avaliacaoCamposSchema", () => {
   });
 
   it("respeita o intervalo de cada medida", () => {
-    const r = avaliacaoCamposSchema.safeParse({ ...avaliacaoValida, gorduraPct: 1, cinturaCm: 400 });
+    const r = avaliacaoCamposSchema.safeParse({
+      ...avaliacaoValida,
+      gorduraPct: 1,
+      cinturaCm: 400,
+    });
     expect(r.success).toBe(false);
     if (!r.success) {
       const erros = errosPorCampo(r.error);

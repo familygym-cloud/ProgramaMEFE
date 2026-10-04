@@ -58,7 +58,6 @@ export type TreinoEquipe = {
   diaSemana: number | null;
   observacoes: string;
   ativo: boolean;
-  atualizadoEm: string;
   exercicios: ExercicioPrescrito[];
 };
 
@@ -92,6 +91,7 @@ export const MEDIDAS = {
 } as const;
 
 export type ChaveMedida = keyof typeof MEDIDAS;
+export const CHAVES_MEDIDA = Object.keys(MEDIDAS) as ChaveMedida[];
 export type MedidasCorporaisEquipe = Record<ChaveMedida, number | null>;
 
 export const GRUPOS_DE_MEDIDAS: readonly {
@@ -233,7 +233,10 @@ export const treinoCamposSchema = z.object({
   exercicios: z
     .array(exercicioSchema, { required_error: "Inclua ao menos um exercício." })
     .min(1, "Inclua ao menos um exercício.")
-    .max(LIMITES.treino.exercicios, `Use no máximo ${LIMITES.treino.exercicios} exercícios por treino.`),
+    .max(
+      LIMITES.treino.exercicios,
+      `Use no máximo ${LIMITES.treino.exercicios} exercícios por treino.`,
+    ),
 });
 
 export const treinoSchema = treinoCamposSchema.extend({
@@ -355,7 +358,10 @@ export function mesCurto(dataIso: string): string {
 }
 
 export function formatarNumero(valor: number, casas = 1): string {
-  return valor.toLocaleString("pt-BR", { minimumFractionDigits: casas, maximumFractionDigits: casas });
+  return valor.toLocaleString("pt-BR", {
+    minimumFractionDigits: casas,
+    maximumFractionDigits: casas,
+  });
 }
 
 /** Diferença com 1 casa; null quando não há registro anterior. */
