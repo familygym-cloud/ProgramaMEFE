@@ -1,5 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { hojeBrasilia } from "@/lib/datas";
+import { buscarTudo, idDaLinha, MAX_LOTES } from "@/lib/relatorios/carga";
 
 export type Pagamento = {
   id: string;
@@ -28,7 +30,7 @@ export const listarPagamentos = createServerFn({ method: "GET" })
       .order("vencimento", { ascending: true });
     if (error) throw error;
 
-    const hoje = new Date().toISOString().slice(0, 10);
+    const hoje = hojeBrasilia();
 
     return (rows ?? []).map((p) => {
       const pago = p.status === "Pago";
@@ -59,7 +61,9 @@ export type PagamentoFinanceiro = Pagamento & {
 
 async function garantirStaff(supabase: {
   from: (t: string) => {
-    select: (c: string) => { eq: (c: string, v: string) => Promise<{ data: unknown; error: unknown }> };
+    select: (c: string) => {
+      eq: (c: string, v: string) => Promise<{ data: unknown; error: unknown }>;
+    };
   };
 }) {
   const { data, error } = await supabase.from("user_roles").select("role").eq("role", "staff");
@@ -75,17 +79,31 @@ export const listarFinanceiro = createServerFn({ method: "GET" })
   .handler(async ({ context }): Promise<PagamentoFinanceiro[]> => {
     await garantirStaff(context.supabase as never);
 
-    const [{ data: rows, error }, { data: alunos, error: alunosError }] = await Promise.all([
-      context.supabase.from("pagamentos").select("*").order("vencimento", { ascending: true }),
-      context.supabase.from("alunos").select("id, nome, plano"),
+    // O PostgREST devolve no máximo 1000 linhas por resposta: lê tudo em lotes (ordem estável).
+    const [rows, alunos] = await Promise.all([
+      buscarTudo(
+        (de, ate) =>
+          context.supabase
+            .from("pagamentos")
+            .select("*")
+            .order("vencimento", { ascending: true })
+            .order("id")
+            .range(de, ate),
+        MAX_LOTES,
+        idDaLinha,
+      ),
+      buscarTudo(
+        (de, ate) =>
+          context.supabase.from("alunos").select("id, nome, plano").order("id").range(de, ate),
+        MAX_LOTES,
+        idDaLinha,
+      ),
     ]);
-    if (error) throw error;
-    if (alunosError) throw alunosError;
 
-    const porId = new Map((alunos ?? []).map((a) => [a.id, a] as const));
-    const hoje = new Date().toISOString().slice(0, 10);
+    const porId = new Map(alunos.map((a) => [a.id, a] as const));
+    const hoje = hojeBrasilia();
 
-    return (rows ?? []).map((p) => {
+    return rows.map((p) => {
       const aluno = porId.get(p.aluno_id);
       const status: Pagamento["status"] =
         p.status === "Pago" ? "Pago" : p.vencimento < hoje ? "Atrasado" : "Pendente";
@@ -119,7 +137,7 @@ export const definirPagamento = createServerFn({ method: "POST" })
       .from("pagamentos")
       .update(
         data.pago
-          ? { status: "Pago", pago_em: new Date().toISOString().slice(0, 10) }
+          ? { status: "Pago", pago_em: hojeBrasilia() }
           : { status: "Pendente", pago_em: null },
       )
       .eq("id", data.id);

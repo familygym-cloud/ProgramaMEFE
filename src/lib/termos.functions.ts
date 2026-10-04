@@ -1,5 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
+import { format, parseISO, subDays } from "date-fns";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { hojeBrasilia } from "@/lib/datas";
+import { buscarTudo, idDaLinha, MAX_LOTES } from "@/lib/relatorios/carga";
 
 export type TermoAluno = {
   id: string;
@@ -19,7 +22,9 @@ export type TermoAluno = {
 
 async function garantirStaff(supabase: {
   from: (t: string) => {
-    select: (c: string) => { eq: (c: string, v: string) => Promise<{ data: unknown; error: unknown }> };
+    select: (c: string) => {
+      eq: (c: string, v: string) => Promise<{ data: unknown; error: unknown }>;
+    };
   };
 }) {
   const { data, error } = await supabase.from("user_roles").select("role").eq("role", "staff");
@@ -34,22 +39,45 @@ export const listarTermos = createServerFn({ method: "GET" })
   .handler(async ({ context }): Promise<TermoAluno[]> => {
     await garantirStaff(context.supabase as never);
 
-    const { data, error } = await context.supabase
-      .from("alunos")
-      .select("id, nome, plano, turno, status, frequencia, termo_valido_ate")
-      .order("nome");
-    if (error) throw error;
+    // O PostgREST devolve no máximo 1000 linhas por resposta: lê tudo em lotes (ordem estável).
+    const [alunos, checkins] = await Promise.all([
+      buscarTudo(
+        (de, ate) =>
+          context.supabase
+            .from("alunos")
+            .select("id, nome, plano, turno, status, frequencia, termo_valido_ate")
+            .order("nome")
+            .order("id")
+            .range(de, ate),
+        MAX_LOTES,
+        idDaLinha,
+      ),
+      buscarTudo(
+        (de, ate) =>
+          context.supabase
+            .from("check_ins")
+            .select("id, aluno_id, data, atividade")
+            .order("data", { ascending: false })
+            .order("id")
+            .range(de, ate),
+        MAX_LOTES,
+        idDaLinha,
+      ),
+    ]);
 
-    const { data: checkins, error: checkinsError } = await context.supabase
-      .from("check_ins")
-      .select("aluno_id, data, atividade")
-      .order("data", { ascending: false });
-    if (checkinsError) throw checkinsError;
+    // Últimos 30 dias = hoje e os 29 anteriores, no dia de Brasília.
+    const limite = format(subDays(parseISO(hojeBrasilia()), 29), "yyyy-MM-dd");
 
-    const limite = new Date(Date.now() - 30 * 86400000).toISOString().slice(0, 10);
+    // Treinos de cada aluno, do mais recente para o mais antigo (a consulta já vem ordenada).
+    const treinosDoAluno = new Map<string, typeof checkins>();
+    for (const c of checkins) {
+      const lista = treinosDoAluno.get(c.aluno_id) ?? [];
+      lista.push(c);
+      treinosDoAluno.set(c.aluno_id, lista);
+    }
 
-    return (data ?? []).map((a) => {
-      const meus = (checkins ?? []).filter((c) => c.aluno_id === a.id);
+    return alunos.map((a) => {
+      const meus = treinosDoAluno.get(a.id) ?? [];
       const recentes = meus.filter((c) => c.data >= limite);
       const porModalidade = new Map<string, number>();
       for (const c of recentes) {

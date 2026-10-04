@@ -2,12 +2,15 @@
 // - separador ";" (o separador de listas do Excel pt-BR) e quebras de linha CRLF;
 // - BOM UTF-8 no início, para os acentos abrirem corretamente;
 // - números com vírgula decimal e sem separador de milhar (o Excel reconhece como número);
-// - datas AAAA-MM-DD saem como dd/mm/aaaa, que o Excel pt-BR reconhece como data;
+// - datas AAAA-MM-DD saem como dd/mm/aaaa, que o Excel pt-BR reconhece como data (um instante com
+//   fuso, como "2026-10-16T01:30:00Z", sai com o dia de BRASÍLIA: 15/10/2026);
 // - células de texto que começam com = + - @ (ou tab/retorno de carro) ganham um apóstrofo na
 //   frente, para o Excel/LibreOffice não executarem o conteúdo como fórmula (injeção de CSV).
 
+import { hojeBrasilia } from "../datas";
+
 export const SEPARADOR_CSV = ";";
-const BOM = "﻿";
+const BOM = "\uFEFF";
 const QUEBRA = "\r\n";
 
 export type CelulaCsv = string | number | boolean | Date | null | undefined;
@@ -21,7 +24,7 @@ type ColunaBase = {
    * - "numero": usa `decimais` casas (padrão: as que o número já tem);
    * - "moeda": número com 2 casas, sem símbolo (ex.: 1234,50);
    * - "percentual": número com 1 casa, sem o símbolo %;
-   * - "data": AAAA-MM-DD (ou instante ISO) vira dd/mm/aaaa.
+   * - "data": AAAA-MM-DD vira dd/mm/aaaa; um instante ISO com fuso vira o dia de Brasília.
    */
   formato?: "texto" | "numero" | "moeda" | "percentual" | "data";
   /** Casas decimais para o formato "numero". */
@@ -74,8 +77,21 @@ function dataParaTexto(valor: string | Date): string {
     const mes = String(valor.getMonth() + 1).padStart(2, "0");
     return `${dia}/${mes}/${valor.getFullYear()}`;
   }
-  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(valor.trim());
+  const texto = valor.trim();
+  const dia = /^\d{4}-\d{2}-\d{2}$/.test(texto) ? texto : diaDeBrasilia(texto);
+  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(dia ?? texto);
   return m ? `${m[3]}/${m[2]}/${m[1]}` : neutralizarFormula(valor);
+}
+
+/** Instante com horário e fuso explícito (Z, +00:00, -03...) -> dia (AAAA-MM-DD) em Brasília. */
+function diaDeBrasilia(texto: string): string | null {
+  if (!/^\d{4}-\d{2}-\d{2}[T\s]\d{2}:\d{2}.*(?:Z|[+-]\d{2}(?::?\d{2})?)$/i.test(texto)) return null;
+  const normalizado = texto
+    .replace(/^(\d{4}-\d{2}-\d{2})\s+/, "$1T")
+    .replace(/([+-]\d{2})$/, "$1:00")
+    .replace(/([+-]\d{2})(\d{2})$/, "$1:$2");
+  const instante = new Date(normalizado);
+  return Number.isNaN(instante.getTime()) ? null : hojeBrasilia(instante);
 }
 
 /** Converte uma célula em texto de CSV (ainda sem aspas). */
@@ -146,7 +162,9 @@ export function nomeArquivoCsv(nome: string): string {
     .replace(/\s+/g, "-")
     .replace(/-{2,}/g, "-")
     .replace(/^[-.]+|[-.]+$/g, "")
-    .replace(/\.csv$/i, "");
+    .replace(/\.csv$/i, "")
+    .slice(0, 120)
+    .replace(/[-.]+$/g, "");
   return `${base || "relatorio"}.csv`;
 }
 

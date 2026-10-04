@@ -58,6 +58,11 @@ export type EntradaRelatorio = {
   hoje: string;
   alunos: AlunoBruto[];
   pagamentos: PagamentoBruto[];
+  /**
+   * Treinos. Para o relatório geral basta cobrir os últimos 13 meses; além disso, quem não tem
+   * nenhum treino nessa janela deve trazer o seu último treino mais antigo (o carregamento do
+   * servidor faz isso) — sem ele o aluno apareceria como "nunca treinou".
+   */
   checkIns: CheckInBruto[];
   avaliacoes: AvaliacaoBruta[];
   assinaturas: AssinaturaBruta[];
@@ -99,8 +104,9 @@ export type KpisRelatorio = {
    */
   inadimplenciaPct: number;
   /**
-   * Treinos (dias distintos) por aluno ativo no mês corrente. "Ativos no mês" = ativos hoje mais
-   * quem treinou no mês, cadastrados até hoje.
+   * Treinos (dias distintos) por aluno ativo no mês corrente. "Ativos no mês" = quem treinou no
+   * mês mais os ativos de hoje já cadastrados (todo aluno que entra no numerador entra no
+   * denominador).
    */
   frequenciaMediaMes: number;
   /**
@@ -199,9 +205,15 @@ export type RelatorioGeral = {
   porDiaSemana: ItemContagem[];
   /** Alunos ativos. As seis faixas de IMC sempre aparecem, mesmo zeradas. */
   saude: {
+    /** IMC da avaliação mais recente (ou o do cadastro, se nunca foi avaliado). */
     imc: FaixaImc[];
     imcMedio: number | null;
+    /**
+     * Última avaliação há mais de 90 dias; quem nunca foi avaliado conta a partir do cadastro (o
+     * recém-chegado ainda não está atrasado).
+     */
     semAvaliacaoHa90d: number;
+    /** Têm ao menos uma avaliação registrada. */
     comAvaliacao: number;
   };
   /**
@@ -216,7 +228,10 @@ export type RelatorioGeral = {
   /** Os 10 mais assíduos do mês corrente. */
   ranking: AlunoRanking[];
   assinaturas: { total: number; alunos: number; ultimos30d: number };
-  /** Parcelas em atraso por faixa de dias: "0–30 dias", "31–60 dias", "61–90 dias", "90+ dias". */
+  /**
+   * Parcelas em atraso por faixa de dias: "0–30 dias" (de 1 a 30), "31–60 dias", "61–90 dias" e
+   * "90+ dias" (mais de 90: 91 em diante). O total das faixas é `kpis.inadimplenciaQtd`.
+   */
   aging: { faixa: string; parcelas: number; valor: number }[];
 };
 
@@ -245,6 +260,7 @@ export type RelatorioAluno = {
     avaliacoes: { referencia: string; peso: number; imc: number }[];
     pesoInicial: number | null;
     pesoAtual: number | null;
+    /** Peso atual - peso inicial; null com menos de duas avaliações com peso (não há evolução). */
     variacaoPeso: number | null;
     imcAtual: number | null;
     classificacaoImc: string | null;

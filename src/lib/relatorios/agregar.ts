@@ -13,6 +13,14 @@
 // - Base ativa = status "Ativo" ou "Risco" (sem diferenciar maiúsculas). Distribuições por
 //   plano/turno, saúde, engajamento, risco e termos usam a base ativa; fatos da unidade
 //   (modalidades, dias da semana, ranking, série mensal) usam todos os treinos registrados.
+// - Dinheiro: a receita entra no mês de `pagoEm` (pago sem data vale o vencimento; data no futuro,
+//   comum quando o banco grava o dia em UTC, vale hoje). Atraso = em aberto com vencimento ANTES
+//   de hoje (vencer hoje não é atraso). Parcela "Cancelado" é ignorada em todos os totais.
+// - Variações (receita e frequência) comparam o mês corrente com o MESMO PERÍODO do mês anterior
+//   (dia 1 até o mesmo dia) e só aparecem a partir do 7º dia do mês; antes disso, ou sem base, null.
+// - A taxa de inadimplência usa a janela móvel dos últimos 30 dias, não o mês civil.
+// - Quem acabou de chegar não é cobrado como "ausente": nunca treinou só entra na lista de risco
+//   após 14 dias de cadastro, e nunca avaliado só conta como "sem avaliação" após 90 dias.
 
 import {
   addDays,
@@ -144,6 +152,9 @@ function limparTexto(texto: string): string {
 
 const compararTexto = (a: string, b: string): number => a.localeCompare(b, "pt-BR");
 
+/** Ordena datas AAAA-MM-DD cronologicamente (comparação direta, sem depender de locale). */
+const compararISO = (a: string, b: string): number => (a < b ? -1 : a > b ? 1 : 0);
+
 /**
  * Agrupa grafias equivalentes (maiúsculas, acentos e espaços) sob um único rótulo: o rótulo fixo,
  * se existir; senão a grafia mais usada (empate: ordem alfabética). Texto vazio vira `vazio`.
@@ -179,12 +190,21 @@ function criarResolvedor(
   };
 }
 
-/** Planos do catálogo: o slug ou o nome (sem acento/caixa) apontam para o nome oficial. */
+/**
+ * Planos do catálogo: o slug, o nome e o nome sem o prefixo "Plano " (sem acento/caixa; hífen do
+ * slug vira espaço) apontam para o nome oficial. Assim "Melhor Idade", "melhor-idade" e
+ * "Plano Melhor Idade" viram uma linha só no relatório.
+ */
 const PLANOS_OFICIAIS: ReadonlyMap<string, string> = new Map(
-  planosCatalogo.flatMap((p) => [
-    [chaveTexto(p.slug), p.nome] as const,
-    [chaveTexto(p.nome), p.nome] as const,
-  ]),
+  planosCatalogo.flatMap((p) => {
+    const chaves = new Set([
+      chaveTexto(p.slug),
+      chaveTexto(p.slug.replace(/-/g, " ")),
+      chaveTexto(p.nome),
+      chaveTexto(p.nome.replace(/^plano\s+/i, "")),
+    ]);
+    return [...chaves].map((chave) => [chave, p.nome] as const);
+  }),
 );
 
 const TURNOS_OFICIAIS: ReadonlyMap<string, string> = new Map(
@@ -202,12 +222,23 @@ function dataValida(valor: string | null | undefined): string | null {
   return RE_DATA.test(s) && isValid(parseISO(s)) ? s : null;
 }
 
-/** Dia de Brasília de um instante ISO com horário; datas puras passam direto. */
+/** Instante com fuso explícito no fim: "Z", "+00:00", "-03", "-0300". */
+const RE_FUSO_NO_FIM = /(?:Z|[+-]\d{2}(?::?\d{2})?)$/i;
+
+/**
+ * Dia de Brasília de um instante ISO com horário; datas puras passam direto. Um horário SEM fuso é
+ * lido como UTC (e não como o fuso do servidor), para o resultado não mudar de máquina para máquina.
+ */
 function diaDoInstante(valor: string | null | undefined): string | null {
   if (typeof valor !== "string") return null;
   const texto = valor.trim();
   if (RE_DATA.test(texto)) return dataValida(texto);
-  const instante = new Date(texto);
+  // Formato do Postgres ("2026-10-15 14:30:12+00"): troca o espaço por T e completa o fuso (+hh:mm).
+  const normalizado = texto
+    .replace(/^(\d{4}-\d{2}-\d{2})\s+/, "$1T")
+    .replace(/([+-]\d{2})$/, "$1:00")
+    .replace(/([+-]\d{2})(\d{2})$/, "$1:$2");
+  const instante = new Date(RE_FUSO_NO_FIM.test(normalizado) ? normalizado : `${normalizado}Z`);
   return isValid(instante) ? hojeBrasilia(instante) : null;
 }
 
@@ -279,7 +310,7 @@ type Preparado = {
 
 export function estaAtivo(status: string): boolean {
   const s = chaveTexto(status ?? "");
-  return s === "ativo" || s === "risco";
+  return s === "ativo" || s === "risco" || s === "em risco";
 }
 
 function statusDoPagamento(status: string): StatusPagamento {
@@ -346,11 +377,24 @@ function preparar(entrada: EntradaRelatorio, apenasAluno?: string): Preparado {
     if (!aluno || !referencia || referencia > hoje) continue;
     aluno.avaliacoes.push({ ...v, referencia });
   }
-  for (const a of alunos) a.avaliacoes.sort((x, y) => x.referencia.localeCompare(y.referencia));
+  // Duas avaliações no mesmo dia: o desempate por peso e IMC é só para o resultado não depender da
+  // ordem em que o banco devolveu as linhas (não há como saber qual foi lançada por último).
+  for (const a of alunos) {
+    a.avaliacoes.sort(
+      (x, y) => compararISO(x.referencia, y.referencia) || x.peso - y.peso || x.imc - y.imc,
+    );
+  }
 
   const pagamentos: PagamentoPrep[] = [];
+  // A leitura paginada pode repetir uma linha se alguém gravar durante a carga: a mesma parcela
+  // (mesmo id) nunca entra duas vezes nos totais.
+  const parcelasVistas = new Set<string>();
   for (const p of entrada.pagamentos) {
     if (apenasAluno !== undefined && p.alunoId !== apenasAluno) continue;
+    if (typeof p.id === "string" && p.id !== "") {
+      if (parcelasVistas.has(p.id)) continue;
+      parcelasVistas.add(p.id);
+    }
     const vencimento = dataValida(p.vencimento);
     if (!vencimento) continue;
     const status = statusDoPagamento(p.status);
@@ -392,8 +436,12 @@ function inicioDaJanela(hoje: string, dias: number): string {
   return paraISO(subDays(parseISO(hoje), dias - 1));
 }
 
-function compararNome(a: { nome: string }, b: { nome: string }): number {
-  return compararTexto(a.nome, b.nome);
+/** Nome e, para homônimos, o id: a ordem final não depende da ordem em que o banco devolveu as linhas. */
+function compararNome(
+  a: { nome: string; alunoId?: string },
+  b: { nome: string; alunoId?: string },
+): number {
+  return compararTexto(a.nome, b.nome) || compararTexto(a.alunoId ?? "", b.alunoId ?? "");
 }
 
 // ----------------------------------------------------------------- relatório geral
@@ -440,16 +488,22 @@ export function agregarRelatorioGeral(entrada: EntradaRelatorio): RelatorioGeral
     for (const [mes, n] of doAluno) somar(treinosPorMes, mes, n);
   }
 
-  /** Alunos considerados "ativos no mês": cadastrados até o fim do mês e (ativos hoje ou com treino no mês). */
-  const alunosAtivosNoMes = (mes: Mes): number => {
-    const limite = mes.fim < hoje ? mes.fim : hoje;
+  /**
+   * Alunos considerados "ativos" no período [de, ate]: quem treinou nele (mesmo que hoje esteja
+   * inativo ou tenha cadastro posterior) mais os ativos de hoje já cadastrados até `ate`. Todo aluno
+   * cujos treinos entram no numerador de uma média também entra no denominador dela.
+   */
+  const alunosAtivosNoPeriodo = (de: string, ate: string): number => {
     let total = 0;
     for (const a of alunos) {
-      if (a.cadastro && a.cadastro > limite) continue;
-      if (a.ativo || (treinosDoAlunoNoMes.get(a.aluno.id)?.get(mes.chave) ?? 0) > 0) total += 1;
+      if (temDiaEntre(a.dias, de, ate) || (a.ativo && (!a.cadastro || a.cadastro <= ate))) {
+        total += 1;
+      }
     }
     return total;
   };
+  const alunosAtivosNoMes = (mes: Mes): number =>
+    alunosAtivosNoPeriodo(mes.inicio, mes.fim < hoje ? mes.fim : hoje);
 
   // ----- série mensal
   const mensal: PontoMensal[] = meses.map((mes) => {
@@ -471,13 +525,15 @@ export function agregarRelatorioGeral(entrada: EntradaRelatorio): RelatorioGeral
 
   // ----- frequência: mês corrente x mesmo período do mês anterior
   const ativosNoMesAtual = alunosAtivosNoMes(mesAtual);
-  const ativosNoMesAnterior = alunosAtivosNoMes(mesAnterior);
   const freqAtual = ativosNoMesAtual > 0 ? (pontoAtual?.treinos ?? 0) / ativosNoMesAtual : 0;
+  // O mesmo período do mês anterior (dia 1 até o corte): treinos E base de alunos desse recorte,
+  // para quem só treinou depois do corte não diluir a média.
   let treinosAnteriorParcial = 0;
   for (const a of alunos)
     treinosAnteriorParcial += contarDias(a.dias, mesAnterior.inicio, corteAnterior);
+  const ativosNoPeriodoAnterior = alunosAtivosNoPeriodo(mesAnterior.inicio, corteAnterior);
   const freqAnteriorParcial =
-    ativosNoMesAnterior > 0 ? treinosAnteriorParcial / ativosNoMesAnterior : 0;
+    ativosNoPeriodoAnterior > 0 ? treinosAnteriorParcial / ativosNoPeriodoAnterior : 0;
 
   // ----- inadimplência
   const atrasadas = prep.pagamentos.filter((p) => p.diasAtraso > 0);
@@ -738,9 +794,13 @@ export function agregarRelatorioGeral(entrada: EntradaRelatorio): RelatorioGeral
   };
 }
 
-function imcValido(valor: number | null | undefined): number | null {
+/** Número finito e positivo; qualquer outra coisa (0, NaN, null) é dado ruim e vira null. */
+function positivoOuNull(valor: number | null | undefined): number | null {
   return typeof valor === "number" && Number.isFinite(valor) && valor > 0 ? valor : null;
 }
+
+const imcValido = positivoOuNull;
+const pesoValido = positivoOuNull;
 
 // ------------------------------------------------------------ relatório do aluno
 
@@ -758,7 +818,9 @@ export function agregarRelatorioAluno(
   const a = prep.porId.get(alunoId);
   if (!a) return null;
 
-  const meses = Number.isFinite(mesesPeriodo) ? Math.max(1, Math.floor(mesesPeriodo)) : 3;
+  const meses = Number.isFinite(mesesPeriodo)
+    ? Math.min(120, Math.max(1, Math.floor(mesesPeriodo)))
+    : 3;
   const hojeD = parseISO(hoje);
   const inicio = paraISO(addDays(subMonths(hojeD, meses), 1));
 
@@ -800,12 +862,12 @@ export function agregarRelatorioAluno(
     peso: v.peso,
     imc: v.imc,
   }));
-  const primeira = a.avaliacoes[0];
+  // Peso e IMC nulos/zerados (dado ruim) não servem de ponto da evolução.
+  const comPeso = a.avaliacoes.filter((v) => pesoValido(v.peso) !== null);
   const ultima = a.avaliacoes[a.avaliacoes.length - 1];
-  const pesoAtual =
-    ultima && Number.isFinite(ultima.peso) ? ultima.peso : a.aluno.peso > 0 ? a.aluno.peso : null;
+  const pesoInicial = pesoValido(comPeso[0]?.peso);
+  const pesoAtual = pesoValido(comPeso[comPeso.length - 1]?.peso) ?? pesoValido(a.aluno.peso);
   const imcAtual = imcValido(ultima?.imc) ?? imcValido(a.aluno.imc);
-  const pesoInicial = primeira && Number.isFinite(primeira.peso) ? primeira.peso : null;
 
   // ----- financeiro
   const meus = prep.pagamentos.filter((p) => p.status !== "cancelado");
@@ -813,7 +875,7 @@ export function agregarRelatorioAluno(
 
   return {
     geradoEm: hoje,
-    aluno: a.aluno,
+    aluno: { ...a.aluno },
     periodo: { inicio, fim: hoje },
     frequencia: {
       treinosNoPeriodo: diasNoPeriodo.size,
@@ -828,8 +890,11 @@ export function agregarRelatorioAluno(
       avaliacoes,
       pesoInicial,
       pesoAtual,
+      // Com uma avaliação só não há evolução para mostrar (0 kg seria "sem variação", não "sem dado").
       variacaoPeso:
-        pesoInicial !== null && pesoAtual !== null ? arredondar(pesoAtual - pesoInicial, 1) : null,
+        comPeso.length >= 2 && pesoInicial !== null && pesoAtual !== null
+          ? arredondar(pesoAtual - pesoInicial, 1)
+          : null,
       imcAtual,
       classificacaoImc: imcAtual !== null ? classificarIMC(imcAtual).rotulo : null,
     },
@@ -842,8 +907,7 @@ export function agregarRelatorioAluno(
     assinaturas: prep.assinaturas
       .filter((s) => s.alunoId === alunoId)
       .sort(
-        (x, y) =>
-          (y.dia ?? "").localeCompare(x.dia ?? "") || y.assinadoEm.localeCompare(x.assinadoEm),
+        (x, y) => compararISO(y.dia ?? "", x.dia ?? "") || compararISO(y.assinadoEm, x.assinadoEm),
       )
       .map((s) => ({ assinante: s.assinante, referencia: s.referencia, assinadoEm: s.assinadoEm })),
   };

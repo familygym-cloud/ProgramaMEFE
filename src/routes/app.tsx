@@ -5,6 +5,7 @@ import { EstadoVazio } from "@/components/app/ui";
 import { BrandLogo } from "@/components/BrandLogo";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
+import { exigirSegundaEtapaCumprida } from "@/lib/auth-mfa";
 import {
   AlunoAppProviderDemo,
   AlunoAppProviderReal,
@@ -30,6 +31,7 @@ export const Route = createFileRoute("/app")({
     if (demoAtivo()) return { demo: true as const };
     const { data, error } = await supabase.auth.getUser();
     if (error || !data.user) throw redirect({ to: "/auth" });
+    await exigirSegundaEtapaCumprida();
     return { demo: false as const };
   },
   component: AppLayout,

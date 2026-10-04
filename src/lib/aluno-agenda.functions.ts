@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { hojeBrasilia } from "@/lib/datas";
 
 export type AulaAluno = {
   id: string;
@@ -34,7 +35,7 @@ export const listarAgendaAluno = createServerFn({ method: "GET" })
       .filter((a): a is AulaAluno => Boolean(a))
       .sort((x, y) => (x.data + x.horario).localeCompare(y.data + y.horario));
 
-    const hoje = new Date().toISOString().slice(0, 10);
+    const hoje = hojeBrasilia();
     const proximas = aulas.filter((a) => a.data >= hoje);
     const anteriores = aulas.filter((a) => a.data < hoje).reverse();
 
