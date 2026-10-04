@@ -19,10 +19,14 @@ import { SiteLayout } from "@/components/site/SiteLayout";
 import { TabelaComparativa } from "@/components/site/TabelaComparativa";
 import { frentesTreino } from "@/components/site/frentes";
 import { categoriasPlanos, planosCatalogo } from "@/lib/planos-catalogo";
+import { marcasCanonicas } from "@/lib/site";
 
 const TITULO = "Planos e valores | Academia Family Gym";
 const DESCRICAO =
   "Compare os planos da Family Gym: musculação, terrestre, lutas, aquático, melhor idade e kids. Veja o valor de cada parcela, a matrícula e as condições para a família.";
+
+// A canônica ignora ?categoria= e ?periodo=: todas as variações são a mesma página para os buscadores.
+const canonica = marcasCanonicas("/valores");
 
 type BuscaValores = {
   categoria?: CategoriaPlano | undefined;
@@ -43,7 +47,9 @@ export const Route = createFileRoute("/valores")({
       { property: "og:type", content: "website" },
       { name: "twitter:title", content: TITULO },
       { name: "twitter:description", content: DESCRICAO },
+      ...canonica.meta,
     ],
+    links: canonica.links,
   }),
   component: Valores,
 });

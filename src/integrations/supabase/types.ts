@@ -570,6 +570,27 @@ export type Database = {
         Args: { _email: string; _telefone: string }
         Returns: undefined
       }
+      bootstrap_primeiro_staff: {
+        Args: { _email_autorizado: string; _user_id: string }
+        Returns: boolean
+      }
+      definir_vinculos: {
+        Args: { _itens: Json }
+        Returns: number
+      }
+      salvar_aula: {
+        Args: {
+          _aluno_ids: string[]
+          _data: string
+          _horario: string
+          _id?: string
+          _modalidade: string
+          _observacoes: string
+          _professor: string
+          _vagas?: number
+        }
+        Returns: string
+      }
       vagas_ocupadas: {
         Args: { _aula_ids: string[] }
         Returns: { aula_id: string; ocupadas: number }[]

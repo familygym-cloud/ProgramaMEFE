@@ -3,6 +3,8 @@
 @import "tw-animate-css";
 @import "@fontsource-variable/outfit";
 
+/* O tema escuro já é o padrão (:root); não existe alternância de tema. A variante `dark:` fica presa à
+   classe `.dark`, que nunca é aplicada, para não ligar por acidente com a preferência do sistema. */
 @custom-variant dark (&:is(.dark *));
 
 /*
@@ -11,11 +13,11 @@
  * The @theme inline block maps CSS custom properties to Tailwind utility
  * classes (e.g. --color-primary -> bg-primary, text-primary).
  *
- * The :root and .dark blocks define the actual color values using oklch.
+ * The :root block defines the actual color values using oklch (the theme is dark-only).
  * All colors MUST use oklch format.
  *
  * To add a new semantic color:
- * 1. Add the variable to :root (light value) and .dark (dark value)
+ * 1. Add the variable to :root
  * 2. Register it in @theme inline as --color-<name>: var(--<name>)
  */
 
@@ -64,12 +66,15 @@
   --color-brand-yellow: var(--brand-yellow);
   --color-brand-onblack: var(--brand-onblack);
   --color-brand-grey: var(--brand-grey);
-  --font-sans: "Outfit Variable", "Outfit", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-sans:
+    "Outfit Variable", "Outfit", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    sans-serif;
   --font-display: "Outfit Variable", "Outfit", ui-sans-serif, system-ui, sans-serif;
 }
 
-
 :root {
+  /* O tema é escuro: avisa o navegador para barras de rolagem, seletor de data, autofill e popups nativos. */
+  color-scheme: dark;
   --radius: 0.875rem;
   --background: oklch(0.17 0 90);
   --foreground: oklch(0.98 0.005 96);
@@ -109,43 +114,6 @@
   --brand-onblack: oklch(1 0 90);
 }
 
-
-
-.dark {
-  --background: oklch(0.129 0.042 264.695);
-  --foreground: oklch(0.984 0.003 247.858);
-  --card: oklch(0.208 0.042 265.755);
-  --card-foreground: oklch(0.984 0.003 247.858);
-  --popover: oklch(0.208 0.042 265.755);
-  --popover-foreground: oklch(0.984 0.003 247.858);
-  --primary: oklch(0.929 0.013 255.508);
-  --primary-foreground: oklch(0.208 0.042 265.755);
-  --secondary: oklch(0.279 0.041 260.031);
-  --secondary-foreground: oklch(0.984 0.003 247.858);
-  --muted: oklch(0.279 0.041 260.031);
-  --muted-foreground: oklch(0.704 0.04 256.788);
-  --accent: oklch(0.279 0.041 260.031);
-  --accent-foreground: oklch(0.984 0.003 247.858);
-  --destructive: oklch(0.704 0.191 22.216);
-  --destructive-foreground: oklch(0.984 0.003 247.858);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.551 0.027 264.364);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.208 0.042 265.755);
-  --sidebar-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-accent: oklch(0.279 0.041 260.031);
-  --sidebar-accent-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.551 0.027 264.364);
-}
-
 @layer base {
   * {
     border-color: var(--color-border);
@@ -156,7 +124,6 @@
     color: var(--color-foreground);
   }
 }
-
 
 @layer base {
   html {
@@ -189,6 +156,14 @@
   .pb-seguro {
     padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
   }
+
+  /* Faixa que rola na horizontal dentro do próprio contêiner (abas, atalhos) sem a barra visível. */
+  .sem-barra-rolagem {
+    scrollbar-width: none;
+  }
+  .sem-barra-rolagem::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 @keyframes fg-subir {
@@ -212,5 +187,118 @@
   }
   html {
     scroll-behavior: auto;
+  }
+}
+
+/*
+ * Impressão da Central de relatórios (botão "Imprimir / salvar PDF" ou Ctrl+P): folha branca, texto
+ * escuro, sem navegação nem botões (as classes `print:hidden` ficam nos componentes). Dentro de
+ * [data-relatorio-raiz] as variáveis de cor do tema são trocadas por tons escuros, então tudo que
+ * usa os tokens (texto, bordas, amarelo da marca, gráficos) se adapta sozinho; as regras abaixo
+ * cobrem as cores fixas (branco translúcido, verde, vermelho) usadas nos cartões e chips.
+ */
+@media print {
+  @page {
+    size: A4;
+    margin: 10mm;
+  }
+
+  :root {
+    /* Sem isto a margem da folha sai escura: o tema escuro pinta o "papel" do navegador. */
+    color-scheme: light;
+  }
+
+  html {
+    font-size: 12px;
+  }
+
+  html,
+  body {
+    background: #fff !important;
+    color: #151515 !important;
+  }
+
+  [data-sonner-toaster] {
+    display: none !important;
+  }
+
+  [data-relatorio-raiz] {
+    --background: #ffffff;
+    --foreground: #151515;
+    --card: #ffffff;
+    --card-foreground: #151515;
+    --popover: #ffffff;
+    --popover-foreground: #151515;
+    --muted-foreground: #4b4b4b;
+    --border: rgb(21 21 21 / 18%);
+    --brand-yellow: #8a6a00;
+    --brand-grey: #5c5c5c;
+    color: #151515;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  [data-relatorio-raiz] .fg-entrada {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  /* `^=` e `*=" "` pegam só a classe pura (bg-white/5), nunca variantes como hover:bg-white/5. */
+  [data-relatorio-raiz] [class^="border-white"],
+  [data-relatorio-raiz] [class*=" border-white"] {
+    border-color: rgb(21 21 21 / 18%) !important;
+  }
+  [data-relatorio-raiz] [class^="bg-white"],
+  [data-relatorio-raiz] [class*=" bg-white"] {
+    background-color: rgb(21 21 21 / 6%) !important;
+  }
+  [data-relatorio-raiz] [class^="text-white"],
+  [data-relatorio-raiz] [class*=" text-white"] {
+    color: #151515 !important;
+  }
+
+  [data-relatorio-raiz] [class*="text-red-"] {
+    color: #b91c1c !important;
+  }
+  [data-relatorio-raiz] [class*="border-red-"] {
+    border-color: #b91c1c !important;
+  }
+  [data-relatorio-raiz] [class~="bg-red-400"] {
+    background-color: #b91c1c !important;
+  }
+  [data-relatorio-raiz] [class*="bg-red-400/"] {
+    background-color: rgb(185 28 28 / 8%) !important;
+  }
+
+  [data-relatorio-raiz] [class*="text-emerald-"] {
+    color: #047857 !important;
+  }
+  [data-relatorio-raiz] [class*="border-emerald-"] {
+    border-color: #047857 !important;
+  }
+  [data-relatorio-raiz] [class*="bg-emerald-400/"] {
+    background-color: rgb(4 120 87 / 8%) !important;
+  }
+
+  /* Selo "destaque" (amarelo cheio com texto escuro) continua legível sobre o amarelo escurecido. */
+  [data-relatorio-raiz] [class*="bg-brand-yellow"][class*="text-brand-black"] {
+    color: #fff !important;
+  }
+
+  [data-relatorio-raiz] thead {
+    display: table-header-group;
+  }
+  [data-relatorio-raiz] tr {
+    break-inside: avoid;
+  }
+  /* Gráficos que não se redesenham para o papel (ResponsiveContainer) encolhem pelo viewBox. */
+  [data-relatorio-raiz] .recharts-wrapper {
+    max-width: 100%;
+    height: auto !important;
+  }
+  [data-relatorio-raiz] .recharts-surface {
+    max-width: 100%;
+    height: auto;
   }
 }

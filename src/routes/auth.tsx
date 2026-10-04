@@ -6,11 +6,13 @@ import { EtapaSegundoFator } from "@/components/auth/EtapaSegundoFator";
 import { FormularioAcesso } from "@/components/auth/FormularioAcesso";
 import { supabase } from "@/integrations/supabase/client";
 import { destinoPosLogin, segundaEtapaPendente } from "@/lib/auth-mfa";
+import { lerErroDoLink, mensagemDoErroDoLink, urlSemErroDoLink } from "@/lib/auth-url-erro";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
       { title: "Acesso | Academia Family Gym" },
+      { name: "robots", content: "noindex, nofollow" },
       {
         name: "description",
         content:
@@ -42,6 +44,16 @@ function AuthPage() {
   const { modo, mfa } = Route.useSearch();
   // Quem chega pelo gate de MFA já tem sessão: confirmamos antes de mostrar qualquer formulário.
   const [etapa, setEtapa] = useState<Etapa>(mfa ? "verificando" : "credenciais");
+  const [erroDoLink, setErroDoLink] = useState<string | null>(null);
+
+  // Link de confirmação de cadastro expirado ou já usado volta para cá com o erro na URL, sem sessão.
+  // Lido antes de qualquer chamada ao Supabase, que também olha a URL.
+  useEffect(() => {
+    const erro = lerErroDoLink(window.location.hash, window.location.search);
+    if (!erro) return;
+    setErroDoLink(mensagemDoErroDoLink(erro));
+    window.history.replaceState(window.history.state, "", urlSemErroDoLink(window.location.href));
+  }, []);
 
   const seguirParaArea = useCallback(async () => {
     const { data } = await supabase.auth.getUser();
@@ -96,6 +108,7 @@ function AuthPage() {
       ) : (
         <FormularioAcesso
           modoInicial={modo === "signup" ? "signup" : "login"}
+          erroInicial={erroDoLink}
           aoAutenticar={seguirParaArea}
           aoExigirSegundaEtapa={() => setEtapa("codigo")}
         />

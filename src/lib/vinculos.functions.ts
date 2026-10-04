@@ -1,200 +1,131 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { buscarTudo, idDaLinha, MAX_LOTES } from "@/lib/relatorios/carga";
+import { exigirStaff } from "@/lib/staff";
+import {
+  emailAutorizadoParaBootstrap,
+  ERRO_APENAS_EQUIPE,
+  erroDoRpc,
+  listarTodasAsContas,
+  validarLote,
+  validarVinculo,
+  type ItemVinculo,
+  type VinculosDados,
+} from "@/lib/vinculos";
 
-export type ContaUsuario = {
-  id: string;
-  email: string;
-  criadoEm: string;
-  ultimoAcesso: string | null;
-};
-
-export type AlunoVinculo = {
-  id: string;
-  nome: string;
-  email: string | null;
-  userId: string | null;
-  emailVinculado: string | null;
-};
-
-export type VinculosDados = {
-  alunos: AlunoVinculo[];
-  contas: ContaUsuario[];
-};
-
-async function assertStaff(supabase: {
-  from: (t: string) => {
-    select: (c: string) => { eq: (c: string, v: string) => Promise<{ data: unknown; error: unknown }> };
-  };
-}) {
-  const { data, error } = await supabase.from("user_roles").select("role").eq("role", "staff");
-  if (error) throw error;
-  return Array.isArray(data) && data.length > 0;
-}
+export type { AlunoVinculo, ContaUsuario, VinculosDados } from "@/lib/vinculos";
 
 /**
- * Bootstrap: quando ninguém é staff ainda, a primeira conta autenticada
- * que abre a tela de vínculos assume o perfil staff.
+ * Bootstrap do primeiro staff. NUNCA promove sozinho: só a conta com o e-mail confirmado igual a
+ * STAFF_BOOTSTRAP_EMAIL (variável de ambiente do servidor), e só enquanto não existir nenhum staff.
+ * Sem a variável, o bootstrap fica desligado e o primeiro staff é criado por SQL (veja o README).
  */
-export const garantirPerfilStaff = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .handler(async ({ context }) => {
-    const { userId } = context;
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+function emailDeBootstrap(): string | undefined {
+  return process.env["STAFF_BOOTSTRAP_EMAIL"];
+}
 
+/** A conta logada pode ativar o perfil da equipe agora? Alimenta o botão da tela de vínculos. */
+export const podeAtivarPerfilStaff = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<boolean> => {
+    if (!emailAutorizadoParaBootstrap(emailDeBootstrap(), context.claims.email)) return false;
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { count, error } = await supabaseAdmin
       .from("user_roles")
       .select("id", { count: "exact", head: true })
       .eq("role", "staff");
     if (error) throw error;
+    return (count ?? 0) === 0;
+  });
 
-    if ((count ?? 0) > 0) return { promovido: false };
+/**
+ * Ação explícita (botão na tela de vínculos), nunca chamada em segundo plano. A decisão final é
+ * do banco: a função SQL confere, numa transação com trava, que não há staff e que a conta tem o
+ * e-mail confirmado igual ao autorizado. Duas chamadas simultâneas não promovem duas contas.
+ */
+export const garantirPerfilStaff = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<{ promovido: boolean }> => {
+    const autorizado = emailDeBootstrap();
+    if (!emailAutorizadoParaBootstrap(autorizado, context.claims.email)) {
+      return { promovido: false };
+    }
 
-    const { error: insertError } = await supabaseAdmin
-      .from("user_roles")
-      .insert({ user_id: userId, role: "staff" });
-    if (insertError) throw insertError;
-
-    return { promovido: true };
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data, error } = await supabaseAdmin.rpc("bootstrap_primeiro_staff", {
+      _user_id: context.userId,
+      _email_autorizado: autorizado,
+    });
+    if (error) throw erroDoRpc(error, "ativar o perfil da equipe");
+    return { promovido: data === true };
   });
 
 export const listarVinculos = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }): Promise<VinculosDados> => {
-    const isStaff = await assertStaff(context.supabase as never);
-    if (!isStaff) throw new Error("Apenas a equipe (staff) pode gerenciar vínculos.");
+    await exigirStaff(context.supabase, context.userId, ERRO_APENAS_EQUIPE);
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-    const [{ data: alunos, error: alunosError }, usersRes] = await Promise.all([
-      supabaseAdmin.from("alunos").select("id, nome, email, user_id").order("nome"),
-      supabaseAdmin.auth.admin.listUsers({ page: 1, perPage: 200 }),
+    const [alunos, contas] = await Promise.all([
+      buscarTudo(
+        (de, ate) =>
+          supabaseAdmin
+            .from("alunos")
+            .select("id, nome, email, user_id")
+            .order("nome")
+            .order("id")
+            .range(de, ate),
+        MAX_LOTES,
+        idDaLinha,
+      ),
+      listarTodasAsContas(async (pagina, porPagina) => {
+        const { data, error } = await supabaseAdmin.auth.admin.listUsers({
+          page: pagina,
+          perPage: porPagina,
+        });
+        if (error) throw error;
+        return { users: data.users, total: data.total };
+      }),
     ]);
-    if (alunosError) throw alunosError;
-    if (usersRes.error) throw usersRes.error;
-
-    const contas: ContaUsuario[] = usersRes.data.users.map((u) => ({
-      id: u.id,
-      email: u.email ?? "(sem e-mail)",
-      criadoEm: u.created_at,
-      ultimoAcesso: u.last_sign_in_at ?? null,
-    }));
-
-    const porId = new Map(contas.map((c) => [c.id, c.email]));
 
     return {
       contas,
-      alunos: (alunos ?? []).map((a) => ({
+      alunos: alunos.map((a) => ({
         id: a.id,
         nome: a.nome,
         email: a.email ?? null,
         userId: a.user_id ?? null,
-        emailVinculado: a.user_id ? porId.get(a.user_id) ?? null : null,
       })),
     };
   });
 
+/**
+ * Grava os vínculos numa única função SQL transacional (`definir_vinculos`): tudo ou nada, trocas
+ * de conta no mesmo lote sem violar o índice único, papel 'aluno' concedido/retirado junto, e a
+ * conta precisa existir e ter o e-mail confirmado.
+ */
+async function gravarVinculos(itens: ItemVinculo[]): Promise<number> {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const { data, error } = await supabaseAdmin.rpc("definir_vinculos", { _itens: itens });
+  if (error) throw erroDoRpc(error, "salvar os vínculos");
+  return data;
+}
+
 export const definirVinculo = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: { alunoId: string; userId: string | null }) => {
-    if (!input?.alunoId) throw new Error("Aluno inválido.");
-    return input;
-  })
+  .inputValidator((input: ItemVinculo) => validarVinculo(input))
   .handler(async ({ data, context }) => {
-    const isStaff = await assertStaff(context.supabase as never);
-    if (!isStaff) throw new Error("Apenas a equipe (staff) pode gerenciar vínculos.");
-
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-
-    if (data.userId) {
-      const { data: emUso, error: emUsoError } = await supabaseAdmin
-        .from("alunos")
-        .select("id, nome")
-        .eq("user_id", data.userId)
-        .neq("id", data.alunoId);
-      if (emUsoError) throw emUsoError;
-      if ((emUso ?? []).length > 0) {
-        throw new Error(`Esta conta já está vinculada a ${emUso![0]!.nome}.`);
-      }
-    }
-
-    const { error } = await supabaseAdmin
-      .from("alunos")
-      .update({ user_id: data.userId })
-      .eq("id", data.alunoId);
-    if (error) throw error;
-
-    if (data.userId) {
-      const { data: papeis, error: papeisError } = await supabaseAdmin
-        .from("user_roles")
-        .select("id")
-        .eq("user_id", data.userId)
-        .eq("role", "aluno");
-      if (papeisError) throw papeisError;
-      if ((papeis ?? []).length === 0) {
-        const { error: roleError } = await supabaseAdmin
-          .from("user_roles")
-          .insert({ user_id: data.userId, role: "aluno" });
-        if (roleError) throw roleError;
-      }
-    }
-
+    await exigirStaff(context.supabase, context.userId, ERRO_APENAS_EQUIPE);
+    await gravarVinculos([data]);
     return { ok: true };
   });
 
 export const definirVinculosEmLote = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: { itens: { alunoId: string; userId: string | null }[] }) => {
-    if (!input?.itens?.length) throw new Error("Selecione ao menos um aluno.");
-    return input;
-  })
+  .inputValidator((input: { itens: ItemVinculo[] }) => validarLote(input))
   .handler(async ({ data, context }) => {
-    const isStaff = await assertStaff(context.supabase as never);
-    if (!isStaff) throw new Error("Apenas a equipe (staff) pode gerenciar vínculos.");
-
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-
-    const alvos = data.itens.filter((i) => i.userId);
-    const usados = new Set<string>();
-    for (const i of alvos) {
-      if (usados.has(i.userId!)) throw new Error("Cada conta só pode ser usada por um aluno.");
-      usados.add(i.userId!);
-    }
-
-    if (usados.size > 0) {
-      const { data: emUso, error: emUsoError } = await supabaseAdmin
-        .from("alunos")
-        .select("id, nome, user_id")
-        .in("user_id", [...usados]);
-      if (emUsoError) throw emUsoError;
-      const ids = new Set(data.itens.map((i) => i.alunoId));
-      const conflito = (emUso ?? []).find((a) => !ids.has(a.id));
-      if (conflito) throw new Error(`Esta conta já está vinculada a ${conflito.nome}.`);
-    }
-
-    let atualizados = 0;
-    for (const item of data.itens) {
-      const { error } = await supabaseAdmin
-        .from("alunos")
-        .update({ user_id: item.userId })
-        .eq("id", item.alunoId);
-      if (error) throw error;
-      atualizados += 1;
-
-      if (item.userId) {
-        const { data: papeis, error: papeisError } = await supabaseAdmin
-          .from("user_roles")
-          .select("id")
-          .eq("user_id", item.userId)
-          .eq("role", "aluno");
-        if (papeisError) throw papeisError;
-        if ((papeis ?? []).length === 0) {
-          const { error: roleError } = await supabaseAdmin
-            .from("user_roles")
-            .insert({ user_id: item.userId, role: "aluno" });
-          if (roleError) throw roleError;
-        }
-      }
-    }
-
-    return { atualizados };
+    await exigirStaff(context.supabase, context.userId, ERRO_APENAS_EQUIPE);
+    return { atualizados: await gravarVinculos(data.itens) };
   });

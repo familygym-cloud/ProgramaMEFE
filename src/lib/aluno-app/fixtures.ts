@@ -19,22 +19,32 @@ export function criarDadosDemo(agora: Date = new Date()): AreaAlunoDados {
   const hoje = new Date(agora.getFullYear(), agora.getMonth(), agora.getDate());
   const rnd = gerador(20261004);
 
+  // Dia 5 do mês, mas nunca depois de hoje: nos 4 primeiros dias do mês a avaliação "do mês" cairia
+  // no futuro e a tela mostraria uma data que ainda não aconteceu.
+  const quintoDiaSemFuturo = (ref: Date) => {
+    const dia = addDays(ref, 4);
+    return dia > hoje ? hoje : dia;
+  };
+
   // Avaliações mensais (peso em queda gradual).
   const pesos = [84.2, 82.9, 81.6, 80.4, 79.3, 78.6];
   const avaliacoes = pesos.map((peso, i) => {
     const ref = startOfMonth(subMonths(hoje, pesos.length - 1 - i));
     return {
       id: `demo-av-${i}`,
-      referencia: paraISO(addDays(ref, 4)),
+      referencia: paraISO(quintoDiaSemFuturo(ref)),
       mes: format(ref, "MMM", { locale: ptBR }).replace(".", ""),
       peso,
       imc: calcularIMC(peso, ALTURA_CM),
     };
   });
 
+  // Da medição mais recente (0 mês atrás, prog 0) à mais antiga (5 meses atrás, prog 1): quanto mais
+  // antiga, maior a gordura e a cintura. Assim, com o peso em queda, as medidas melhoram no mesmo
+  // sentido ao longo do tempo (gordura e cintura descem, massa magra sobe).
   const medidas = [0, 2, 5].map((atras, i) => {
-    const data = paraISO(addDays(startOfMonth(subMonths(hoje, atras)), 4));
-    const prog = 1 - i * 0.5;
+    const data = paraISO(quintoDiaSemFuturo(startOfMonth(subMonths(hoje, atras))));
+    const prog = i * 0.5;
     return {
       id: `demo-med-${i}`,
       data,
@@ -57,7 +67,8 @@ export function criarDadosDemo(agora: Date = new Date()): AreaAlunoDados {
     const dia = subDays(hoje, i);
     const dow = dia.getDay();
     const recente = i < 4; // sequência de hoje para trás
-    const treina = recente || ([1, 3, 5].includes(dow) && rnd() < 0.86) || (dow === 6 && rnd() < 0.3);
+    const treina =
+      recente || ([1, 3, 5].includes(dow) && rnd() < 0.86) || (dow === 6 && rnd() < 0.3);
     if (!treina) continue;
     checkIns.push({
       id: `demo-ci-${i}`,
@@ -180,7 +191,8 @@ export function criarDadosDemo(agora: Date = new Date()): AreaAlunoDados {
       totalParcelas: 12,
       valor: 259,
       vencimento: paraISO(venc),
-      pagoEm: pago ? paraISO(venc) : null,
+      // Parcela paga antes do vencimento (a deste mês vence no dia 10): nunca com data futura.
+      pagoEm: pago ? paraISO(venc > hoje ? hoje : venc) : null,
       status: pago ? "pago" : "pendente",
       metodo: pago ? (i % 2 ? "Pix" : "Cartão") : "",
     };
@@ -211,7 +223,13 @@ export function criarDadosDemo(agora: Date = new Date()): AreaAlunoDados {
     agenda,
     pagamentos,
     metas: [
-      { id: "demo-meta-1", tipo: "peso", alvo: 76, prazo: paraISO(addMonths(hoje, 3)), concluida: false },
+      {
+        id: "demo-meta-1",
+        tipo: "peso",
+        alvo: 76,
+        prazo: paraISO(addMonths(hoje, 3)),
+        concluida: false,
+      },
       { id: "demo-meta-2", tipo: "frequencia", alvo: 12, prazo: null, concluida: false },
     ],
     modulos: { treinos: true, reservas: true, metas: true, medidas: true },

@@ -188,6 +188,39 @@ export type AlunoRanking = {
 
 export type FaixaImc = { faixa: string; alunos: number };
 
+/**
+ * Uma linha da lista de alunos da Central: TODOS os cadastrados (ativos ou não), com o mínimo
+ * necessário para pesquisar, filtrar, ordenar e apontar o que pede atenção. Os significados são os
+ * mesmos das listas de risco, inadimplência e termos do `RelatorioGeral`.
+ */
+export type AlunoResumo = {
+  alunoId: string;
+  nome: string;
+  plano: string;
+  turno: string;
+  /** Situação cadastrada ("Ativo", "Risco", "Inativo"...), com a primeira letra maiúscula. */
+  status: string;
+  /** Status "Ativo" ou "Risco": entra nos indicadores da base ativa. */
+  ativo: boolean;
+  /** AAAA-MM-DD do cadastro; null quando a data é inválida. */
+  cadastro: string | null;
+  telefone: string | null;
+  ultimoTreino: string | null;
+  /** null = nunca treinou. */
+  diasSemTreinar: number | null;
+  /** Dias distintos de treino no mês corrente. */
+  treinosNoMes: number;
+  /** Está entre os alunos em risco (o total é `kpis.alunosEmRisco`); só alunos ativos entram. */
+  emRisco: boolean;
+  termoValidoAte: string | null;
+  /** Negativo = vencido há N dias; null = sem termo registrado. */
+  diasTermo: number | null;
+  /** Parcelas em atraso do aluno (as mesmas de `inadimplentes`). */
+  parcelasEmAtraso: number;
+  /** Soma das parcelas em atraso. */
+  valorEmAtraso: number;
+};
+
 export type RelatorioGeral = {
   /** AAAA-MM-DD (= `hoje`). */
   geradoEm: string;
@@ -227,6 +260,8 @@ export type RelatorioGeral = {
   termos: AlunoTermo[];
   /** Os 10 mais assíduos do mês corrente. */
   ranking: AlunoRanking[];
+  /** Todos os alunos cadastrados, em ordem alfabética (a lista da aba Alunos). */
+  alunos: AlunoResumo[];
   assinaturas: { total: number; alunos: number; ultimos30d: number };
   /**
    * Parcelas em atraso por faixa de dias: "0–30 dias" (de 1 a 30), "31–60 dias", "61–90 dias" e

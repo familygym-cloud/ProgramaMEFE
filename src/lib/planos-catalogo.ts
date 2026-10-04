@@ -99,7 +99,11 @@ export const planosCatalogo: PlanoCatalogo[] = [
       { label: "Semestral", valor: 539, parcelas: 6 },
       { label: "Mensal", valor: 619, parcelas: 1 },
     ],
-    inclui: ["Aulas de natação", "Hidroginástica", "Plano terrestre completo (musculação + aulas coletivas)"],
+    inclui: [
+      "Aulas de natação",
+      "Hidroginástica",
+      "Plano terrestre completo (musculação + aulas coletivas)",
+    ],
     matricula: 130,
   },
   {
@@ -201,16 +205,21 @@ export function descreverOpcao(opcao: OpcaoPlano) {
     : `${formatarBRL(opcao.valor)} por mês`;
 }
 
-/** Plano cadastrado na ficha do aluno -> plano oficial do catálogo. */
-const equivalencias: Record<string, string> = {
-  Família: "terrestre",
-  Individual: "terrestre",
-  Kids: "kids-natacao-2x",
+/**
+ * Plano cadastrado na ficha do aluno -> plano oficial do catálogo.
+ *
+ * `alunos.plano` guarda só um rótulo (Família, Individual, Kids, Sênior), que não diz qual dos 11
+ * planos foi contratado. Só devolvemos o plano do catálogo quando o rótulo aponta para um único
+ * plano; nos demais (Kids pode ser 1x, 2x ou com esportes; Família e Individual podem ser terrestre,
+ * lutas, aquático...) mostrar valores e matrícula seria chute apresentado como contrato. Quem chama
+ * deve cair no rótulo cadastrado e mandar confirmar com a recepção. Um slug do catálogo gravado
+ * direto na ficha também é aceito.
+ */
+const equivalenciasInequivocas: Record<string, string> = {
   Sênior: "melhor-idade",
-  Musculação: "musculacao",
 };
 
 export function planoDoAluno(plano: string): PlanoCatalogo | undefined {
-  const slug = equivalencias[plano];
-  return planosCatalogo.find((p) => p.slug === (slug ?? plano));
+  const slug = equivalenciasInequivocas[plano] ?? plano;
+  return planosCatalogo.find((p) => p.slug === slug);
 }

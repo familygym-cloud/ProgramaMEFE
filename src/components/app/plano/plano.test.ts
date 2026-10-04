@@ -29,9 +29,14 @@ describe("encontrarPlanoCatalogo", () => {
     );
   });
 
-  it("usa as equivalências antigas da ficha do aluno", () => {
-    expect(encontrarPlanoCatalogo("Família")?.slug).toBe("terrestre");
+  it("usa a equivalência antiga da ficha só quando ela aponta para um único plano", () => {
     expect(encontrarPlanoCatalogo("Sênior")?.slug).toBe("melhor-idade");
+  });
+
+  it("não adivinha o plano a partir dos rótulos ambíguos da ficha", () => {
+    expect(encontrarPlanoCatalogo("Família")).toBeUndefined();
+    expect(encontrarPlanoCatalogo("Individual")).toBeUndefined();
+    expect(encontrarPlanoCatalogo("Kids")).toBeUndefined();
   });
 
   it("não chuta quando há mais de uma possibilidade ou nenhuma", () => {

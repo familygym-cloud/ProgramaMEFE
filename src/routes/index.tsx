@@ -8,6 +8,7 @@ import { HeroLanding } from "@/components/site/HeroLanding";
 import { PlanosDestaque } from "@/components/site/PlanosDestaque";
 import { SecaoFaq } from "@/components/site/SecaoFaq";
 import { SiteLayout } from "@/components/site/SiteLayout";
+import { marcasCanonicas } from "@/lib/site";
 
 const TITULO = "Academia Family Gym | Treine em família. Evolua sempre.";
 const DESCRICAO =
@@ -23,6 +24,8 @@ const dadosEstruturados = {
   })),
 };
 
+const canonica = marcasCanonicas("/");
+
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
@@ -33,7 +36,9 @@ export const Route = createFileRoute("/")({
       { property: "og:type", content: "website" },
       { name: "twitter:title", content: TITULO },
       { name: "twitter:description", content: DESCRICAO },
+      ...canonica.meta,
     ],
+    links: canonica.links,
     scripts: [{ type: "application/ld+json", children: JSON.stringify(dadosEstruturados) }],
   }),
   component: Home,

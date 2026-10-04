@@ -1,14 +1,26 @@
-User-agent: Googlebot
-Allow: /
-
-User-agent: Bingbot
-Allow: /
-
-User-agent: Twitterbot
-Allow: /
-
-User-agent: facebookexternalhit
-Allow: /
-
+# Páginas públicas (início, modalidades e valores) ficam liberadas. As áreas que exigem login ou são
+# internas não têm nada para indexar. Atenção: um robô obedece apenas ao grupo mais específico para
+# o seu nome, por isso há um único grupo "*" (grupos separados por robô ignorariam as regras abaixo).
+#
+# /auth e /reset-password continuam rastreáveis de propósito: elas trazem <meta name="robots"
+# content="noindex">, e o robô só consegue ler essa marca se puder abrir a página.
+#
+# Quando houver o domínio de produção, acrescentar: Sitemap: https://<dominio>/sitemap.xml
 User-agent: *
 Allow: /
+
+# Área do aluno. "/app$" e "/app/" (e não "/app") para não bloquear arquivos como /apple-touch-icon.png.
+Disallow: /app$
+Disallow: /app/
+Disallow: /app?
+
+# Painel e ferramentas da equipe (rotas protegidas por login).
+Disallow: /dashboard
+Disallow: /financeiro
+Disallow: /aulas
+Disallow: /termos
+Disallow: /vinculos
+Disallow: /planos
+Disallow: /prescricao-treinos
+Disallow: /registrar-avaliacao
+Disallow: /equipe-demo

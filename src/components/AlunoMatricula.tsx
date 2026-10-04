@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import {
@@ -11,6 +12,7 @@ import {
   Sparkles,
   Users,
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -60,13 +62,59 @@ function Info({
   );
 }
 
+/**
+ * O que mostrar numa lista sem linhas: carregando, erro (com nova tentativa) ou o texto de vazio.
+ * "Vazio" só vale depois de uma consulta bem-sucedida: antes disso a lista não está vazia, só não chegou.
+ */
+function EstadoLista({
+  carregando,
+  erro,
+  aoTentar,
+  vazio,
+}: {
+  carregando: boolean;
+  erro: boolean;
+  /** Sem esta função não há botão de nova tentativa (as outras listas da tela já têm um). */
+  aoTentar?: () => void;
+  vazio: string | null;
+}) {
+  if (carregando) {
+    return (
+      <p role="status" className="flex items-center gap-2 text-sm text-muted-foreground">
+        <Loader2 className="size-4 animate-spin" /> Carregando…
+      </p>
+    );
+  }
+  if (erro) {
+    return (
+      <div role="alert" className="space-y-2 text-sm text-destructive">
+        <p>Não foi possível carregar as aulas.</p>
+        {aoTentar ? (
+          <Button size="sm" variant="outline" onClick={aoTentar}>
+            Tentar novamente
+          </Button>
+        ) : null}
+      </div>
+    );
+  }
+  return vazio ? <p className="text-sm text-muted-foreground">{vazio}</p> : null;
+}
+
 export function AlunoMatricula({ aluno }: { aluno: Membro }) {
   const buscar = useServerFn(listarAgendaAluno);
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, isSuccess, error, refetch } = useQuery({
     queryKey: ["agenda-aluno", aluno.id],
     queryFn: () => buscar({ data: { alunoId: aluno.id! } }),
     enabled: Boolean(aluno.id),
+    retry: 1,
   });
+
+  // A tela mostra um texto fixo; o erro real (que pode vir em inglês ou cru) fica só no console.
+  useEffect(() => {
+    if (error) console.error("[AlunoMatricula] falha ao carregar as aulas", error);
+  }, [error]);
+  const falhou = Boolean(error);
+  const tentarDeNovo = () => void refetch();
 
   const catalogo = planoDoAluno(aluno.plano);
 
@@ -76,7 +124,8 @@ export function AlunoMatricula({ aluno }: { aluno: Membro }) {
         <div className="space-y-1">
           <h3 className="text-sm font-semibold">Dados da matrícula</h3>
           <p className="text-xs text-muted-foreground">
-            Tudo o que está registrado no seu contrato com a Academia Family Gym.
+            Dados do cadastro do aluno na Academia Family Gym. Valores e condições do plano seguem a
+            tabela de referência da academia: confirme com a recepção.
           </p>
         </div>
 
@@ -88,7 +137,12 @@ export function AlunoMatricula({ aluno }: { aluno: Membro }) {
             value={dataBR(aluno.matricula)}
             sub={diaSemana(aluno.matricula)}
           />
-          <Info icon={Dumbbell} label="Plano" value={catalogo?.nome ?? aluno.plano} sub={catalogo?.resumo} />
+          <Info
+            icon={Dumbbell}
+            label="Plano"
+            value={catalogo?.nome ?? aluno.plano}
+            sub={catalogo?.resumo}
+          />
           <Info icon={Clock} label="Turno" value={aluno.turno || "—"} />
           <Info
             icon={ShieldCheck}
@@ -99,13 +153,13 @@ export function AlunoMatricula({ aluno }: { aluno: Membro }) {
             icon={Users}
             label="Taxa de matrícula"
             value={catalogo ? formatarBRL(catalogo.matricula) : "—"}
-            sub="Cobrada na adesão"
+            sub={catalogo ? "Valor de tabela, cobrado na adesão" : "Confirme com a recepção"}
           />
         </div>
 
         {catalogo ? (
           <div className="space-y-3 rounded-xl border border-border p-4">
-            <div className="text-sm font-medium">Formas de pagamento do plano</div>
+            <div className="text-sm font-medium">Formas de pagamento (tabela do plano)</div>
             <div className="flex flex-wrap gap-2">
               {catalogo.opcoes.map((o) => (
                 <Badge key={o.label} variant="secondary" className="font-normal">
@@ -136,7 +190,7 @@ export function AlunoMatricula({ aluno }: { aluno: Membro }) {
           <div className="space-y-2 rounded-xl border border-border p-4">
             <div className="flex items-center gap-1.5 text-sm font-medium">
               <Sparkles className="size-4 text-primary" />
-              Modalidades liberadas no seu plano
+              Modalidades liberadas no plano
             </div>
             <div className="flex flex-wrap gap-1.5">
               {catalogo.modalidades.map((m) => (
@@ -151,14 +205,15 @@ export function AlunoMatricula({ aluno }: { aluno: Membro }) {
         <div className="space-y-2 rounded-xl border border-border p-4">
           <div className="flex items-center gap-1.5 text-sm font-medium">
             <CalendarCheck className="size-4 text-primary" />
-            Minhas modalidades e horários
+            Modalidades e horários
           </div>
-          {isLoading ? (
-            <p className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Loader2 className="size-4 animate-spin" /> Carregando aulas…
-            </p>
-          ) : error ? (
-            <p className="text-sm text-destructive">Não foi possível carregar suas aulas.</p>
+          {isLoading || falhou || !isSuccess ? (
+            <EstadoLista
+              carregando={isLoading}
+              erro={falhou}
+              aoTentar={tentarDeNovo}
+              vazio={null}
+            />
           ) : data && data.modalidades.length > 0 ? (
             <div className="grid gap-2 sm:grid-cols-2">
               {data.modalidades.map((m) => (
@@ -177,7 +232,8 @@ export function AlunoMatricula({ aluno }: { aluno: Membro }) {
             </div>
           ) : (
             <p className="text-sm text-muted-foreground">
-              Você ainda não está em nenhuma aula coletiva. Fale com a equipe para se inscrever.
+              Nenhuma aula coletiva registrada até agora. A inscrição nas aulas é feita com a
+              equipe.
             </p>
           )}
         </div>
@@ -189,7 +245,9 @@ export function AlunoMatricula({ aluno }: { aluno: Membro }) {
             <h3 className="text-sm font-semibold">Próximas aulas</h3>
             <p className="text-xs text-muted-foreground">Data, modalidade e horário</p>
           </div>
-          {data && data.proximas.length > 0 ? (
+          {!isSuccess || !data ? (
+            <EstadoLista carregando={isLoading} erro={falhou} vazio={null} />
+          ) : data.proximas.length > 0 ? (
             <Table>
               <TableHeader>
                 <TableRow>
@@ -201,7 +259,9 @@ export function AlunoMatricula({ aluno }: { aluno: Membro }) {
               <TableBody>
                 {data.proximas.map((a) => (
                   <TableRow key={a.id}>
-                    <TableCell className="text-xs text-muted-foreground">{dataBR(a.data)}</TableCell>
+                    <TableCell className="text-xs text-muted-foreground">
+                      {dataBR(a.data)}
+                    </TableCell>
                     <TableCell className="text-xs font-medium">
                       {a.modalidade}
                       {a.professor ? (
@@ -223,7 +283,9 @@ export function AlunoMatricula({ aluno }: { aluno: Membro }) {
             <h3 className="text-sm font-semibold">Aulas já realizadas</h3>
             <p className="text-xs text-muted-foreground">Histórico recente de presença</p>
           </div>
-          {data && data.anteriores.length > 0 ? (
+          {!isSuccess || !data ? (
+            <EstadoLista carregando={isLoading} erro={falhou} vazio={null} />
+          ) : data.anteriores.length > 0 ? (
             <Table>
               <TableHeader>
                 <TableRow>
@@ -235,7 +297,9 @@ export function AlunoMatricula({ aluno }: { aluno: Membro }) {
               <TableBody>
                 {data.anteriores.map((a) => (
                   <TableRow key={a.id}>
-                    <TableCell className="text-xs text-muted-foreground">{dataBR(a.data)}</TableCell>
+                    <TableCell className="text-xs text-muted-foreground">
+                      {dataBR(a.data)}
+                    </TableCell>
                     <TableCell className="text-xs font-medium">{a.modalidade}</TableCell>
                     <TableCell className="text-right text-xs tabular-nums">{a.horario}</TableCell>
                   </TableRow>

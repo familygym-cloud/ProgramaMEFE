@@ -4,10 +4,13 @@ import { CtaFinal } from "@/components/site/CtaFinal";
 import { frentesTreino } from "@/components/site/frentes";
 import { GrupoModalidades } from "@/components/site/GrupoModalidades";
 import { SiteLayout } from "@/components/site/SiteLayout";
+import { marcasCanonicas } from "@/lib/site";
 
 const TITULO = "Modalidades | Academia Family Gym";
 const DESCRICAO =
   "Musculação, aulas coletivas, lutas, natação, melhor idade e kids: conheça as modalidades da Family Gym e encontre a que combina com você e com a sua família.";
+
+const canonica = marcasCanonicas("/modalidades");
 
 export const Route = createFileRoute("/modalidades")({
   head: () => ({
@@ -19,7 +22,9 @@ export const Route = createFileRoute("/modalidades")({
       { property: "og:type", content: "website" },
       { name: "twitter:title", content: TITULO },
       { name: "twitter:description", content: DESCRICAO },
+      ...canonica.meta,
     ],
+    links: canonica.links,
   }),
   component: Modalidades,
 });

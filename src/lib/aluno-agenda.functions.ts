@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { hojeBrasilia } from "@/lib/datas";
+import { ehUuid } from "@/lib/uuid";
 
 export type AulaAluno = {
   id: string;
@@ -22,7 +23,10 @@ export type AgendaAluno = {
  */
 export const listarAgendaAluno = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: { alunoId: string }) => data)
+  .inputValidator((input: { alunoId: string }) => {
+    if (!ehUuid(input?.alunoId)) throw new Error("Aluno inválido.");
+    return { alunoId: input.alunoId.toLowerCase() };
+  })
   .handler(async ({ context, data }): Promise<AgendaAluno> => {
     const { data: presencas, error } = await context.supabase
       .from("aula_presencas")

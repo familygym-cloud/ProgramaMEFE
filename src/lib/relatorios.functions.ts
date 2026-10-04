@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { hojeBrasilia } from "@/lib/datas";
 import { gerarRelatorioAluno, gerarRelatorioGeral } from "@/lib/relatorios/consultas";
+import { perfilDosPapeis, type PerfilAcesso } from "@/lib/relatorios/perfil";
 import type { RelatorioAluno, RelatorioGeral } from "@/lib/relatorios/types";
 
 // Relatórios da equipe: as server functions só LEEM o banco (como o usuário logado, sob RLS) e
@@ -9,6 +10,21 @@ import type { RelatorioAluno, RelatorioGeral } from "@/lib/relatorios/types";
 // em si está em `relatorios/consultas.ts`.
 
 const RE_UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/**
+ * Perfil de quem está logado (leve: uma consulta só). Decide se a pessoa vê a Central de relatórios
+ * (staff), vai para a área do aluno ou recebe a orientação de pedir acesso à equipe.
+ */
+export const obterPerfilAcesso = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<PerfilAcesso> => {
+    const { data, error } = await context.supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", context.userId);
+    if (error) throw error;
+    return perfilDosPapeis(data ?? []);
+  });
 
 /** Relatório geral da academia (staff). */
 export const carregarRelatorioGeral = createServerFn({ method: "GET" })

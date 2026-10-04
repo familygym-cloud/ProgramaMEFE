@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as EquipeDemoRouteImport } from './routes/equipe-demo'
 import { Route as ModalidadesRouteImport } from './routes/modalidades'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as ValoresRouteImport } from './routes/valores'
@@ -51,6 +52,11 @@ const AppRoute = AppRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EquipeDemoRoute = EquipeDemoRouteImport.update({
+  id: '/equipe-demo',
+  path: '/equipe-demo',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ModalidadesRoute = ModalidadesRouteImport.update({
@@ -160,6 +166,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
   '/auth': typeof AuthRoute
+  '/equipe-demo': typeof EquipeDemoRoute
   '/modalidades': typeof ModalidadesRoute
   '/reset-password': typeof ResetPasswordRoute
   '/valores': typeof ValoresRoute
@@ -184,6 +191,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/equipe-demo': typeof EquipeDemoRoute
   '/modalidades': typeof ModalidadesRoute
   '/reset-password': typeof ResetPasswordRoute
   '/valores': typeof ValoresRoute
@@ -211,6 +219,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/app': typeof AppRouteWithChildren
   '/auth': typeof AuthRoute
+  '/equipe-demo': typeof EquipeDemoRoute
   '/modalidades': typeof ModalidadesRoute
   '/reset-password': typeof ResetPasswordRoute
   '/valores': typeof ValoresRoute
@@ -238,6 +247,7 @@ export interface FileRouteTypes {
     | '/'
     | '/app'
     | '/auth'
+    | '/equipe-demo'
     | '/modalidades'
     | '/reset-password'
     | '/valores'
@@ -262,6 +272,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/equipe-demo'
     | '/modalidades'
     | '/reset-password'
     | '/valores'
@@ -288,6 +299,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/app'
     | '/auth'
+    | '/equipe-demo'
     | '/modalidades'
     | '/reset-password'
     | '/valores'
@@ -315,6 +327,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AppRoute: typeof AppRouteWithChildren
   AuthRoute: typeof AuthRoute
+  EquipeDemoRoute: typeof EquipeDemoRoute
   ModalidadesRoute: typeof ModalidadesRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   ValoresRoute: typeof ValoresRoute
@@ -348,6 +361,13 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/equipe-demo': {
+      id: '/equipe-demo'
+      path: '/equipe-demo'
+      fullPath: '/equipe-demo'
+      preLoaderRoute: typeof EquipeDemoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/modalidades': {
@@ -549,6 +569,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AppRoute: AppRouteWithChildren,
   AuthRoute: AuthRoute,
+  EquipeDemoRoute: EquipeDemoRoute,
   ModalidadesRoute: ModalidadesRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   ValoresRoute: ValoresRoute,

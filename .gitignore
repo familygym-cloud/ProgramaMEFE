@@ -20,6 +20,12 @@ dist-ssr
 .wrangler/
 .dev.vars
 
+# Variáveis de ambiente: nunca versionar chaves (a SUPABASE_SERVICE_ROLE_KEY ignora o RLS).
+# Os nomes esperados estão em .env.example.
+.env
+.env.*
+!.env.example
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

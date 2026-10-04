@@ -1,11 +1,11 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { Link } from "@tanstack/react-router";
 import { Loader2, Mail, MailCheck, PlayCircle } from "lucide-react";
 import { CampoAuth, CampoSenha } from "@/components/auth/CampoAuth";
 import { ForcaSenha } from "@/components/auth/ForcaSenha";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import { traduzErroAuth } from "@/lib/auth-erros";
+import { emailParecidoValido, traduzErroAuth } from "@/lib/auth-erros";
 import { segundaEtapaPendente } from "@/lib/auth-mfa";
 import { TAMANHO_MINIMO_SENHA } from "@/lib/auth-senha";
 import { cn } from "@/lib/utils";
@@ -28,10 +28,13 @@ const TEXTOS: Record<Modo, { titulo: string; descricao: string; botao: string }>
 /** Etapa de e-mail e senha: entrar, criar conta, recuperar senha e reenviar a confirmação. */
 export function FormularioAcesso({
   modoInicial,
+  erroInicial = null,
   aoAutenticar,
   aoExigirSegundaEtapa,
 }: {
   modoInicial: Modo;
+  /** Aviso vindo de fora, como o de um link do e-mail que expirou. */
+  erroInicial?: string | null;
   /** Sessão completa: pode seguir para a área certa. */
   aoAutenticar: () => void | Promise<void>;
   /** Senha correta, mas a conta tem verificação em duas etapas. */
@@ -46,6 +49,10 @@ export function FormularioAcesso({
   const [pendente, setPendente] = useState<string | null>(null);
 
   const textos = TEXTOS[modo];
+
+  useEffect(() => {
+    if (erroInicial) setErro(erroInicial);
+  }, [erroInicial]);
 
   function trocarModo(novo: Modo) {
     setModo(novo);
@@ -71,9 +78,12 @@ export function FormularioAcesso({
   async function esqueciSenha() {
     setErro(null);
     setAviso(null);
-    if (!email) return setErro("Digite seu e-mail acima para receber o link.");
+    const emailLimpo = email.trim();
+    if (!emailLimpo) return setErro("Digite seu e-mail acima para receber o link.");
+    if (!emailParecidoValido(emailLimpo))
+      return setErro("E-mail inválido. Confira se digitou tudo certo.");
     setCarregando(true);
-    const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+    const { error } = await supabase.auth.resetPasswordForEmail(emailLimpo, {
       redirectTo: `${window.location.origin}/reset-password`,
     });
     setCarregando(false);

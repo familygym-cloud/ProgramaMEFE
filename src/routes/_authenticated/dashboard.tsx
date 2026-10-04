@@ -1,52 +1,32 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { queryOptions, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
-import {
-  CalendarCheck,
-  Dumbbell,
-  Link2,
-  LogOut,
-  Ruler,
-  ShieldAlert,
-  ShieldCheck,
-  Tags,
-  Wallet,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { FamilyGymDashboard } from "@/components/FamilyGymDashboard";
-import { listarAlunos } from "@/lib/alunos.functions";
-import { supabase } from "@/integrations/supabase/client";
+import { useEffect } from "react";
+import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { toast } from "sonner";
+import { BarraEquipe } from "@/components/relatorios/BarraEquipe";
+import { CentralRelatorios } from "@/components/relatorios/CentralRelatorios";
+import { CarregandoCentral, ErroCentral, SemPerfil } from "@/components/relatorios/EstadosCentral";
+import { MolduraRelatorios } from "@/components/relatorios/MolduraRelatorios";
+import { useSair } from "@/components/relatorios/useSair";
+import { carregarRelatorioGeral, obterPerfilAcesso } from "@/lib/relatorios.functions";
+import { abaDaBusca, buscaDaAba, validarBuscaRelatorio } from "@/lib/relatorios/abas";
 
-const painelQueryOptions = queryOptions({
-  queryKey: ["painel-alunos"],
-  queryFn: () => listarAlunos(),
-});
+const TITULO = "Central de relatórios | Academia Family Gym";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
+  validateSearch: validarBuscaRelatorio,
   head: () => ({
     meta: [
-      { title: "Painel | Academia Family Gym" },
+      { title: TITULO },
       {
         name: "description",
         content:
-          "Painel da Academia Family Gym: alunos, avaliações, frequência e evolução — com acesso por perfil (staff ou aluno).",
+          "Central de relatórios da Academia Family Gym: alunos, financeiro, frequência, saúde e termos, com exportação em CSV e impressão.",
       },
-      { property: "og:title", content: "Painel | Academia Family Gym" },
-      {
-        property: "og:description",
-        content: "Acompanhe alunos, avaliações e frequência da Academia Family Gym.",
-      },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
+      { name: "robots", content: "noindex" },
     ],
   }),
-  errorComponent: ({ error }) => (
-    <div className="flex min-h-screen items-center justify-center bg-background p-8 text-center">
-      <div className="space-y-2">
-        <h1 className="text-xl font-semibold">Não foi possível carregar os dados</h1>
-        <p className="text-sm text-muted-foreground">{error instanceof Error ? error.message : String(error)}</p>
-      </div>
-    </div>
-  ),
+  errorComponent: ErroDoPainel,
   notFoundComponent: () => (
     <div className="flex min-h-screen items-center justify-center bg-background">
       <p className="text-sm text-muted-foreground">Página não encontrada.</p>
@@ -55,138 +35,81 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
   component: Painel,
 });
 
-function Painel() {
-  const { data } = useSuspenseQuery(painelQueryOptions);
-  const navigate = useNavigate();
-  const queryClient = useQueryClient();
+/** Erro inesperado da própria rota: mensagem amigável, nunca o texto técnico. */
+function ErroDoPainel({ error }: { error: unknown }) {
+  const router = useRouter();
+  const sair = useSair();
+  return (
+    <MolduraRelatorios barra={<BarraEquipe perfil={undefined} aoSair={sair} />}>
+      <ErroCentral erro={error} aoTentar={() => router.invalidate()} aoSair={sair} />
+    </MolduraRelatorios>
+  );
+}
 
-  async function sair() {
-    await queryClient.cancelQueries();
-    queryClient.clear();
-    await supabase.auth.signOut();
-    navigate({ to: "/auth", replace: true });
+function Painel() {
+  const busca = Route.useSearch();
+  const { user } = Route.useRouteContext();
+  const navigate = useNavigate();
+  const sair = useSair();
+  const buscarPerfil = useServerFn(obterPerfilAcesso);
+  const buscarRelatorio = useServerFn(carregarRelatorioGeral);
+
+  const perfil = useQuery({
+    queryKey: ["perfil-acesso", user.id],
+    queryFn: () => buscarPerfil(),
+    staleTime: 5 * 60_000,
+  });
+  const relatorio = useQuery({
+    queryKey: ["relatorio-geral", user.id],
+    queryFn: () => buscarRelatorio(),
+    enabled: perfil.data === "staff",
+    staleTime: 60_000,
+  });
+
+  const ehAluno = perfil.data === "aluno";
+  useEffect(() => {
+    if (ehAluno) void navigate({ to: "/app", replace: true });
+  }, [ehAluno, navigate]);
+
+  async function atualizar() {
+    const resultado = await relatorio.refetch();
+    if (resultado.isError) toast.error("Não foi possível atualizar os dados. Tente de novo.");
+  }
+
+  let conteudo;
+  if (perfil.isError) {
+    conteudo = (
+      <ErroCentral erro={perfil.error} aoTentar={() => void perfil.refetch()} aoSair={sair} />
+    );
+  } else if (perfil.data === "aluno") {
+    conteudo = <CarregandoCentral rotulo="Abrindo a sua área do aluno" />;
+  } else if (perfil.data === "sem-perfil") {
+    conteudo = <SemPerfil />;
+  } else if (relatorio.data) {
+    conteudo = (
+      <CentralRelatorios
+        relatorio={relatorio.data}
+        modo="real"
+        aba={abaDaBusca(busca)}
+        aoMudarAba={(aba) =>
+          void navigate({ to: ".", search: buscaDaAba(aba), resetScroll: false })
+        }
+        atualizadoEm={relatorio.dataUpdatedAt}
+        aoAtualizar={() => void atualizar()}
+        atualizando={relatorio.isFetching}
+      />
+    );
+  } else if (relatorio.isError) {
+    conteudo = (
+      <ErroCentral erro={relatorio.error} aoTentar={() => void relatorio.refetch()} aoSair={sair} />
+    );
+  } else {
+    conteudo = <CarregandoCentral />;
   }
 
   return (
-    <div className="relative">
-      <div className="sticky top-0 z-30 flex flex-wrap items-center justify-between gap-3 border-b border-brand-yellow/20 bg-brand-black/90 px-4 py-3 backdrop-blur">
-        <span className="text-[0.65rem] font-bold uppercase tracking-[0.3em] text-brand-yellow">
-          {data.perfil === "staff" ? "Perfil staff" : data.perfil === "aluno" ? "Perfil aluno" : "Sem perfil"}
-        </span>
-        <div className="flex flex-wrap items-center gap-2">
-          {data.perfil === "staff" ? (
-            <>
-              <Button
-                asChild
-                variant="outline"
-                size="sm"
-                className="gap-2 rounded-full border-brand-yellow/40 bg-transparent text-xs uppercase tracking-widest text-brand-onblack hover:bg-brand-yellow hover:text-brand-black"
-              >
-                <Link to="/aulas">
-                  <CalendarCheck className="size-3.5" /> Aulas
-                </Link>
-              </Button>
-              <Button
-                asChild
-                variant="outline"
-                size="sm"
-                className="gap-2 rounded-full border-brand-yellow/40 bg-transparent text-xs uppercase tracking-widest text-brand-onblack hover:bg-brand-yellow hover:text-brand-black"
-              >
-                <Link to="/financeiro">
-                  <Wallet className="size-3.5" /> Financeiro
-                </Link>
-              </Button>
-              <Button
-                asChild
-                variant="outline"
-                size="sm"
-                className="gap-2 rounded-full border-brand-yellow/40 bg-transparent text-xs uppercase tracking-widest text-brand-onblack hover:bg-brand-yellow hover:text-brand-black"
-              >
-                <Link to="/planos">
-                  <Tags className="size-3.5" /> Planos
-                </Link>
-              </Button>
-              <Button
-                asChild
-                variant="outline"
-                size="sm"
-                className="gap-2 rounded-full border-brand-yellow/40 bg-transparent text-xs uppercase tracking-widest text-brand-onblack hover:bg-brand-yellow hover:text-brand-black"
-              >
-                <Link to="/termos">
-                  <ShieldCheck className="size-3.5" /> Termos
-                </Link>
-              </Button>
-              <Button
-                asChild
-                variant="outline"
-                size="sm"
-                className="gap-2 rounded-full border-brand-yellow/40 bg-transparent text-xs uppercase tracking-widest text-brand-onblack hover:bg-brand-yellow hover:text-brand-black"
-              >
-                <Link to="/vinculos">
-                  <Link2 className="size-3.5" /> Vínculos
-                </Link>
-              </Button>
-              <Button
-                asChild
-                variant="outline"
-                size="sm"
-                className="gap-2 rounded-full border-brand-yellow/40 bg-transparent text-xs uppercase tracking-widest text-brand-onblack hover:bg-brand-yellow hover:text-brand-black"
-              >
-                <Link to="/prescricao-treinos">
-                  <Dumbbell className="size-3.5" /> Treinos
-                </Link>
-              </Button>
-              <Button
-                asChild
-                variant="outline"
-                size="sm"
-                className="gap-2 rounded-full border-brand-yellow/40 bg-transparent text-xs uppercase tracking-widest text-brand-onblack hover:bg-brand-yellow hover:text-brand-black"
-              >
-                <Link to="/registrar-avaliacao">
-                  <Ruler className="size-3.5" /> Avaliação
-                </Link>
-              </Button>
-            </>
-          ) : null}
-
-          <Button
-            onClick={sair}
-            variant="outline"
-            size="sm"
-            className="gap-2 rounded-full border-brand-yellow/40 bg-transparent text-xs uppercase tracking-widest text-brand-onblack hover:bg-brand-yellow hover:text-brand-black"
-          >
-            <LogOut className="size-3.5" /> Sair
-          </Button>
-        </div>
-
-      </div>
-
-      {data.membros.length === 0 ? (
-        <div className="flex min-h-[70vh] items-center justify-center px-6 text-center">
-          <div className="max-w-md space-y-3">
-            <ShieldAlert className="mx-auto size-10 text-brand-yellow" />
-            <h1 className="text-xl font-semibold">Nenhum dado liberado para este acesso</h1>
-            <p className="text-sm text-muted-foreground">
-              {data.perfil === "sem-perfil"
-                ? "Sua conta ainda não tem perfil atribuído. Peça à equipe da academia para liberar seu acesso como staff ou aluno."
-                : "Sua ficha ainda não foi vinculada a esta conta. Fale com a equipe da academia."}
-            </p>
-            {data.perfil === "sem-perfil" ? (
-              <Button
-                asChild
-                className="gap-2 rounded-full bg-brand-yellow text-brand-black hover:bg-brand-yellow/90"
-              >
-                <Link to="/vinculos">
-                  <Link2 className="size-4" /> Gerenciar vínculos de alunos
-                </Link>
-              </Button>
-            ) : null}
-          </div>
-
-        </div>
-      ) : (
-        <FamilyGymDashboard membros={data.membros} />
-      )}
-    </div>
+    <MolduraRelatorios barra={<BarraEquipe perfil={perfil.data} aoSair={sair} />}>
+      {conteudo}
+    </MolduraRelatorios>
   );
 }

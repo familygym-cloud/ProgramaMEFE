@@ -24,6 +24,16 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { BrandLogo } from "@/components/BrandLogo";
+import { ConfirmarAcao } from "@/components/ConfirmarAcao";
+import { dataExiste, hojeBrasilia, somarMeses } from "@/lib/datas";
+import { traduzErroServidor } from "@/lib/erros-servidor";
+import {
+  avisoDaNovaData,
+  DATA_MAXIMA_TERMO,
+  DATA_MINIMA_TERMO,
+  situacaoTermo,
+  type Situacao,
+} from "@/lib/termos";
 import { listarTermos, registrarTermo, registrarTermosEmLote } from "@/lib/termos.functions";
 
 export const Route = createFileRoute("/_authenticated/termos")({
@@ -47,31 +57,8 @@ export const Route = createFileRoute("/_authenticated/termos")({
   component: Termos,
 });
 
-function hojeISO() {
-  return new Date().toISOString().slice(0, 10);
-}
-
-function somarMeses(meses: number) {
-  const d = new Date();
-  d.setMonth(d.getMonth() + meses);
-  return d.toISOString().slice(0, 10);
-}
-
 function dataBR(d: string) {
   return new Date(d + "T00:00:00").toLocaleDateString("pt-BR");
-}
-
-type Situacao = "Vencido" | "A vencer" | "Válido" | "Não registrado";
-
-function situacaoTermo(validoAte: string | null): { situacao: Situacao; dias: number } {
-  if (!validoAte) return { situacao: "Não registrado", dias: 0 };
-  const dias = Math.round(
-    (new Date(validoAte + "T00:00:00").getTime() - new Date(hojeISO() + "T00:00:00").getTime()) /
-      86400000,
-  );
-  if (dias < 0) return { situacao: "Vencido", dias };
-  if (dias <= 30) return { situacao: "A vencer", dias };
-  return { situacao: "Válido", dias };
 }
 
 const variante: Record<Situacao, "default" | "secondary" | "destructive" | "outline"> = {
@@ -87,51 +74,103 @@ function Termos() {
   const salvar = useServerFn(registrarTermo);
   const salvarLote = useServerFn(registrarTermosEmLote);
 
+  // Dia de Brasília, recalculado a cada renderização: a conta não depende do fuso do navegador.
+  const hoje = hojeBrasilia();
+
   const [selecionados, setSelecionados] = useState<string[]>([]);
-  const [novaData, setNovaData] = useState(somarMeses(12));
+  const [novaData, setNovaData] = useState(() => somarMeses(hojeBrasilia(), 12));
+  const [pergunta, setPergunta] = useState<{ aviso: string; executar: () => void } | null>(null);
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["termos"],
     queryFn: () => buscar(),
   });
 
-  function aoSalvar(msg: string) {
-    toast.success(msg);
-    setSelecionados([]);
+  function recarregar() {
     queryClient.invalidateQueries({ queryKey: ["termos"] });
     queryClient.invalidateQueries({ queryKey: ["painel-alunos"] });
   }
 
+  // A seleção só perde quem foi atualizado: renovar uma linha não apaga o lote que a pessoa montou.
   const individual = useMutation({
     mutationFn: (vars: { alunoId: string; validoAte: string }) => salvar({ data: vars }),
-    onSuccess: () => aoSalvar("Termo atualizado."),
-    onError: (e: Error) => toast.error(e.message),
+    onSuccess: (_resultado, vars) => {
+      toast.success("Termo atualizado.");
+      setSelecionados((s) => s.filter((id) => id !== vars.alunoId));
+      recarregar();
+    },
+    onError: (e: Error) => toast.error(traduzErroServidor(e)),
   });
 
   const lote = useMutation({
     mutationFn: (vars: { alunoIds: string[]; validoAte: string }) => salvarLote({ data: vars }),
-    onSuccess: (r) => aoSalvar(`${r.atualizados} termo(s) atualizado(s).`),
-    onError: (e: Error) => toast.error(e.message),
+    onSuccess: (r, vars) => {
+      const enviados = new Set(vars.alunoIds);
+      setSelecionados((s) => s.filter((id) => !enviados.has(id)));
+      if (r.atualizados === r.solicitados) {
+        toast.success(`${r.atualizados} termo(s) atualizado(s).`);
+      } else {
+        toast.warning(
+          `${r.atualizados} de ${r.solicitados} termo(s) atualizado(s). Os demais alunos não foram encontrados; atualize a página.`,
+        );
+      }
+      recarregar();
+    },
+    onError: (e: Error) => {
+      toast.error(traduzErroServidor(e));
+      // Uma falha no meio do lote pode ter gravado parte dos alunos: mostra o estado real.
+      recarregar();
+    },
   });
 
-  const alunos = data ?? [];
+  const alunos = useMemo(() => data ?? [], [data]);
   const marcados = useMemo(() => new Set(selecionados), [selecionados]);
-  const todosMarcados = alunos.length > 0 && selecionados.length === alunos.length;
+  const alvos = useMemo(() => alunos.filter((a) => marcados.has(a.id)), [alunos, marcados]);
+  const todosMarcados = alunos.length > 0 && alvos.length === alunos.length;
+  const parcial = alvos.length > 0 && !todosMarcados;
+
+  const novaDataValida =
+    dataExiste(novaData) && novaData >= DATA_MINIMA_TERMO && novaData <= DATA_MAXIMA_TERMO;
+  const avisoData = !novaData
+    ? "Informe a data de validade."
+    : !novaDataValida
+      ? "Data inválida. Use uma data entre os anos 2000 e 2100."
+      : novaData < hoje
+        ? "Data anterior a hoje: o termo ficará vencido."
+        : null;
+
+  // Pergunta antes de gravar quando a data parece engano (já passou, ou encurta um prazo maior).
+  function confirmarOuExecutar(
+    alvosDoPedido: readonly { nome: string; termoValidoAte: string | null }[],
+    executar: () => void,
+  ) {
+    const aviso = avisoDaNovaData(alvosDoPedido, novaData, hoje);
+    if (aviso) setPergunta({ aviso, executar });
+    else executar();
+  }
+
+  function registrarSelecionados() {
+    confirmarOuExecutar(alvos, () =>
+      lote.mutate({ alunoIds: alvos.map((a) => a.id), validoAte: novaData }),
+    );
+  }
+
+  function renovar(aluno: (typeof alunos)[number]) {
+    confirmarOuExecutar([aluno], () =>
+      individual.mutate({ alunoId: aluno.id, validoAte: novaData }),
+    );
+  }
 
   const resumo = useMemo(() => {
     const base = { Vencido: 0, "A vencer": 0, Válido: 0, "Não registrado": 0 } as Record<
       Situacao,
       number
     >;
-    for (const a of alunos) base[situacaoTermo(a.termoValidoAte).situacao] += 1;
+    for (const a of alunos) base[situacaoTermo(a.termoValidoAte, hoje).situacao] += 1;
     return base;
-  }, [alunos]);
+  }, [alunos, hoje]);
 
-  const semPresenca = useMemo(
-    () => alunos.filter((a) => a.presencas30d === 0).length,
-    [alunos],
-  );
-
+  const semPresenca = useMemo(() => alunos.filter((a) => a.presencas30d === 0).length, [alunos]);
 
   return (
     <div className="min-h-screen bg-background px-5 py-8 md:px-10">
@@ -179,50 +218,75 @@ function Termos() {
           </div>
         </section>
 
-        <section className="flex flex-wrap items-end gap-3 rounded-xl border border-border p-4">
-          <div className="space-y-1.5">
-            <label htmlFor="validade" className="text-xs text-muted-foreground">
-              Nova validade
-            </label>
-            <Input
-              id="validade"
-              type="date"
-              value={novaData}
-              onChange={(e) => setNovaData(e.target.value)}
-              className="w-44"
-            />
-          </div>
-          <Button variant="outline" size="sm" onClick={() => setNovaData(somarMeses(12))}>
-            <CalendarClock className="size-3.5" /> +12 meses
-          </Button>
-          <Button variant="outline" size="sm" onClick={() => setNovaData(somarMeses(6))}>
-            <CalendarClock className="size-3.5" /> +6 meses
-          </Button>
-          <Button
-            size="sm"
-            disabled={selecionados.length === 0 || lote.isPending}
-            onClick={() => lote.mutate({ alunoIds: selecionados, validoAte: novaData })}
-          >
-            {lote.isPending ? (
-              <Loader2 className="size-3.5 animate-spin" />
-            ) : (
-              <ShieldCheck className="size-3.5" />
-            )}
-            Registrar para {selecionados.length} selecionado(s)
-          </Button>
-          {selecionados.length > 0 ? (
-            <Button variant="ghost" size="sm" onClick={() => setSelecionados([])}>
-              Limpar seleção
+        <section className="space-y-2 rounded-xl border border-border p-4">
+          <div className="flex flex-wrap items-end gap-3">
+            <div className="space-y-1.5">
+              <label htmlFor="validade" className="text-xs text-muted-foreground">
+                Nova validade
+              </label>
+              <Input
+                id="validade"
+                type="date"
+                value={novaData}
+                min={DATA_MINIMA_TERMO}
+                max={DATA_MAXIMA_TERMO}
+                aria-invalid={!novaDataValida}
+                aria-describedby={avisoData ? "validade-ajuda" : undefined}
+                onChange={(e) => setNovaData(e.target.value)}
+                className="w-44"
+              />
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setNovaData(somarMeses(hojeBrasilia(), 12))}
+            >
+              <CalendarClock className="size-3.5" /> +12 meses
             </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setNovaData(somarMeses(hojeBrasilia(), 6))}
+            >
+              <CalendarClock className="size-3.5" /> +6 meses
+            </Button>
+            <Button
+              size="sm"
+              disabled={alvos.length === 0 || lote.isPending || !novaDataValida}
+              onClick={registrarSelecionados}
+            >
+              {lote.isPending ? (
+                <Loader2 className="size-3.5 animate-spin" />
+              ) : (
+                <ShieldCheck className="size-3.5" />
+              )}
+              Registrar para {alvos.length} selecionado(s)
+            </Button>
+            {alvos.length > 0 ? (
+              <Button variant="ghost" size="sm" onClick={() => setSelecionados([])}>
+                Limpar seleção
+              </Button>
+            ) : null}
+          </div>
+          {avisoData ? (
+            <p
+              id="validade-ajuda"
+              className={`text-xs ${novaDataValida ? "text-muted-foreground" : "text-destructive"}`}
+              role={novaDataValida ? "status" : "alert"}
+            >
+              {avisoData}
+            </p>
           ) : null}
         </section>
 
         {isLoading ? (
-          <p className="flex items-center gap-2 text-sm text-muted-foreground">
+          <p role="status" className="flex items-center gap-2 text-sm text-muted-foreground">
             <Loader2 className="size-4 animate-spin" /> Carregando alunos…
           </p>
         ) : error ? (
-          <p className="text-sm text-destructive">{(error as Error).message}</p>
+          <p role="alert" className="text-sm text-destructive">
+            {traduzErroServidor(error)}
+          </p>
         ) : (
           <div className="rounded-xl border border-border">
             <Table>
@@ -230,26 +294,26 @@ function Termos() {
                 <TableRow>
                   <TableHead className="w-10">
                     <Checkbox
-                      checked={todosMarcados}
-                      onCheckedChange={(v) =>
-                        setSelecionados(v ? alunos.map((a) => a.id) : [])
-                      }
+                      checked={todosMarcados ? true : parcial ? "indeterminate" : false}
+                      onCheckedChange={(v) => setSelecionados(v ? alunos.map((a) => a.id) : [])}
                       aria-label="Selecionar todos"
                     />
                   </TableHead>
                   <TableHead>Aluno</TableHead>
                   <TableHead>Plano</TableHead>
-                  <TableHead>Turno</TableHead>
-                  <TableHead className="text-right">Treinos/mês</TableHead>
-                  <TableHead>Frequência por modalidade (30 dias)</TableHead>
+                  <TableHead className="hidden md:table-cell">Turno</TableHead>
+                  <TableHead className="hidden text-right md:table-cell">Treinos/mês</TableHead>
+                  <TableHead className="hidden lg:table-cell">
+                    Frequência por modalidade (30 dias)
+                  </TableHead>
                   <TableHead>Prazo</TableHead>
                   <TableHead>Situação</TableHead>
-                  <TableHead className="text-right">Ação</TableHead>
+                  <TableHead className="sticky right-0 bg-background text-right">Ação</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {alunos.map((a) => {
-                  const { situacao, dias } = situacaoTermo(a.termoValidoAte);
+                  const { situacao, dias } = situacaoTermo(a.termoValidoAte, hoje);
                   return (
                     <TableRow key={a.id}>
                       <TableCell>
@@ -257,17 +321,30 @@ function Termos() {
                           checked={marcados.has(a.id)}
                           onCheckedChange={(v) =>
                             setSelecionados((s) =>
-                              v ? [...s, a.id] : s.filter((id) => id !== a.id),
+                              v ? [...new Set([...s, a.id])] : s.filter((id) => id !== a.id),
                             )
                           }
                           aria-label={`Selecionar ${a.nome}`}
                         />
                       </TableCell>
-                      <TableCell className="font-medium">{a.nome}</TableCell>
+                      <TableCell className="font-medium">
+                        {a.nome}
+                        {/* Abaixo de lg a coluna de frequência some; o alerta importante vai para cá. */}
+                        {a.presencas30d === 0 ? (
+                          <span className="mt-0.5 flex items-center gap-1 text-xs font-medium text-destructive lg:hidden">
+                            <AlertTriangle className="size-3" />
+                            Sem presença em 30 dias
+                          </span>
+                        ) : null}
+                      </TableCell>
                       <TableCell className="text-muted-foreground">{a.plano}</TableCell>
-                      <TableCell className="text-muted-foreground">{a.turno}</TableCell>
-                      <TableCell className="text-right tabular-nums">{a.frequencia}</TableCell>
-                      <TableCell>
+                      <TableCell className="hidden text-muted-foreground md:table-cell">
+                        {a.turno}
+                      </TableCell>
+                      <TableCell className="hidden text-right tabular-nums md:table-cell">
+                        {a.frequencia}
+                      </TableCell>
+                      <TableCell className="hidden lg:table-cell">
                         {a.modalidades.length > 0 ? (
                           <div className="flex flex-wrap gap-1.5">
                             {a.modalidades.map((m) => (
@@ -292,11 +369,11 @@ function Termos() {
                           </div>
                         )}
                       </TableCell>
-                      <TableCell className="text-sm text-muted-foreground">
+                      <TableCell className="whitespace-nowrap text-sm text-muted-foreground">
                         {a.termoValidoAte ? dataBR(a.termoValidoAte) : "—"}
                       </TableCell>
                       <TableCell>
-                        <div className="flex items-center gap-2">
+                        <div className="flex flex-wrap items-center gap-x-2">
                           <Badge variant={variante[situacao]}>{situacao}</Badge>
                           {situacao === "Vencido" ? (
                             <span className="text-xs text-destructive">
@@ -304,19 +381,18 @@ function Termos() {
                             </span>
                           ) : situacao === "A vencer" ? (
                             <span className="text-xs text-muted-foreground">
-                              em {dias} dia(s)
+                              {dias === 0 ? "vence hoje" : `em ${dias} dia(s)`}
                             </span>
                           ) : null}
                         </div>
                       </TableCell>
-                      <TableCell className="text-right">
+                      <TableCell className="sticky right-0 bg-background text-right">
                         <Button
                           size="sm"
                           variant="outline"
-                          disabled={individual.isPending}
-                          onClick={() =>
-                            individual.mutate({ alunoId: a.id, validoAte: novaData })
-                          }
+                          disabled={individual.isPending || !novaDataValida}
+                          aria-label={`${a.termoValidoAte ? "Renovar" : "Registrar"} termo de ${a.nome}`}
+                          onClick={() => renovar(a)}
                         >
                           <RefreshCw className="size-3.5" />
                           {a.termoValidoAte ? "Renovar" : "Registrar"}
@@ -330,6 +406,20 @@ function Termos() {
           </div>
         )}
       </div>
+
+      <ConfirmarAcao
+        aberto={pergunta !== null}
+        aoMudarAberto={(aberto) => {
+          if (!aberto) setPergunta(null);
+        }}
+        titulo="Confirmar a nova validade?"
+        descricao={pergunta ? `${pergunta.aviso} Deseja continuar?` : ""}
+        rotuloConfirmar="Continuar"
+        aoConfirmar={() => {
+          pergunta?.executar();
+          setPergunta(null);
+        }}
+      />
     </div>
   );
 }

@@ -1,6 +1,8 @@
+import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { AlertTriangle, CheckCircle2, CreditCard, Loader2, Wallet } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -11,10 +13,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { listarPagamentos, type Pagamento } from "@/lib/pagamentos.functions";
+import { resumirPagamentos, type Pagamento } from "@/lib/pagamentos";
+import { listarPagamentos } from "@/lib/pagamentos.functions";
 
-const moeda = (v: number) =>
-  v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+const moeda = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
 function dataBR(d: string) {
   return new Date(d + "T00:00:00").toLocaleDateString("pt-BR", {
@@ -32,10 +34,17 @@ const badgeVariant: Record<Pagamento["status"], "default" | "secondary" | "destr
 
 export function AlunoPagamentos({ alunoId, plano }: { alunoId: string; plano: string }) {
   const buscar = useServerFn(listarPagamentos);
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["pagamentos", alunoId],
     queryFn: () => buscar({ data: { alunoId } }),
+    // Uma nova tentativa cobre falha de rede passageira sem deixar o "Carregando" por ~7 s (padrão: 3).
+    retry: 1,
   });
+
+  // A tela mostra um texto fixo; a mensagem real (pode vir em inglês ou cru do servidor) fica no console.
+  useEffect(() => {
+    if (error) console.error("[AlunoPagamentos] falha ao carregar os pagamentos", error);
+  }, [error]);
 
   if (isLoading) {
     return (
@@ -47,19 +56,18 @@ export function AlunoPagamentos({ alunoId, plano }: { alunoId: string; plano: st
 
   if (error) {
     return (
-      <Card className="p-6 text-sm text-destructive">
-        Não foi possível carregar os pagamentos: {(error as Error).message}
+      <Card role="alert" className="items-start gap-3 p-6 text-sm text-destructive">
+        <p>Não foi possível carregar os pagamentos. Tente novamente.</p>
+        <Button size="sm" variant="outline" onClick={() => void refetch()}>
+          Tentar novamente
+        </Button>
       </Card>
     );
   }
 
   const parcelas = data ?? [];
-  const atrasadas = parcelas.filter((p) => p.status === "Atrasado");
-  const emAberto = parcelas.filter((p) => p.status !== "Pago");
-  const valorPlano = parcelas[0]?.valor ?? 0;
-  const totalAberto = emAberto.reduce((s, p) => s + p.valor, 0);
-  const totalParcelas = parcelas[0]?.totalParcelas ?? parcelas.length;
-  const pagas = parcelas.filter((p) => p.status === "Pago").length;
+  const { atrasadas, emAberto, pagas, totalAberto, totalParcelas, valorParcela } =
+    resumirPagamentos(parcelas);
 
   return (
     <div className="space-y-4">
@@ -71,11 +79,12 @@ export function AlunoPagamentos({ alunoId, plano }: { alunoId: string; plano: st
           <AlertTriangle className="mt-0.5 size-4 shrink-0" />
           <div>
             <div className="font-medium">
-              {atrasadas.length} parcela(s) em atraso · {moeda(atrasadas.reduce((s, p) => s + p.valor, 0))}
+              {atrasadas.length} parcela(s) em atraso ·{" "}
+              {moeda(atrasadas.reduce((s, p) => s + p.valor, 0))}
             </div>
             <p className="text-xs opacity-90">
-              Vencimento mais antigo em {dataBR(atrasadas[0]!.vencimento)}. Combine a
-              regularização com o aluno antes de liberar novos treinos.
+              Vencimento mais antigo em {dataBR(atrasadas[0]!.vencimento)}. A regularização é feita
+              na recepção da academia.
             </p>
           </div>
         </div>
@@ -86,33 +95,37 @@ export function AlunoPagamentos({ alunoId, plano }: { alunoId: string; plano: st
         </div>
       ) : null}
 
-      <div className="grid gap-3 sm:grid-cols-3">
-        <Card className="gap-1 p-4">
-          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-            <Wallet className="size-3.5 text-primary" /> Valor do plano {plano}
-          </div>
-          <div className="text-lg font-semibold tabular-nums">{moeda(valorPlano)}</div>
-          <div className="text-xs text-muted-foreground">por mês</div>
-        </Card>
-        <Card className="gap-1 p-4">
-          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-            <CreditCard className="size-3.5 text-primary" /> Parcelas pagas
-          </div>
-          <div className="text-lg font-semibold tabular-nums">
-            {pagas} / {totalParcelas}
-          </div>
-          <div className="text-xs text-muted-foreground">{emAberto.length} em aberto</div>
-        </Card>
-        <Card className="gap-1 p-4">
-          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-            <AlertTriangle className="size-3.5 text-primary" /> Total em aberto
-          </div>
-          <div className="text-lg font-semibold tabular-nums">{moeda(totalAberto)}</div>
-          <div className="text-xs text-muted-foreground">
-            {atrasadas.length > 0 ? `${atrasadas.length} em atraso` : "sem atrasos"}
-          </div>
-        </Card>
-      </div>
+      {parcelas.length > 0 ? (
+        <div className="grid gap-3 sm:grid-cols-3">
+          <Card className="gap-1 p-4">
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+              <Wallet className="size-3.5 text-primary" /> Valor da parcela
+            </div>
+            <div className="text-lg font-semibold tabular-nums">
+              {valorParcela === null ? "—" : moeda(valorParcela)}
+            </div>
+            <div className="text-xs text-muted-foreground">Plano {plano}</div>
+          </Card>
+          <Card className="gap-1 p-4">
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+              <CreditCard className="size-3.5 text-primary" /> Parcelas pagas
+            </div>
+            <div className="text-lg font-semibold tabular-nums">
+              {pagas} / {totalParcelas}
+            </div>
+            <div className="text-xs text-muted-foreground">{emAberto.length} em aberto</div>
+          </Card>
+          <Card className="gap-1 p-4">
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+              <AlertTriangle className="size-3.5 text-primary" /> Total em aberto
+            </div>
+            <div className="text-lg font-semibold tabular-nums">{moeda(totalAberto)}</div>
+            <div className="text-xs text-muted-foreground">
+              {atrasadas.length > 0 ? `${atrasadas.length} em atraso` : "sem atrasos"}
+            </div>
+          </Card>
+        </div>
+      ) : null}
 
       <Card className="p-5">
         <div className="mb-3 space-y-1">

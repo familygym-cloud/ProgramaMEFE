@@ -49,6 +49,7 @@ import type {
   AlunoBruto,
   AlunoInadimplente,
   AlunoRanking,
+  AlunoResumo,
   AlunoRisco,
   AlunoTermo,
   AvaliacaoBruta,
@@ -151,6 +152,12 @@ function limparTexto(texto: string): string {
 }
 
 const compararTexto = (a: string, b: string): number => a.localeCompare(b, "pt-BR");
+
+/** "ATIVO", "ativo " e "Ativo" viram "Ativo"; vazio vira "Não informado". */
+function rotuloStatus(status: string): string {
+  const limpo = (status ?? "").replace(/\s+/g, " ").trim().toLowerCase();
+  return limpo ? limpo.charAt(0).toUpperCase() + limpo.slice(1) : "Não informado";
+}
 
 /** Ordena datas AAAA-MM-DD cronologicamente (comparação direta, sem depender de locale). */
 const compararISO = (a: string, b: string): number => (a < b ? -1 : a > b ? 1 : 0);
@@ -431,6 +438,15 @@ function temDiaEntre(dias: Set<string>, de: string, ate: string): boolean {
   return false;
 }
 
+/** Validade do termo e dias até ela (negativo = vencido); null nos dois = sem termo registrado. */
+function situacaoDoTermo(
+  a: AlunoPrep,
+  hoje: string,
+): { validoAte: string | null; dias: number | null } {
+  const validoAte = dataValida(a.aluno.termoValidoAte);
+  return { validoAte, dias: validoAte ? diasEntre(validoAte, hoje) : null };
+}
+
 /** Primeiro dia da janela "últimos N dias" que termina em `hoje` (inclusive). */
 function inicioDaJanela(hoje: string, dias: number): string {
   return paraISO(subDays(parseISO(hoje), dias - 1));
@@ -554,8 +570,7 @@ export function agregarRelatorioGeral(entrada: EntradaRelatorio): RelatorioGeral
   // ----- termos (base ativa)
   const termos: AlunoTermo[] = [];
   for (const a of ativos) {
-    const validoAte = dataValida(a.aluno.termoValidoAte);
-    const dias = validoAte ? diasEntre(validoAte, hoje) : null;
+    const { validoAte, dias } = situacaoDoTermo(a, hoje);
     if (dias !== null && dias > DIAS_TERMO_A_VENCER) continue;
     termos.push({
       alunoId: a.aluno.id,
@@ -636,6 +651,33 @@ export function agregarRelatorioGeral(entrada: EntradaRelatorio): RelatorioGeral
       valor: emReais(dentro.reduce((s, p) => s + p.valorCentavos, 0)),
     };
   });
+
+  // ----- lista de alunos (todos os cadastrados, em ordem alfabética)
+  const idsEmRisco = new Set(candidatosRisco.map((c) => c.item.alunoId));
+  const listaAlunos: AlunoResumo[] = alunos
+    .map((a) => {
+      const { validoAte, dias: diasTermo } = situacaoDoTermo(a, hoje);
+      const devendo = devedores.get(a.aluno.id);
+      return {
+        alunoId: a.aluno.id,
+        nome: a.aluno.nome,
+        plano: a.plano,
+        turno: a.turno,
+        status: rotuloStatus(a.aluno.status),
+        ativo: a.ativo,
+        cadastro: a.cadastro,
+        telefone: a.aluno.telefone,
+        ultimoTreino: a.ultimoTreino,
+        diasSemTreinar: a.ultimoTreino ? diasEntre(hoje, a.ultimoTreino) : null,
+        treinosNoMes: treinosDoAlunoNoMes.get(a.aluno.id)?.get(mesAtual.chave) ?? 0,
+        emRisco: idsEmRisco.has(a.aluno.id),
+        termoValidoAte: validoAte,
+        diasTermo,
+        parcelasEmAtraso: devendo?.parcelas ?? 0,
+        valorEmAtraso: emReais(devendo?.centavos ?? 0),
+      };
+    })
+    .sort(compararNome);
 
   // ----- distribuição por plano e turno (base ativa)
   const alunosPorPlano = new Map<string, number>();
@@ -789,6 +831,7 @@ export function agregarRelatorioGeral(entrada: EntradaRelatorio): RelatorioGeral
     inadimplentes,
     termos,
     ranking,
+    alunos: listaAlunos,
     assinaturas,
     aging,
   };

@@ -37,12 +37,13 @@ function Planos() {
   const [filtro, setFiltro] = useState<string>("Todos");
 
   const lista = useMemo(
-    () => (filtro === "Todos" ? planosCatalogo : planosCatalogo.filter((p) => p.categoria === filtro)),
+    () =>
+      filtro === "Todos" ? planosCatalogo : planosCatalogo.filter((p) => p.categoria === filtro),
     [filtro],
   );
 
   return (
-    <div className="min-h-screen bg-background px-5 py-8 md:px-10">
+    <main id="conteudo" className="min-h-screen bg-background px-5 py-8 md:px-10">
       <div className="mx-auto max-w-6xl space-y-6">
         <header className="flex flex-wrap items-end justify-between gap-4">
           <div className="space-y-3">
@@ -70,11 +71,12 @@ function Planos() {
           </Button>
         </header>
 
-        <div className="flex flex-wrap gap-2">
+        <div role="group" aria-label="Filtrar por categoria" className="flex flex-wrap gap-2">
           {(["Todos", ...categoriasPlanos] as string[]).map((c) => (
             <Button
               key={c}
               size="sm"
+              aria-pressed={filtro === c}
               variant={filtro === c ? "default" : "outline"}
               className="rounded-full text-xs"
               onClick={() => setFiltro(c)}
@@ -154,6 +156,6 @@ function Planos() {
           ))}
         </section>
       </div>
-    </div>
+    </main>
   );
 }

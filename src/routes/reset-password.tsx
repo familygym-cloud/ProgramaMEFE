@@ -9,6 +9,7 @@ import { ForcaSenha } from "@/components/auth/ForcaSenha";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { traduzErroAuth } from "@/lib/auth-erros";
+import { lerErroDoLink, mensagemDoErroDoLink, urlSemErroDoLink } from "@/lib/auth-url-erro";
 import { destinoPosLogin, segundaEtapaPendente } from "@/lib/auth-mfa";
 import { TAMANHO_MINIMO_SENHA } from "@/lib/auth-senha";
 
@@ -16,6 +17,7 @@ export const Route = createFileRoute("/reset-password")({
   head: () => ({
     meta: [
       { title: "Nova senha | Academia Family Gym" },
+      { name: "robots", content: "noindex, nofollow" },
       { name: "description", content: "Defina uma nova senha para acessar a Academia Family Gym." },
       { property: "og:title", content: "Nova senha | Academia Family Gym" },
       { property: "og:description", content: "Redefinição de senha da área restrita Family Gym." },
@@ -29,6 +31,9 @@ export const Route = createFileRoute("/reset-password")({
 function ResetPage() {
   const navigate = useNavigate();
   const [sessaoPronta, setSessaoPronta] = useState(false);
+  // Falso até o Supabase terminar de olhar a URL e o aparelho: só depois dá para dizer "sem link válido".
+  const [sessaoVerificada, setSessaoVerificada] = useState(false);
+  const [erroDoLink, setErroDoLink] = useState<string | null>(null);
   // null = ainda checando se a conta pede o código de duas etapas antes de trocar a senha.
   const [exigeCodigo, setExigeCodigo] = useState<boolean | null>(null);
   const [senha, setSenha] = useState("");
@@ -37,13 +42,37 @@ function ResetPage() {
   const [erro, setErro] = useState<string | null>(null);
 
   useEffect(() => {
+    // Lido antes de qualquer chamada ao Supabase: link expirado ou já usado volta com o erro na URL,
+    // sem sessão e sem evento nenhum.
+    const erroNaUrl = lerErroDoLink(window.location.hash, window.location.search);
+    if (erroNaUrl) {
+      setErroDoLink(mensagemDoErroDoLink(erroNaUrl));
+      // Sem isso o erro voltaria a cada recarga e ficaria no histórico e nos favoritos.
+      window.history.replaceState(window.history.state, "", urlSemErroDoLink(window.location.href));
+    }
+
+    let ativo = true;
     const { data } = supabase.auth.onAuthStateChange((evento) => {
       if (evento === "PASSWORD_RECOVERY" || evento === "SIGNED_IN") setSessaoPronta(true);
     });
-    supabase.auth.getSession().then(({ data: s }) => {
-      if (s.session) setSessaoPronta(true);
-    });
-    return () => data.subscription.unsubscribe();
+    // getSession() espera o Supabase terminar de processar o link; se voltar sem sessão, não há
+    // link válido. O limite de tempo evita ficar em "Validando…" para sempre se algo travar.
+    supabase.auth
+      .getSession()
+      .then(({ data: s }) => {
+        if (!ativo) return;
+        if (s.session) setSessaoPronta(true);
+        setSessaoVerificada(true);
+      })
+      .catch(() => {
+        if (ativo) setSessaoVerificada(true);
+      });
+    const limite = window.setTimeout(() => setSessaoVerificada(true), 8000);
+    return () => {
+      ativo = false;
+      window.clearTimeout(limite);
+      data.subscription.unsubscribe();
+    };
   }, []);
 
   useEffect(() => {
@@ -93,6 +122,7 @@ function ResetPage() {
     );
   }
 
+  const semLinkValido = sessaoVerificada && !sessaoPronta;
   const validando = !sessaoPronta || exigeCodigo === null;
 
   return (
@@ -112,7 +142,20 @@ function ResetPage() {
           </div>
         </div>
 
-        {validando ? (
+        {semLinkValido ? (
+          <div
+            role="alert"
+            className="space-y-4 rounded-3xl border border-destructive/40 bg-destructive/10 p-5 text-sm"
+          >
+            <p className="text-red-200">
+              {erroDoLink ??
+                "Não encontramos um link de redefinição válido. Abra esta página pelo link do e-mail ou peça um novo na tela de acesso."}
+            </p>
+            <Button asChild className="h-11 w-full rounded-2xl font-semibold">
+              <Link to="/auth">Ir para a tela de acesso</Link>
+            </Button>
+          </div>
+        ) : validando ? (
           <div
             role="status"
             className="space-y-4 rounded-3xl border border-white/10 bg-white/[0.03] p-5 text-sm"

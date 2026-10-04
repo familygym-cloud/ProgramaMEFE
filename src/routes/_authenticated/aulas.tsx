@@ -9,6 +9,7 @@ import {
   LayoutList,
   Loader2,
   Pencil,
+  Search,
   Trash2,
   Users,
   X,
@@ -29,7 +30,20 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { BrandLogo } from "@/components/BrandLogo";
+import { ConfirmarAcao } from "@/components/ConfirmarAcao";
+import {
+  agruparPorModalidade,
+  alunosVisiveis,
+  aplicarSelecao,
+  entradaDoFormulario,
+  formularioDaAula,
+  formularioVazio,
+  LIMITES_AULA,
+  type Formulario,
+} from "@/lib/aulas";
 import { excluirAula, listarAulas, salvarAula, type Aula } from "@/lib/aulas.functions";
+import { hojeBrasilia } from "@/lib/datas";
+import { traduzErroServidor } from "@/lib/erros-servidor";
 
 export const Route = createFileRoute("/_authenticated/aulas")({
   head: () => ({
@@ -67,10 +81,6 @@ const MODALIDADES = [
   "Dança do Ventre",
 ];
 
-function hojeISO() {
-  return new Date().toISOString().slice(0, 10);
-}
-
 function dataBR(d: string) {
   return new Date(d + "T00:00:00").toLocaleDateString("pt-BR", {
     day: "2-digit",
@@ -80,87 +90,39 @@ function dataBR(d: string) {
   });
 }
 
-type Formulario = {
-  id?: string;
-  data: string;
-  modalidade: string;
-  horario: string;
-  professor: string;
-  observacoes: string;
-  alunoIds: string[];
-};
-
-const formVazio: Formulario = {
-  data: hojeISO(),
-  modalidade: "",
-  horario: "07:00",
-  professor: "",
-  observacoes: "",
-  alunoIds: [],
-};
-
 function Aulas() {
   const queryClient = useQueryClient();
   const buscar = useServerFn(listarAulas);
   const gravar = useServerFn(salvarAula);
   const apagar = useServerFn(excluirAula);
 
-  const [form, setForm] = useState<Formulario>(formVazio);
+  // A data de hoje é a de Brasília e é calculada na hora de abrir/limpar o formulário: uma aba aberta
+  // de um dia para o outro não oferece a data de ontem como padrão.
+  const [form, setForm] = useState<Formulario>(() => formularioVazio(hojeBrasilia()));
+  const [aulaParaExcluir, setAulaParaExcluir] = useState<Aula | null>(null);
+  const [busca, setBusca] = useState("");
+  const [mostrarInativos, setMostrarInativos] = useState(false);
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["aulas"],
     queryFn: () => buscar(),
   });
 
-  const alunos = data?.alunos ?? [];
-  const aulas = data?.aulas ?? [];
+  const alunos = useMemo(() => data?.alunos ?? [], [data]);
+  const aulas = useMemo(() => data?.aulas ?? [], [data]);
   const marcados = useMemo(() => new Set(form.alunoIds), [form.alunoIds]);
 
-  // Agrupa as aulas por modalidade e soma a frequência de cada aluno na modalidade.
-  const porModalidade = useMemo(() => {
-    const hoje = hojeISO();
-    const grupos = new Map<
-      string,
-      {
-        modalidade: string;
-        aulas: Aula[];
-        programadas: Aula[];
-        frequencia: Map<string, number>;
-        totalPresencas: number;
-      }
-    >();
+  // Agrupa as aulas por modalidade e soma a frequência de cada aluno (pelo aluno, não pelo nome).
+  const porModalidade = useMemo(() => agruparPorModalidade(aulas, hojeBrasilia()), [aulas]);
 
-    for (const aula of aulas) {
-      const grupo =
-        grupos.get(aula.modalidade) ??
-        {
-          modalidade: aula.modalidade,
-          aulas: [] as Aula[],
-          programadas: [] as Aula[],
-          frequencia: new Map<string, number>(),
-          totalPresencas: 0,
-        };
-      grupo.aulas.push(aula);
-      if (aula.data >= hoje) grupo.programadas.push(aula);
-      for (const p of aula.presentes) {
-        grupo.frequencia.set(p.nome, (grupo.frequencia.get(p.nome) ?? 0) + 1);
-        grupo.totalPresencas += 1;
-      }
-      grupos.set(aula.modalidade, grupo);
-    }
-
-    return [...grupos.values()]
-      .map((g) => ({
-        ...g,
-        programadas: [...g.programadas].sort((a, b) =>
-          a.data === b.data ? a.horario.localeCompare(b.horario) : a.data.localeCompare(b.data),
-        ),
-        ranking: [...g.frequencia.entries()]
-          .map(([nome, presencas]) => ({ nome, presencas }))
-          .sort((a, b) => b.presencas - a.presencas || a.nome.localeCompare(b.nome, "pt-BR")),
-      }))
-      .sort((a, b) => a.modalidade.localeCompare(b.modalidade, "pt-BR"));
-  }, [aulas]);
+  const visiveis = useMemo(
+    () => alunosVisiveis(alunos, { busca, mostrarInativos, marcados }),
+    [alunos, busca, mostrarInativos, marcados],
+  );
+  const inativosOcultos = useMemo(
+    () => alunos.filter((a) => a.status === "Inativo" && !marcados.has(a.id)).length,
+    [alunos, marcados],
+  );
 
   function recarregar() {
     queryClient.invalidateQueries({ queryKey: ["aulas"] });
@@ -168,44 +130,43 @@ function Aulas() {
   }
 
   const salvarMutation = useMutation({
-    mutationFn: (vars: Formulario) => gravar({ data: vars }),
+    mutationFn: (vars: Formulario) => gravar({ data: entradaDoFormulario(vars) }),
     onSuccess: (r) => {
       toast.success(`Aula salva com ${r.presentes} aluno(s) presente(s).`);
-      setForm(formVazio);
+      setForm(formularioVazio(hojeBrasilia()));
       recarregar();
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => {
+      toast.error(traduzErroServidor(e));
+      // A gravação é tudo ou nada, mas uma falha de rede depois do commit deixaria a lista velha na
+      // tela: recarregar mostra o estado real e evita salvar de novo uma aula que já existe.
+      recarregar();
+    },
   });
 
   const excluirMutation = useMutation({
     mutationFn: (vars: { id: string }) => apagar({ data: vars }),
-    onSuccess: () => {
+    onSuccess: (_resultado, vars) => {
       toast.success("Aula removida.");
-      setForm((f) => f.id ? formVazio : f);
+      // Só zera o formulário se a aula excluída é a que estava sendo editada.
+      setForm((f) => (f.id === vars.id ? formularioVazio(hojeBrasilia()) : f));
       recarregar();
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => {
+      toast.error(traduzErroServidor(e));
+      recarregar();
+    },
   });
 
   function editar(aula: Aula) {
-    setForm({
-      id: aula.id,
-      data: aula.data,
-      modalidade: aula.modalidade,
-      horario: aula.horario,
-      professor: aula.professor,
-      observacoes: aula.observacoes,
-      alunoIds: aula.presentes.map((p) => p.alunoId),
-    });
+    setForm(formularioDaAula(aula));
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   function alternarAluno(id: string) {
     setForm((f) => ({
       ...f,
-      alunoIds: f.alunoIds.includes(id)
-        ? f.alunoIds.filter((x) => x !== id)
-        : [...f.alunoIds, id],
+      alunoIds: f.alunoIds.includes(id) ? f.alunoIds.filter((x) => x !== id) : [...f.alunoIds, id],
     }));
   }
 
@@ -233,7 +194,7 @@ function Aulas() {
       <main className="mx-auto max-w-6xl space-y-6 px-4 py-6">
         {error ? (
           <div className="rounded-xl border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">
-            {(error as Error).message}
+            {traduzErroServidor(error)}
           </div>
         ) : null}
 
@@ -243,7 +204,7 @@ function Aulas() {
             {form.id ? "Editar aula" : "Cadastrar aula"}
           </h1>
 
-          <div className="mt-4 grid gap-4 md:grid-cols-4">
+          <div className="mt-4 grid gap-4 md:grid-cols-5">
             <div className="space-y-1.5">
               <Label htmlFor="data">Data</Label>
               <Input
@@ -269,6 +230,7 @@ function Aulas() {
                 list="modalidades-familygym"
                 placeholder="Ex.: Natação"
                 value={form.modalidade}
+                maxLength={LIMITES_AULA.modalidade}
                 onChange={(e) => setForm((f) => ({ ...f, modalidade: e.target.value }))}
               />
               <datalist id="modalidades-familygym">
@@ -283,7 +245,21 @@ function Aulas() {
                 id="professor"
                 placeholder="Opcional"
                 value={form.professor}
+                maxLength={LIMITES_AULA.professor}
                 onChange={(e) => setForm((f) => ({ ...f, professor: e.target.value }))}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="vagas">Vagas</Label>
+              <Input
+                id="vagas"
+                type="number"
+                inputMode="numeric"
+                min={1}
+                max={LIMITES_AULA.vagas}
+                step={1}
+                value={form.vagas}
+                onChange={(e) => setForm((f) => ({ ...f, vagas: e.target.value }))}
               />
             </div>
           </div>
@@ -295,6 +271,7 @@ function Aulas() {
               rows={2}
               placeholder="Opcional"
               value={form.observacoes}
+              maxLength={LIMITES_AULA.observacoes}
               onChange={(e) => setForm((f) => ({ ...f, observacoes: e.target.value }))}
             />
           </div>
@@ -304,7 +281,7 @@ function Aulas() {
               <h2 className="flex items-center gap-2 text-sm font-semibold uppercase tracking-widest text-muted-foreground">
                 <Users className="size-4 text-brand-yellow" /> Alunos presentes
               </h2>
-              <span className="text-xs text-muted-foreground">
+              <span className="text-xs text-muted-foreground" aria-live="polite">
                 {form.alunoIds.length} de {alunos.length} marcados
               </span>
             </div>
@@ -314,23 +291,85 @@ function Aulas() {
                 <Loader2 className="size-4 animate-spin" /> Carregando alunos...
               </p>
             ) : (
-              <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-                {alunos.map((a) => (
-                  <label
-                    key={a.id}
-                    className="flex cursor-pointer items-center gap-3 rounded-lg border border-border bg-background/60 px-3 py-2 text-sm hover:border-brand-yellow/50"
-                  >
-                    <Checkbox
-                      checked={marcados.has(a.id)}
-                      onCheckedChange={() => alternarAluno(a.id)}
+              <>
+                <div className="mt-3 flex flex-wrap items-center gap-2">
+                  <div className="relative min-w-48 flex-1 sm:max-w-xs">
+                    <Search className="pointer-events-none absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                    <Input
+                      type="search"
+                      aria-label="Buscar aluno pelo nome"
+                      placeholder="Buscar aluno"
+                      className="pl-8"
+                      value={busca}
+                      onChange={(e) => setBusca(e.target.value)}
                     />
-                    <span className="flex-1 truncate">{a.nome}</span>
-                    <span className="text-[0.65rem] uppercase tracking-widest text-muted-foreground">
-                      {a.turno}
-                    </span>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="rounded-full"
+                    disabled={visiveis.length === 0}
+                    onClick={() =>
+                      setForm((f) => ({
+                        ...f,
+                        alunoIds: aplicarSelecao(f.alunoIds, visiveis, true),
+                      }))
+                    }
+                  >
+                    Marcar {busca.trim() ? "os filtrados" : "todos"}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="rounded-full"
+                    disabled={visiveis.length === 0}
+                    onClick={() =>
+                      setForm((f) => ({
+                        ...f,
+                        alunoIds: aplicarSelecao(f.alunoIds, visiveis, false),
+                      }))
+                    }
+                  >
+                    Limpar
+                  </Button>
+                  <label className="flex cursor-pointer items-center gap-2 text-xs text-muted-foreground">
+                    <Checkbox
+                      checked={mostrarInativos}
+                      onCheckedChange={(v) => setMostrarInativos(v === true)}
+                    />
+                    Mostrar inativos
+                    {!mostrarInativos && inativosOcultos > 0 ? ` (${inativosOcultos} ocultos)` : ""}
                   </label>
-                ))}
-              </div>
+                </div>
+
+                {visiveis.length === 0 ? (
+                  <p className="mt-3 text-sm text-muted-foreground">
+                    {alunos.length === 0
+                      ? "Nenhum aluno cadastrado."
+                      : "Nenhum aluno encontrado com esse filtro."}
+                  </p>
+                ) : (
+                  <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                    {visiveis.map((a) => (
+                      <label
+                        key={a.id}
+                        className="flex cursor-pointer items-center gap-3 rounded-lg border border-border bg-background/60 px-3 py-2 text-sm hover:border-brand-yellow/50"
+                      >
+                        <Checkbox
+                          checked={marcados.has(a.id)}
+                          onCheckedChange={() => alternarAluno(a.id)}
+                        />
+                        <span className="flex-1 truncate">{a.nome}</span>
+                        <span className="text-[0.65rem] uppercase tracking-widest text-muted-foreground">
+                          {a.status === "Inativo" ? "Inativo" : a.turno}
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+                )}
+              </>
             )}
           </div>
 
@@ -348,7 +387,11 @@ function Aulas() {
               {form.id ? "Salvar alterações" : "Cadastrar aula"}
             </Button>
             {form.id ? (
-              <Button variant="outline" className="gap-2 rounded-full" onClick={() => setForm(formVazio)}>
+              <Button
+                variant="outline"
+                className="gap-2 rounded-full"
+                onClick={() => setForm(formularioVazio(hojeBrasilia()))}
+              >
                 <X className="size-4" /> Cancelar edição
               </Button>
             ) : null}
@@ -410,6 +453,9 @@ function Aulas() {
                             <Badge variant="outline" className="text-[0.65rem]">
                               {aula.presentes.length} presente(s)
                             </Badge>
+                            <span className="text-xs text-muted-foreground">
+                              {aula.vagas} vaga(s)
+                            </span>
                           </li>
                         ))}
                       </ul>
@@ -427,7 +473,7 @@ function Aulas() {
                     ) : (
                       <div className="mt-1 flex flex-wrap gap-1">
                         {grupo.ranking.map((r) => (
-                          <Badge key={r.nome} variant="outline">
+                          <Badge key={r.alunoId} variant="outline">
                             {r.nome} · {r.presencas}
                           </Badge>
                         ))}
@@ -462,6 +508,7 @@ function Aulas() {
                     <TableHead>Horário</TableHead>
                     <TableHead>Modalidade</TableHead>
                     <TableHead>Professor(a)</TableHead>
+                    <TableHead>Vagas</TableHead>
                     <TableHead>Alunos presentes</TableHead>
                     <TableHead className="text-right">Ações</TableHead>
                   </TableRow>
@@ -476,6 +523,9 @@ function Aulas() {
                       </TableCell>
                       <TableCell className="text-sm text-muted-foreground">
                         {aula.professor || "—"}
+                      </TableCell>
+                      <TableCell className="whitespace-nowrap text-sm tabular-nums">
+                        {aula.vagas}
                       </TableCell>
                       <TableCell>
                         {aula.presentes.length === 0 ? (
@@ -508,7 +558,7 @@ function Aulas() {
                             variant="outline"
                             className="gap-1 rounded-full text-destructive hover:text-destructive"
                             disabled={excluirMutation.isPending}
-                            onClick={() => excluirMutation.mutate({ id: aula.id })}
+                            onClick={() => setAulaParaExcluir(aula)}
                           >
                             <Trash2 className="size-3.5" /> Excluir
                           </Button>
@@ -522,6 +572,27 @@ function Aulas() {
           )}
         </section>
       </main>
+
+      <ConfirmarAcao
+        aberto={aulaParaExcluir !== null}
+        aoMudarAberto={(aberto) => {
+          if (!aberto) setAulaParaExcluir(null);
+        }}
+        titulo="Excluir esta aula?"
+        descricao={
+          aulaParaExcluir
+            ? `${aulaParaExcluir.modalidade}, ${dataBR(aulaParaExcluir.data)} às ${aulaParaExcluir.horario}. ` +
+              `As ${aulaParaExcluir.presentes.length} presença(s) registradas e as reservas dos alunos ` +
+              "nessa aula também serão removidas. Isso não pode ser desfeito."
+            : ""
+        }
+        rotuloConfirmar="Excluir aula"
+        destrutivo
+        aoConfirmar={() => {
+          if (aulaParaExcluir) excluirMutation.mutate({ id: aulaParaExcluir.id });
+          setAulaParaExcluir(null);
+        }}
+      />
     </div>
   );
 }
