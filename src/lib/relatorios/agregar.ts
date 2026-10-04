@@ -236,7 +236,7 @@ const RE_FUSO_NO_FIM = /(?:Z|[+-]\d{2}(?::?\d{2})?)$/i;
  * Dia de Brasília de um instante ISO com horário; datas puras passam direto. Um horário SEM fuso é
  * lido como UTC (e não como o fuso do servidor), para o resultado não mudar de máquina para máquina.
  */
-function diaDoInstante(valor: string | null | undefined): string | null {
+export function diaDoInstante(valor: string | null | undefined): string | null {
   if (typeof valor !== "string") return null;
   const texto = valor.trim();
   if (RE_DATA.test(texto)) return dataValida(texto);
