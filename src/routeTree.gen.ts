@@ -32,8 +32,10 @@ import { Route as AppPerfilRouteImport } from './routes/app/perfil'
 import { Route as AppPlanoRouteImport } from './routes/app/plano'
 import { Route as AppResultadosRouteImport } from './routes/app/resultados'
 import { Route as AppSegurancaRouteImport } from './routes/app/seguranca'
+import { Route as AuthenticatedRelatorioAlunoAlunoIdRouteImport } from './routes/_authenticated/relatorio-aluno.$alunoId'
 import { Route as AppTreinosIndexRouteImport } from './routes/app/treinos/index'
 import { Route as AppTreinosTreinoIdRouteImport } from './routes/app/treinos/$treinoId'
+import { Route as EquipeDemoAlunoAlunoIdRouteImport } from './routes/equipe-demo_.aluno.$alunoId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -151,6 +153,12 @@ const AppSegurancaRoute = AppSegurancaRouteImport.update({
   path: '/seguranca',
   getParentRoute: () => AppRoute,
 } as any)
+const AuthenticatedRelatorioAlunoAlunoIdRoute =
+  AuthenticatedRelatorioAlunoAlunoIdRouteImport.update({
+    id: '/relatorio-aluno/$alunoId',
+    path: '/relatorio-aluno/$alunoId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AppTreinosIndexRoute = AppTreinosIndexRouteImport.update({
   id: '/treinos/',
   path: '/treinos/',
@@ -160,6 +168,11 @@ const AppTreinosTreinoIdRoute = AppTreinosTreinoIdRouteImport.update({
   id: '/treinos/$treinoId',
   path: '/treinos/$treinoId',
   getParentRoute: () => AppRoute,
+} as any)
+const EquipeDemoAlunoAlunoIdRoute = EquipeDemoAlunoAlunoIdRouteImport.update({
+  id: '/equipe-demo_/aluno/$alunoId',
+  path: '/equipe-demo/aluno/$alunoId',
+  getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -185,7 +198,9 @@ export interface FileRoutesByFullPath {
   '/app/resultados': typeof AppResultadosRoute
   '/app/seguranca': typeof AppSegurancaRoute
   '/app/': typeof AppIndexRoute
+  '/relatorio-aluno/$alunoId': typeof AuthenticatedRelatorioAlunoAlunoIdRoute
   '/app/treinos/$treinoId': typeof AppTreinosTreinoIdRoute
+  '/equipe-demo/aluno/$alunoId': typeof EquipeDemoAlunoAlunoIdRoute
   '/app/treinos/': typeof AppTreinosIndexRoute
 }
 export interface FileRoutesByTo {
@@ -210,7 +225,9 @@ export interface FileRoutesByTo {
   '/app/resultados': typeof AppResultadosRoute
   '/app/seguranca': typeof AppSegurancaRoute
   '/app': typeof AppIndexRoute
+  '/relatorio-aluno/$alunoId': typeof AuthenticatedRelatorioAlunoAlunoIdRoute
   '/app/treinos/$treinoId': typeof AppTreinosTreinoIdRoute
+  '/equipe-demo/aluno/$alunoId': typeof EquipeDemoAlunoAlunoIdRoute
   '/app/treinos': typeof AppTreinosIndexRoute
 }
 export interface FileRoutesById {
@@ -238,7 +255,9 @@ export interface FileRoutesById {
   '/app/resultados': typeof AppResultadosRoute
   '/app/seguranca': typeof AppSegurancaRoute
   '/app/': typeof AppIndexRoute
+  '/_authenticated/relatorio-aluno/$alunoId': typeof AuthenticatedRelatorioAlunoAlunoIdRoute
   '/app/treinos/$treinoId': typeof AppTreinosTreinoIdRoute
+  '/equipe-demo_/aluno/$alunoId': typeof EquipeDemoAlunoAlunoIdRoute
   '/app/treinos/': typeof AppTreinosIndexRoute
 }
 export interface FileRouteTypes {
@@ -266,7 +285,9 @@ export interface FileRouteTypes {
     | '/app/resultados'
     | '/app/seguranca'
     | '/app/'
+    | '/relatorio-aluno/$alunoId'
     | '/app/treinos/$treinoId'
+    | '/equipe-demo/aluno/$alunoId'
     | '/app/treinos/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -291,7 +312,9 @@ export interface FileRouteTypes {
     | '/app/resultados'
     | '/app/seguranca'
     | '/app'
+    | '/relatorio-aluno/$alunoId'
     | '/app/treinos/$treinoId'
+    | '/equipe-demo/aluno/$alunoId'
     | '/app/treinos'
   id:
     | '__root__'
@@ -318,7 +341,9 @@ export interface FileRouteTypes {
     | '/app/resultados'
     | '/app/seguranca'
     | '/app/'
+    | '/_authenticated/relatorio-aluno/$alunoId'
     | '/app/treinos/$treinoId'
+    | '/equipe-demo_/aluno/$alunoId'
     | '/app/treinos/'
   fileRoutesById: FileRoutesById
 }
@@ -331,6 +356,7 @@ export interface RootRouteChildren {
   ModalidadesRoute: typeof ModalidadesRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   ValoresRoute: typeof ValoresRoute
+  EquipeDemoAlunoAlunoIdRoute: typeof EquipeDemoAlunoAlunoIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -496,6 +522,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppSegurancaRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_authenticated/relatorio-aluno/$alunoId': {
+      id: '/_authenticated/relatorio-aluno/$alunoId'
+      path: '/relatorio-aluno/$alunoId'
+      fullPath: '/relatorio-aluno/$alunoId'
+      preLoaderRoute: typeof AuthenticatedRelatorioAlunoAlunoIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/app/treinos/': {
       id: '/app/treinos/'
       path: '/treinos'
@@ -510,6 +543,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppTreinosTreinoIdRouteImport
       parentRoute: typeof AppRoute
     }
+    '/equipe-demo_/aluno/$alunoId': {
+      id: '/equipe-demo_/aluno/$alunoId'
+      path: '/equipe-demo/aluno/$alunoId'
+      fullPath: '/equipe-demo/aluno/$alunoId'
+      preLoaderRoute: typeof EquipeDemoAlunoAlunoIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -522,6 +562,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedRegistrarAvaliacaoRoute: typeof AuthenticatedRegistrarAvaliacaoRoute
   AuthenticatedTermosRoute: typeof AuthenticatedTermosRoute
   AuthenticatedVinculosRoute: typeof AuthenticatedVinculosRoute
+  AuthenticatedRelatorioAlunoAlunoIdRoute: typeof AuthenticatedRelatorioAlunoAlunoIdRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -533,6 +574,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedRegistrarAvaliacaoRoute: AuthenticatedRegistrarAvaliacaoRoute,
   AuthenticatedTermosRoute: AuthenticatedTermosRoute,
   AuthenticatedVinculosRoute: AuthenticatedVinculosRoute,
+  AuthenticatedRelatorioAlunoAlunoIdRoute:
+    AuthenticatedRelatorioAlunoAlunoIdRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
@@ -573,6 +616,7 @@ const rootRouteChildren: RootRouteChildren = {
   ModalidadesRoute: ModalidadesRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   ValoresRoute: ValoresRoute,
+  EquipeDemoAlunoAlunoIdRoute: EquipeDemoAlunoAlunoIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

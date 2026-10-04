@@ -1,35 +1,32 @@
-import { GradeKpis, KpiRelatorio, SecaoRelatorio } from "@/components/relatorios/blocos";
+import { Entrada } from "@/components/relatorios/blocos";
+import { FrequenciaDiaSemana } from "@/components/relatorios/frequencia/FrequenciaDiaSemana";
+import { FrequenciaEmRisco } from "@/components/relatorios/frequencia/FrequenciaEmRisco";
+import { FrequenciaIndicadores } from "@/components/relatorios/frequencia/FrequenciaIndicadores";
+import { FrequenciaModalidades } from "@/components/relatorios/frequencia/FrequenciaModalidades";
+import { FrequenciaRanking } from "@/components/relatorios/frequencia/FrequenciaRanking";
+import { FrequenciaTreinosMensais } from "@/components/relatorios/frequencia/FrequenciaTreinosMensais";
+import { FrequenciaTurnos } from "@/components/relatorios/frequencia/FrequenciaTurnos";
 import type { PropsAba } from "@/components/relatorios/tipos";
-import { formatarNumero, formatarPercentual } from "@/lib/relatorios/formatar";
 
-/** Aba provisória: mostra só os indicadores de frequência até o detalhamento ficar pronto. */
-export function Frequencia({ relatorio }: PropsAba) {
-  const { kpis } = relatorio;
+/** Aba Frequência: quanto e quando os alunos treinam, quem se destaca e quem está sumindo. */
+export function Frequencia({ relatorio, modo }: PropsAba) {
   return (
-    <SecaoRelatorio
-      titulo="Frequência"
-      descricao="O detalhamento por aluno, modalidade e turno ainda está em preparação."
-    >
-      <GradeKpis rotulo="Indicadores de frequência">
-        <KpiRelatorio
-          rotulo="Frequência média"
-          valor={formatarNumero(kpis.frequenciaMediaMes, 1)}
-          detalhe="treinos por aluno ativo neste mês"
-          dica="Dias distintos de treino por aluno ativo no mês corrente."
-        />
-        <KpiRelatorio
-          rotulo="Engajamento"
-          valor={formatarPercentual(kpis.engajamentoPct)}
-          detalhe="dos alunos ativos treinaram nos últimos 30 dias"
-          dica="Percentual dos alunos ativos com ao menos um treino hoje ou nos 29 dias anteriores."
-        />
-        <KpiRelatorio
-          rotulo="Alunos em risco"
-          valor={formatarNumero(kpis.alunosEmRisco)}
-          detalhe="sem treinar há 14 dias ou mais"
-          dica="Alunos ativos sem treino há 14 dias ou mais, ou que nunca treinaram."
-        />
-      </GradeKpis>
-    </SecaoRelatorio>
+    <div className="space-y-4 sm:space-y-6">
+      <FrequenciaIndicadores relatorio={relatorio} />
+      <Entrada atraso={120}>
+        <FrequenciaTreinosMensais relatorio={relatorio} modo={modo} />
+      </Entrada>
+      <Entrada atraso={160} className="grid gap-4 sm:gap-6 lg:grid-cols-2">
+        <FrequenciaDiaSemana relatorio={relatorio} modo={modo} />
+        <FrequenciaTurnos relatorio={relatorio} modo={modo} />
+      </Entrada>
+      <Entrada atraso={200} className="grid gap-4 sm:gap-6 lg:grid-cols-2">
+        <FrequenciaModalidades relatorio={relatorio} modo={modo} />
+        <FrequenciaRanking relatorio={relatorio} modo={modo} />
+      </Entrada>
+      <Entrada atraso={240}>
+        <FrequenciaEmRisco relatorio={relatorio} modo={modo} />
+      </Entrada>
+    </div>
   );
 }
