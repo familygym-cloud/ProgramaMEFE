@@ -4,6 +4,7 @@ import { CalendarDays } from "lucide-react";
 import { botaoMarca } from "@/components/site/botoes";
 import { CabecalhoPagina } from "@/components/site/CabecalhoPagina";
 import { CtaFinal } from "@/components/site/CtaFinal";
+import { FaleConosco } from "@/components/site/FaleConosco";
 import { frentesTreino } from "@/components/site/frentes";
 import { GrupoModalidades } from "@/components/site/GrupoModalidades";
 import { SiteLayout } from "@/components/site/SiteLayout";
@@ -50,9 +51,17 @@ function IndiceModalidades() {
           ))}
         </ul>
       </nav>
-      <Link to="/grade" className={botaoMarca("secundario", "lg", "w-full sm:w-auto")}>
-        <CalendarDays aria-hidden="true" /> Ver a grade de aulas
-      </Link>
+      <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+        <Link to="/grade" className={botaoMarca("secundario", "lg", "w-full sm:w-auto")}>
+          <CalendarDays aria-hidden="true" /> Ver a grade de aulas
+        </Link>
+        <FaleConosco
+          variante="primario"
+          tamanho="lg"
+          className="max-md:hidden"
+          mensagem="Olá! Gostaria de saber mais sobre as modalidades da Academia Family Gym."
+        />
+      </div>
     </div>
   );
 }

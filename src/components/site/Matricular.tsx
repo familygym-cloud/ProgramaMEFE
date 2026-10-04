@@ -82,8 +82,17 @@ function Linha({
 const CLASSE_LINK_CONTATO =
   "inline-flex min-h-11 items-center underline-offset-4 hover:text-brand-yellow hover:underline";
 
-/** Contatos configurados da academia; sem nenhum, não desenha nada (devolve `null`). */
-export function DadosDeContato({ contato = contatoDaAcademia }: { contato?: ContatoAcademia }) {
+/**
+ * Contatos configurados da academia; sem nenhum, não desenha nada (devolve `null`).
+ * `mensagem` é o texto que já vai digitado quando a pessoa toca no número do WhatsApp.
+ */
+export function DadosDeContato({
+  contato = contatoDaAcademia,
+  mensagem = MENSAGEM_MATRICULA,
+}: {
+  contato?: ContatoAcademia;
+  mensagem?: string;
+}) {
   const { whatsapp, telefone, endereco } = contato;
   if (!whatsapp && !telefone && !endereco) return null;
   return (
@@ -91,7 +100,7 @@ export function DadosDeContato({ contato = contatoDaAcademia }: { contato?: Cont
       {whatsapp ? (
         <Linha icone={MessageCircle} rotulo="WhatsApp">
           <a
-            href={linkWhatsapp(whatsapp, MENSAGEM_MATRICULA)}
+            href={linkWhatsapp(whatsapp, mensagem)}
             target="_blank"
             rel="noopener noreferrer"
             className={CLASSE_LINK_CONTATO}

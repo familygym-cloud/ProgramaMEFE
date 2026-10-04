@@ -114,6 +114,9 @@ export const contatoDaAcademia: ContatoAcademia = montarContato({
 export const MENSAGEM_MATRICULA = "Olá! Quero me matricular na Academia Family Gym.";
 export const MENSAGEM_CONTATO =
   "Olá! Vim pelo site da Academia Family Gym e gostaria de mais informações.";
+/** Mensagem do botão "Fale conosco" dentro da área do aluno (dúvidas sobre o próprio plano). */
+export const MENSAGEM_AJUDA_PLANO =
+  "Olá! Sou aluno da Family Gym e preciso de ajuda com o meu plano.";
 
 /** Destino externo de "Quero me matricular" (WhatsApp, depois telefone), ou `null` sem contato configurado. */
 export function destinoMatricula(contato: ContatoAcademia): string | null {
@@ -158,4 +161,17 @@ export function linksComoChegar(endereco: string | null): LinkDeMapa[] {
     { app: "apple", nome: "Maps (Apple)", href: `https://maps.apple.com/?daddr=${q}&dirflg=d` },
     { app: "waze", nome: "Waze", href: `https://waze.com/ul?q=${q}&navigate=yes` },
   ];
+}
+
+/**
+ * Separa o endereço em "rua e número" e "bairro, cidade e CEP" para exibir em duas linhas.
+ * "R. Dias de Toledo, 456 - Vila da Saúde, São Paulo - SP, 04143-030" vira
+ * { rua: "R. Dias de Toledo, 456", complemento: "Vila da Saúde, São Paulo - SP, 04143-030" }.
+ * Um endereço sem " - " fica inteiro em `rua`, e `complemento` vem vazio.
+ */
+export function dividirEndereco(endereco: string): { rua: string; complemento: string } {
+  const texto = endereco.trim();
+  const corte = texto.indexOf(" - ");
+  if (corte <= 0) return { rua: texto, complemento: "" };
+  return { rua: texto.slice(0, corte).trim(), complemento: texto.slice(corte + 3).trim() };
 }

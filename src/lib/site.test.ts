@@ -3,11 +3,13 @@ import {
   contatoDaAcademia,
   destinoFaleConosco,
   destinoMatricula,
+  dividirEndereco,
   ENDERECO_DA_ACADEMIA,
   formatarTelefoneBR,
   linkTelefone,
   linksComoChegar,
   linkWhatsapp,
+  MENSAGEM_AJUDA_PLANO,
   MENSAGEM_CONTATO,
   montarContato,
   montarUrlAbsoluta,
@@ -111,6 +113,15 @@ describe("Fale conosco", () => {
     expect(link).toBe(`https://wa.me/5511945239997?text=${encodeURIComponent(MENSAGEM_CONTATO)}`);
   });
 
+  it("na área do aluno a mensagem pronta fala do plano", () => {
+    expect(MENSAGEM_AJUDA_PLANO).toBe(
+      "Olá! Sou aluno da Family Gym e preciso de ajuda com o meu plano.",
+    );
+    expect(destinoFaleConosco(contatoDaAcademia, MENSAGEM_AJUDA_PLANO)).toBe(
+      `https://wa.me/5511945239997?text=${encodeURIComponent(MENSAGEM_AJUDA_PLANO)}`,
+    );
+  });
+
   it("aceita mensagem própria e cai no telefone sem WhatsApp", () => {
     expect(destinoFaleConosco(contatoDaAcademia, "Quero conhecer o MEFE")).toBe(
       "https://wa.me/5511945239997?text=Quero%20conhecer%20o%20MEFE",
@@ -145,5 +156,22 @@ describe("Como chegar", () => {
   it("sem endereço não inventa link", () => {
     expect(linksComoChegar(null)).toEqual([]);
     expect(linksComoChegar("   ")).toEqual([]);
+  });
+});
+
+describe("dividirEndereco", () => {
+  it("separa a rua do bairro, da cidade e do CEP", () => {
+    expect(dividirEndereco(ENDERECO_DA_ACADEMIA)).toEqual({
+      rua: "R. Dias de Toledo, 456",
+      complemento: "Vila da Saúde, São Paulo - SP, 04143-030",
+    });
+  });
+
+  it("endereço sem separador fica inteiro na primeira linha", () => {
+    expect(dividirEndereco("  Rua Exemplo, 100  ")).toEqual({
+      rua: "Rua Exemplo, 100",
+      complemento: "",
+    });
+    expect(dividirEndereco("")).toEqual({ rua: "", complemento: "" });
   });
 });

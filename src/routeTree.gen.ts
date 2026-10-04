@@ -15,6 +15,7 @@ import { Route as AppRouteImport } from './routes/app'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as EquipeDemoRouteImport } from './routes/equipe-demo'
 import { Route as GradeRouteImport } from './routes/grade'
+import { Route as MefeRouteImport } from './routes/mefe'
 import { Route as ModalidadesRouteImport } from './routes/modalidades'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as ValoresRouteImport } from './routes/valores'
@@ -35,6 +36,8 @@ import { Route as AppPlanoRouteImport } from './routes/app/plano'
 import { Route as AppResultadosRouteImport } from './routes/app/resultados'
 import { Route as AppSegurancaRouteImport } from './routes/app/seguranca'
 import { Route as AppValoresRouteImport } from './routes/app/valores'
+import { Route as AuthenticatedFormulariosMefeIndexRouteImport } from './routes/_authenticated/formularios-mefe.index'
+import { Route as AuthenticatedFormulariosMefeTipoRouteImport } from './routes/_authenticated/formularios-mefe.$tipo'
 import { Route as AuthenticatedRelatorioAlunoAlunoIdRouteImport } from './routes/_authenticated/relatorio-aluno.$alunoId'
 import { Route as AppTreinosIndexRouteImport } from './routes/app/treinos/index'
 import { Route as AppTreinosTreinoIdRouteImport } from './routes/app/treinos/$treinoId'
@@ -67,6 +70,11 @@ const EquipeDemoRoute = EquipeDemoRouteImport.update({
 const GradeRoute = GradeRouteImport.update({
   id: '/grade',
   path: '/grade',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MefeRoute = MefeRouteImport.update({
+  id: '/mefe',
+  path: '/mefe',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ModalidadesRoute = ModalidadesRouteImport.update({
@@ -171,6 +179,18 @@ const AppValoresRoute = AppValoresRouteImport.update({
   path: '/valores',
   getParentRoute: () => AppRoute,
 } as any)
+const AuthenticatedFormulariosMefeIndexRoute =
+  AuthenticatedFormulariosMefeIndexRouteImport.update({
+    id: '/formularios-mefe/',
+    path: '/formularios-mefe/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedFormulariosMefeTipoRoute =
+  AuthenticatedFormulariosMefeTipoRouteImport.update({
+    id: '/formularios-mefe/$tipo',
+    path: '/formularios-mefe/$tipo',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedRelatorioAlunoAlunoIdRoute =
   AuthenticatedRelatorioAlunoAlunoIdRouteImport.update({
     id: '/relatorio-aluno/$alunoId',
@@ -199,6 +219,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/equipe-demo': typeof EquipeDemoRoute
   '/grade': typeof GradeRoute
+  '/mefe': typeof MefeRoute
   '/modalidades': typeof ModalidadesRoute
   '/reset-password': typeof ResetPasswordRoute
   '/valores': typeof ValoresRoute
@@ -219,9 +240,11 @@ export interface FileRoutesByFullPath {
   '/app/seguranca': typeof AppSegurancaRoute
   '/app/valores': typeof AppValoresRoute
   '/app/': typeof AppIndexRoute
+  '/formularios-mefe/$tipo': typeof AuthenticatedFormulariosMefeTipoRoute
   '/relatorio-aluno/$alunoId': typeof AuthenticatedRelatorioAlunoAlunoIdRoute
   '/app/treinos/$treinoId': typeof AppTreinosTreinoIdRoute
   '/equipe-demo/aluno/$alunoId': typeof EquipeDemoAlunoAlunoIdRoute
+  '/formularios-mefe/': typeof AuthenticatedFormulariosMefeIndexRoute
   '/app/treinos/': typeof AppTreinosIndexRoute
 }
 export interface FileRoutesByTo {
@@ -229,6 +252,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/equipe-demo': typeof EquipeDemoRoute
   '/grade': typeof GradeRoute
+  '/mefe': typeof MefeRoute
   '/modalidades': typeof ModalidadesRoute
   '/reset-password': typeof ResetPasswordRoute
   '/valores': typeof ValoresRoute
@@ -249,9 +273,11 @@ export interface FileRoutesByTo {
   '/app/seguranca': typeof AppSegurancaRoute
   '/app/valores': typeof AppValoresRoute
   '/app': typeof AppIndexRoute
+  '/formularios-mefe/$tipo': typeof AuthenticatedFormulariosMefeTipoRoute
   '/relatorio-aluno/$alunoId': typeof AuthenticatedRelatorioAlunoAlunoIdRoute
   '/app/treinos/$treinoId': typeof AppTreinosTreinoIdRoute
   '/equipe-demo/aluno/$alunoId': typeof EquipeDemoAlunoAlunoIdRoute
+  '/formularios-mefe': typeof AuthenticatedFormulariosMefeIndexRoute
   '/app/treinos': typeof AppTreinosIndexRoute
 }
 export interface FileRoutesById {
@@ -262,6 +288,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/equipe-demo': typeof EquipeDemoRoute
   '/grade': typeof GradeRoute
+  '/mefe': typeof MefeRoute
   '/modalidades': typeof ModalidadesRoute
   '/reset-password': typeof ResetPasswordRoute
   '/valores': typeof ValoresRoute
@@ -282,9 +309,11 @@ export interface FileRoutesById {
   '/app/seguranca': typeof AppSegurancaRoute
   '/app/valores': typeof AppValoresRoute
   '/app/': typeof AppIndexRoute
+  '/_authenticated/formularios-mefe/$tipo': typeof AuthenticatedFormulariosMefeTipoRoute
   '/_authenticated/relatorio-aluno/$alunoId': typeof AuthenticatedRelatorioAlunoAlunoIdRoute
   '/app/treinos/$treinoId': typeof AppTreinosTreinoIdRoute
   '/equipe-demo_/aluno/$alunoId': typeof EquipeDemoAlunoAlunoIdRoute
+  '/_authenticated/formularios-mefe/': typeof AuthenticatedFormulariosMefeIndexRoute
   '/app/treinos/': typeof AppTreinosIndexRoute
 }
 export interface FileRouteTypes {
@@ -295,6 +324,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/equipe-demo'
     | '/grade'
+    | '/mefe'
     | '/modalidades'
     | '/reset-password'
     | '/valores'
@@ -315,9 +345,11 @@ export interface FileRouteTypes {
     | '/app/seguranca'
     | '/app/valores'
     | '/app/'
+    | '/formularios-mefe/$tipo'
     | '/relatorio-aluno/$alunoId'
     | '/app/treinos/$treinoId'
     | '/equipe-demo/aluno/$alunoId'
+    | '/formularios-mefe/'
     | '/app/treinos/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -325,6 +357,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/equipe-demo'
     | '/grade'
+    | '/mefe'
     | '/modalidades'
     | '/reset-password'
     | '/valores'
@@ -345,9 +378,11 @@ export interface FileRouteTypes {
     | '/app/seguranca'
     | '/app/valores'
     | '/app'
+    | '/formularios-mefe/$tipo'
     | '/relatorio-aluno/$alunoId'
     | '/app/treinos/$treinoId'
     | '/equipe-demo/aluno/$alunoId'
+    | '/formularios-mefe'
     | '/app/treinos'
   id:
     | '__root__'
@@ -357,6 +392,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/equipe-demo'
     | '/grade'
+    | '/mefe'
     | '/modalidades'
     | '/reset-password'
     | '/valores'
@@ -377,9 +413,11 @@ export interface FileRouteTypes {
     | '/app/seguranca'
     | '/app/valores'
     | '/app/'
+    | '/_authenticated/formularios-mefe/$tipo'
     | '/_authenticated/relatorio-aluno/$alunoId'
     | '/app/treinos/$treinoId'
     | '/equipe-demo_/aluno/$alunoId'
+    | '/_authenticated/formularios-mefe/'
     | '/app/treinos/'
   fileRoutesById: FileRoutesById
 }
@@ -390,6 +428,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   EquipeDemoRoute: typeof EquipeDemoRoute
   GradeRoute: typeof GradeRoute
+  MefeRoute: typeof MefeRoute
   ModalidadesRoute: typeof ModalidadesRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   ValoresRoute: typeof ValoresRoute
@@ -438,6 +477,13 @@ declare module '@tanstack/react-router' {
       path: '/grade'
       fullPath: '/grade'
       preLoaderRoute: typeof GradeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mefe': {
+      id: '/mefe'
+      path: '/mefe'
+      fullPath: '/mefe'
+      preLoaderRoute: typeof MefeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/modalidades': {
@@ -580,6 +626,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppValoresRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_authenticated/formularios-mefe/': {
+      id: '/_authenticated/formularios-mefe/'
+      path: '/formularios-mefe'
+      fullPath: '/formularios-mefe/'
+      preLoaderRoute: typeof AuthenticatedFormulariosMefeIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/formularios-mefe/$tipo': {
+      id: '/_authenticated/formularios-mefe/$tipo'
+      path: '/formularios-mefe/$tipo'
+      fullPath: '/formularios-mefe/$tipo'
+      preLoaderRoute: typeof AuthenticatedFormulariosMefeTipoRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/relatorio-aluno/$alunoId': {
       id: '/_authenticated/relatorio-aluno/$alunoId'
       path: '/relatorio-aluno/$alunoId'
@@ -620,7 +680,9 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedRegistrarAvaliacaoRoute: typeof AuthenticatedRegistrarAvaliacaoRoute
   AuthenticatedTermosRoute: typeof AuthenticatedTermosRoute
   AuthenticatedVinculosRoute: typeof AuthenticatedVinculosRoute
+  AuthenticatedFormulariosMefeTipoRoute: typeof AuthenticatedFormulariosMefeTipoRoute
   AuthenticatedRelatorioAlunoAlunoIdRoute: typeof AuthenticatedRelatorioAlunoAlunoIdRoute
+  AuthenticatedFormulariosMefeIndexRoute: typeof AuthenticatedFormulariosMefeIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -632,8 +694,11 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedRegistrarAvaliacaoRoute: AuthenticatedRegistrarAvaliacaoRoute,
   AuthenticatedTermosRoute: AuthenticatedTermosRoute,
   AuthenticatedVinculosRoute: AuthenticatedVinculosRoute,
+  AuthenticatedFormulariosMefeTipoRoute: AuthenticatedFormulariosMefeTipoRoute,
   AuthenticatedRelatorioAlunoAlunoIdRoute:
     AuthenticatedRelatorioAlunoAlunoIdRoute,
+  AuthenticatedFormulariosMefeIndexRoute:
+    AuthenticatedFormulariosMefeIndexRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
@@ -676,6 +741,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   EquipeDemoRoute: EquipeDemoRoute,
   GradeRoute: GradeRoute,
+  MefeRoute: MefeRoute,
   ModalidadesRoute: ModalidadesRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   ValoresRoute: ValoresRoute,

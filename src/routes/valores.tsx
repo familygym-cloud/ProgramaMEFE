@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, ClipboardList, Lock, MessageCircle, UserPlus } from "lucide-react";
 import { CabecalhoPagina } from "@/components/site/CabecalhoPagina";
 import { botaoMarca } from "@/components/site/botoes";
+import { ComoChegar } from "@/components/site/ComoChegar";
 import { CtaFinal } from "@/components/site/CtaFinal";
 import { perguntasPorId } from "@/components/site/faq";
 import { FiltrosPlanos } from "@/components/site/FiltrosPlanos";
@@ -154,7 +155,10 @@ function ComoSeMatricular() {
             texto="O atendimento é feito pela recepção da Family Gym. Os valores são apresentados no cadastro e ficam disponíveis na área do aluno."
           />
           <DadosDeContato />
-          <BotaoMatricular variante="primario" />
+          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+            <BotaoMatricular variante="primario" />
+            <ComoChegar variante="secundario" tamanho="lg" />
+          </div>
         </div>
         <ol className="grid gap-4 md:grid-cols-3 lg:grid-cols-1">
           {PASSOS_MATRICULA.map(({ icone: Icone, titulo, texto }, i) => (

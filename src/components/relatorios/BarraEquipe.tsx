@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import {
   CalendarCheck,
+  ClipboardList,
   Dumbbell,
   Link2,
   LogIn,
@@ -27,6 +28,7 @@ const FERRAMENTAS = [
   { to: "/vinculos", rotulo: "Vínculos", Icone: Link2 },
   { to: "/prescricao-treinos", rotulo: "Treinos", Icone: Dumbbell },
   { to: "/registrar-avaliacao", rotulo: "Avaliação", Icone: Ruler },
+  { to: "/formularios-mefe", rotulo: "Formulários MEFE", Icone: ClipboardList },
 ] as const satisfies readonly {
   to: string;
   rotulo: string;

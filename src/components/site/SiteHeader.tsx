@@ -4,6 +4,8 @@ import { Menu, X } from "lucide-react";
 import { BrandLogo } from "@/components/BrandLogo";
 import { cn } from "@/lib/utils";
 import { botaoMarca } from "./botoes";
+import { ComoChegar } from "./ComoChegar";
+import { FaleConosco } from "./FaleConosco";
 import { CONTAINER } from "./SecaoSite";
 import { useSessao } from "./sessao";
 
@@ -41,11 +43,19 @@ function NavegacaoDesktop() {
       <Link to="/valores" className={CLASSE_LINK} activeProps={{ className: CLASSE_LINK_ATIVO }}>
         Planos
       </Link>
+      <Link to="/mefe" className={CLASSE_LINK} activeProps={{ className: CLASSE_LINK_ATIVO }}>
+        Programa MEFE
+      </Link>
       <LinkAreaAluno className={CLASSE_LINK}>Área do aluno</LinkAreaAluno>
     </nav>
   );
 }
 
+/**
+ * Entrar e Criar conta (ou o atalho para a área de quem já entrou). O único botão amarelo do
+ * cabeçalho é o "Fale conosco"; aqui os botões são secundários. `empilhado` é o menu do celular:
+ * dois botões lado a lado.
+ */
 function AcoesConta({
   aoClicar,
   empilhado = false,
@@ -55,11 +65,15 @@ function AcoesConta({
 }) {
   const { logado } = useSessao();
   const tamanho = empilhado ? "lg" : "md";
-  const grupo = empilhado ? "flex flex-col gap-3" : "flex items-center gap-2";
+  const grupo = empilhado ? "grid grid-cols-2 gap-3" : "flex items-center gap-2";
   if (logado) {
     return (
       <div className={grupo}>
-        <Link to="/app" onClick={aoClicar} className={botaoMarca("primario", tamanho)}>
+        <Link
+          to="/app"
+          onClick={aoClicar}
+          className={botaoMarca("secundario", tamanho, empilhado ? "col-span-2" : undefined)}
+        >
           Ir para minha área
         </Link>
       </div>
@@ -78,7 +92,7 @@ function AcoesConta({
         to="/auth"
         search={{ modo: "signup" }}
         onClick={aoClicar}
-        className={botaoMarca("primario", tamanho)}
+        className={botaoMarca("secundario", tamanho)}
       >
         Criar conta
       </Link>
@@ -136,9 +150,23 @@ function MenuMobile({
             >
               Planos
             </Link>
+            <Link
+              to="/mefe"
+              onClick={aoFechar}
+              className={linkMobile}
+              activeProps={{ className: "bg-foreground/[0.07]" }}
+            >
+              Programa MEFE
+            </Link>
             <LinkAreaAluno className={linkMobile}>Área do aluno</LinkAreaAluno>
           </nav>
-          <AcoesConta aoClicar={aoFechar} empilhado />
+          <div className="space-y-3 border-t border-foreground/10 pt-5">
+            <AcoesConta aoClicar={aoFechar} empilhado />
+            <div className="flex gap-3">
+              <ComoChegar variante="secundario" tamanho="lg" className="flex-1 px-3" />
+              <FaleConosco variante="primario" tamanho="lg" className="flex-1 px-3" />
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -157,11 +185,14 @@ export function SiteHeader() {
     if (!aberto) return;
     const aoTeclar = (e: KeyboardEvent) => {
       if (e.key !== "Escape") return;
+      // O ESC de uma janela aberta (como "Como chegar") só fecha a janela, não o menu por baixo dela.
+      // O ouvinte é de captura para rodar antes do da janela, que a marca como fechada na sequência.
+      if (document.querySelector('[role="dialog"][data-state="open"]')) return;
       setAberto(false);
       botao.current?.focus();
     };
-    document.addEventListener("keydown", aoTeclar);
-    return () => document.removeEventListener("keydown", aoTeclar);
+    document.addEventListener("keydown", aoTeclar, true);
+    return () => document.removeEventListener("keydown", aoTeclar, true);
   }, [aberto]);
 
   return (
@@ -171,8 +202,9 @@ export function SiteHeader() {
           <BrandLogo variante="principal" className="h-8 sm:h-9" />
         </Link>
         <NavegacaoDesktop />
-        <div className="hidden lg:block">
+        <div className="hidden items-center gap-2 lg:flex">
           <AcoesConta />
+          <FaleConosco variante="primario" tamanho="md" />
         </div>
         <button
           ref={botao}

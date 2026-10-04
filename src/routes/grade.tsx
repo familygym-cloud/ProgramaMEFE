@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { GradeAulas } from "@/components/grade/GradeAulas";
 import { CabecalhoPagina } from "@/components/site/CabecalhoPagina";
 import { CtaFinal } from "@/components/site/CtaFinal";
+import { FaixaContato } from "@/components/site/FaixaContato";
 import { Secao } from "@/components/site/SecaoSite";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { SETORES_GRADE, type SetorGrade } from "@/lib/grade/dados";
@@ -57,6 +58,11 @@ function Grade() {
         />
       </Secao>
       <div className="print:hidden">
+        <FaixaContato
+          titulo="Dúvida sobre algum horário?"
+          texto="A recepção confirma horários, vagas e o que levar para a aula. Se preferir, veja como chegar à academia."
+          mensagem="Olá! Tenho uma dúvida sobre a grade de aulas da Academia Family Gym."
+        />
         <CtaFinal
           titulo="Pronto para escolher o seu horário?"
           texto="Crie a sua conta para acompanhar treinos e aulas, ou veja a área do aluno em ação antes de decidir."

@@ -1,5 +1,7 @@
 import { HeartHandshake } from "lucide-react";
 import { Superficie } from "@/components/app/ui";
+import { FaleConosco } from "@/components/site/FaleConosco";
+import { MENSAGEM_AJUDA_PLANO } from "@/lib/site";
 
 export function AjudaRecepcao() {
   return (
@@ -19,6 +21,12 @@ export function AjudaRecepcao() {
           recepção da Family Gym. Estamos aqui para ajudar.
         </p>
       </div>
+      <FaleConosco
+        variante="primario"
+        tamanho="md"
+        className="self-start"
+        mensagem={MENSAGEM_AJUDA_PLANO}
+      />
     </Superficie>
   );
 }

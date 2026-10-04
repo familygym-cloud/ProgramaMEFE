@@ -2,6 +2,9 @@ import type { ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import { BrandLogo } from "@/components/BrandLogo";
 import { cn } from "@/lib/utils";
+import { contatoDaAcademia, MENSAGEM_CONTATO } from "@/lib/site";
+import { ComoChegar } from "./ComoChegar";
+import { FaleConosco } from "./FaleConosco";
 import { DadosDeContato } from "./Matricular";
 import { CONTAINER } from "./SecaoSite";
 
@@ -19,22 +22,45 @@ function Coluna({ titulo, children }: { titulo: string; children: ReactNode }) {
   );
 }
 
+/** Endereço, WhatsApp e os dois botões de contato. Sem contato configurado, não desenha nada. */
+function BlocoContato() {
+  const { whatsapp, telefone, endereco } = contatoDaAcademia;
+  if (!whatsapp && !telefone && !endereco) return null;
+  return (
+    <section aria-labelledby="rodape-contato" className="space-y-4">
+      <h2
+        id="rodape-contato"
+        className="text-xs font-semibold uppercase tracking-[0.22em] text-foreground/60"
+      >
+        Contato
+      </h2>
+      <DadosDeContato mensagem={MENSAGEM_CONTATO} />
+      <div className="flex flex-col gap-3 min-[420px]:flex-row min-[420px]:flex-wrap">
+        <ComoChegar variante="secundario" tamanho="md" />
+        <FaleConosco variante="primario" tamanho="md" />
+      </div>
+    </section>
+  );
+}
+
 export function SiteFooter() {
   return (
     <footer className="relative border-t border-foreground/10 bg-sidebar/70">
       <div
         className={cn(
           CONTAINER,
-          "grid gap-10 py-12 sm:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr_1fr] lg:py-16",
+          "grid gap-10 py-12 sm:grid-cols-2 lg:grid-cols-[1.7fr_1fr_1fr_1fr] lg:py-16",
         )}
       >
-        <div className="max-w-xs space-y-4 sm:col-span-2 lg:col-span-1">
-          <BrandLogo variante="principal" className="h-10" />
-          <p className="text-sm leading-relaxed text-muted-foreground">
-            Treine em família. Evolua sempre. Musculação, aulas coletivas, lutas, natação, melhor
-            idade e kids.
-          </p>
-          <DadosDeContato />
+        <div className="max-w-md space-y-8 sm:col-span-2 lg:col-span-1">
+          <div className="max-w-xs space-y-4">
+            <BrandLogo variante="principal" className="h-10" />
+            <p className="text-sm leading-relaxed text-muted-foreground">
+              Treine em família. Evolua sempre. Musculação, aulas coletivas, lutas, natação, melhor
+              idade e kids.
+            </p>
+          </div>
+          <BlocoContato />
         </div>
 
         <Coluna titulo="Conheça">
@@ -51,6 +77,11 @@ export function SiteFooter() {
           <li>
             <Link to="/valores" className={CLASSE_LINK}>
               Planos
+            </Link>
+          </li>
+          <li>
+            <Link to="/mefe" className={CLASSE_LINK}>
+              Programa MEFE
             </Link>
           </li>
         </Coluna>

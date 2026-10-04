@@ -1,9 +1,10 @@
 import type { ReactNode } from "react";
+import { BarraDeContatoMobile } from "./BarraDeContatoMobile";
 import { SiteFooter } from "./SiteFooter";
 import { SiteHeader } from "./SiteHeader";
 import { SessaoProvider } from "./SessaoProvider";
 
-/** Moldura das páginas públicas: cabeçalho, conteúdo principal e rodapé. */
+/** Moldura das páginas públicas: cabeçalho, conteúdo principal, rodapé e a barra de contato do celular. */
 export function SiteLayout({ children }: { children: ReactNode }) {
   return (
     <SessaoProvider>
@@ -17,6 +18,7 @@ export function SiteLayout({ children }: { children: ReactNode }) {
         <SiteHeader />
         <main id="conteudo">{children}</main>
         <SiteFooter />
+        <BarraDeContatoMobile />
       </div>
     </SessaoProvider>
   );
