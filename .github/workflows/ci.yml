@@ -1,0 +1,50 @@
+name: CI
+
+# O push na branch conectada ao Lovable vai direto para produção: sem esta verificação, erro de tipo,
+# de teste ou de build chega lá sem que ninguém veja.
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verificar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.14
+
+      - name: Instalar dependências
+        run: bun install --frozen-lockfile
+
+      - name: Tipos
+        run: bun run typecheck
+
+      - name: Lint e formatação
+        run: bun run lint
+
+      - name: Testes
+        run: bun run test
+
+      - name: Build
+        run: bun run build
+        env:
+          # O build só embute valores públicos. Aqui basta um endereço qualquer para validar a
+          # compilação; nada deste job é publicado.
+          VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL || 'https://exemplo.supabase.co' }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ vars.VITE_SUPABASE_PUBLISHABLE_KEY || 'chave-publica-de-exemplo' }}

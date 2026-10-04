@@ -1,0 +1,39 @@
+# Configuração do Supabase CLI deste projeto.
+#
+# project_id é a referência do projeto Supabase (Lovable Cloud) usado por `supabase link` e
+# `supabase db push`. Ao migrar para um projeto próprio, troque pelo "Project ref" do novo projeto.
+project_id = "yjmabkypfzftxyqetgva"
+
+# Autenticação. O app envia `emailRedirectTo = <origem>/auth` no cadastro e no reenvio da
+# confirmação, e `redirectTo = <origem>/reset-password` na recuperação de senha. Uma URL que não
+# estiver na lista abaixo é trocada pelo site_url, e o link do e-mail leva ao lugar errado.
+#
+# ATENÇÃO: `supabase config push` grava estas configurações no projeto REMOTO, e chaves de [auth] que
+# não estão aqui podem voltar ao padrão da CLI. Revise o diff que o comando mostra antes de confirmar.
+# Se o app tiver outro domínio (domínio próprio, outro projeto no Lovable), troque o endereço
+# abaixo e inclua as URLs /auth e /reset-password dele antes de rodar o comando.
+[auth]
+site_url = "https://familygym-healthhub.lovable.app"
+additional_redirect_urls = [
+  "https://familygym-healthhub.lovable.app/auth",
+  "https://familygym-healthhub.lovable.app/reset-password",
+  # Desenvolvimento local: `bun run dev` sobe na porta 8080 (padrão do projeto); 5173 é a porta
+  # padrão do Vite, para quem sobe com `--port 5173`.
+  "http://localhost:8080/auth",
+  "http://localhost:8080/reset-password",
+  "http://localhost:5173/auth",
+  "http://localhost:5173/reset-password",
+]
+
+[auth.email]
+enable_signup = true
+# O app mostra "enviamos um link de confirmação" após o cadastro e só deixa entrar com e-mail
+# confirmado; os vínculos de aluno e o bootstrap do primeiro staff também exigem e-mail confirmado.
+enable_confirmations = true
+
+# Verificação em duas etapas (aplicativo autenticador). A tela Segurança do app cadastra
+# (mfa.enroll) e confirma (mfa.challengeAndVerify) fatores TOTP; no padrão da CLI as duas etapas
+# vêm desligadas.
+[auth.mfa.totp]
+enroll_enabled = true
+verify_enabled = true

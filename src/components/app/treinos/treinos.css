@@ -1,0 +1,46 @@
+/* Celebração da tela de treino concluído. Só roda quando o aparelho aceita animações. */
+
+@keyframes fg-confete {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) rotate(0deg) scale(0.4);
+  }
+  15% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--dx), var(--dy)) rotate(var(--giro)) scale(1);
+  }
+}
+
+@keyframes fg-selo-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.12);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.fg-confete {
+  animation: fg-confete 1.7s cubic-bezier(0.2, 0.8, 0.25, 1) var(--atraso) both;
+}
+
+.fg-selo-pop {
+  animation: fg-selo-pop 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fg-confete {
+    display: none;
+  }
+  .fg-selo-pop {
+    animation: none;
+  }
+}
