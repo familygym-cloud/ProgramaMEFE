@@ -1,24 +1,40 @@
 @import "tailwindcss" source(none);
 @source "../src";
 @import "tw-animate-css";
-@import "@fontsource-variable/outfit";
+@import "@fontsource-variable/urbanist";
+
+/*
+ * Fonte dos títulos: New Order (peso único, Regular), servida de public/fonts/NewOrder-Regular.otf.
+ * O arquivo é licenciado e NÃO é versionado (veja .gitignore e o README, seção "Identidade visual").
+ * O intervalo de pesos faz o navegador usar esta única face em qualquer font-weight (sem negrito
+ * sintetizado). Se o arquivo não existir, o título cai na Urbanist (veja --font-titulo).
+ */
+@font-face {
+  font-family: "New Order";
+  src: url("/fonts/NewOrder-Regular.otf") format("opentype");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
 
 /* O tema escuro já é o padrão (:root); não existe alternância de tema. A variante `dark:` fica presa à
    classe `.dark`, que nunca é aplicada, para não ligar por acidente com a preferência do sistema. */
 @custom-variant dark (&:is(.dark *));
 
 /*
- * Design system definition.
+ * Identidade visual da Family Gym.
  *
- * The @theme inline block maps CSS custom properties to Tailwind utility
- * classes (e.g. --color-primary -> bg-primary, text-primary).
+ * PALETA: somente três cores, definidas uma única vez em :root (--fg-onix, --fg-amarelo e
+ * --fg-alabastro). Qualquer outro tom da interface é transparência ou mistura entre elas
+ * (color-mix). A única exceção é o vermelho funcional (--destructive), reservado a erro e ação
+ * destrutiva. Sucesso e atenção usam a paleta, sempre com ícone e texto (nunca só cor).
  *
- * The :root block defines the actual color values using oklch (the theme is dark-only).
- * All colors MUST use oklch format.
+ * FONTES: títulos em New Order (--font-titulo, utilitário `font-titulo`/`font-display`) e todo o
+ * resto em Urbanist (--font-sans).
  *
- * To add a new semantic color:
- * 1. Add the variable to :root
- * 2. Register it in @theme inline as --color-<name>: var(--<name>)
+ * O bloco @theme inline liga as variáveis CSS aos utilitários do Tailwind (--color-primary ->
+ * bg-primary, text-primary). Para criar uma cor semântica nova: 1) declare a variável em :root,
+ * 2) registre em @theme inline como --color-<nome>: var(--<nome>).
  */
 
 @theme inline {
@@ -29,6 +45,9 @@
   --radius-2xl: calc(var(--radius) + 8px);
   --radius-3xl: calc(var(--radius) + 12px);
   --radius-4xl: calc(var(--radius) + 16px);
+  --color-fg-onix: var(--fg-onix);
+  --color-fg-amarelo: var(--fg-amarelo);
+  --color-fg-alabastro: var(--fg-alabastro);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -66,52 +85,141 @@
   --color-brand-yellow: var(--brand-yellow);
   --color-brand-onblack: var(--brand-onblack);
   --color-brand-grey: var(--brand-grey);
-  --font-sans:
-    "Outfit Variable", "Outfit", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
-    sans-serif;
-  --font-display: "Outfit Variable", "Outfit", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Urbanist Variable", "Urbanist", ui-sans-serif, system-ui, sans-serif;
+  /* Sem o arquivo da New Order o título cai na Urbanist (peso 800 definido nas regras de título). */
+  --font-titulo: "New Order", "Urbanist Variable", "Urbanist", system-ui, sans-serif;
+  --font-display: var(--font-titulo);
+  /* Não há fonte monoespaçada na identidade: códigos e chaves usam a Urbanist com algarismos tabulares. */
+  --font-mono: "Urbanist Variable", "Urbanist", ui-sans-serif, system-ui, sans-serif;
+}
+
+/*
+ * Sombras do Tailwind refeitas com Onix translúcido no lugar do preto puro (#000) do tema padrão, para
+ * que nenhuma cor fora da paleta apareça. Sobre o fundo Onix a sombra é quase invisível, como antes.
+ */
+@theme {
+  --shadow-2xs: 0 1px color-mix(in srgb, var(--fg-onix) 5%, transparent);
+  --shadow-xs: 0 1px 2px 0 color-mix(in srgb, var(--fg-onix) 5%, transparent);
+  --shadow:
+    0 1px 3px 0 color-mix(in srgb, var(--fg-onix) 10%, transparent),
+    0 1px 2px -1px color-mix(in srgb, var(--fg-onix) 10%, transparent);
+  --shadow-sm:
+    0 1px 3px 0 color-mix(in srgb, var(--fg-onix) 10%, transparent),
+    0 1px 2px -1px color-mix(in srgb, var(--fg-onix) 10%, transparent);
+  --shadow-md:
+    0 4px 6px -1px color-mix(in srgb, var(--fg-onix) 10%, transparent),
+    0 2px 4px -2px color-mix(in srgb, var(--fg-onix) 10%, transparent);
+  --shadow-lg:
+    0 10px 15px -3px color-mix(in srgb, var(--fg-onix) 10%, transparent),
+    0 4px 6px -4px color-mix(in srgb, var(--fg-onix) 10%, transparent);
+  --shadow-xl:
+    0 20px 25px -5px color-mix(in srgb, var(--fg-onix) 10%, transparent),
+    0 8px 10px -6px color-mix(in srgb, var(--fg-onix) 10%, transparent);
+  --shadow-2xl: 0 25px 50px -12px color-mix(in srgb, var(--fg-onix) 25%, transparent);
 }
 
 :root {
   /* O tema é escuro: avisa o navegador para barras de rolagem, seletor de data, autofill e popups nativos. */
   color-scheme: dark;
   --radius: 0.875rem;
-  --background: oklch(0.17 0 90);
-  --foreground: oklch(0.98 0.005 96);
-  --card: oklch(0.215 0.003 90);
-  --card-foreground: oklch(0.98 0.005 96);
-  --popover: oklch(0.215 0.003 90);
-  --popover-foreground: oklch(0.98 0.005 96);
-  --primary: oklch(0.893 0.147 95.9);
-  --primary-foreground: oklch(0.196 0 90);
-  --secondary: oklch(0.26 0.004 90);
-  --secondary-foreground: oklch(0.98 0.005 96);
-  --muted: oklch(0.25 0.004 90);
-  --muted-foreground: oklch(0.764 0 90);
-  --accent: oklch(0.893 0.147 95.9);
-  --accent-foreground: oklch(0.196 0 90);
-  --destructive: oklch(0.62 0.22 22);
-  --destructive-foreground: oklch(0.98 0.005 96);
-  --border: oklch(1 0 0 / 12%);
-  --input: oklch(1 0 0 / 16%);
-  --ring: oklch(0.893 0.147 95.9);
-  --chart-1: oklch(0.893 0.147 95.9);
-  --chart-2: oklch(0.72 0.15 85);
-  --chart-3: oklch(0.6 0.1 96);
-  --chart-4: oklch(0.85 0.02 96);
-  --chart-5: oklch(0.5 0.05 96);
-  --sidebar: oklch(0.16 0.005 96);
-  --sidebar-foreground: oklch(0.98 0.005 96);
-  --sidebar-primary: oklch(0.893 0.147 95.9);
-  --sidebar-primary-foreground: oklch(0.13 0 0);
-  --sidebar-accent: oklch(0.24 0.01 96);
-  --sidebar-accent-foreground: oklch(0.98 0.005 96);
-  --sidebar-border: oklch(0.86 0.19 96 / 20%);
-  --sidebar-ring: oklch(0.86 0.19 96);
-  --brand-black: oklch(0.196 0 90);
-  --brand-yellow: oklch(0.893 0.147 95.9);
-  --brand-grey: oklch(0.764 0 90);
-  --brand-onblack: oklch(1 0 90);
+
+  /* As três cores da marca (valores exatos). */
+  --fg-onix: #151515; /* Preto Onix: rgb(21, 21, 21) */
+  --fg-amarelo: #f9db5d; /* Amarelo Real: rgb(249, 219, 93) */
+  --fg-alabastro: #e5e5e4; /* Cinza Alabastro: rgb(229, 229, 228) */
+
+  /* Camadas do tema escuro: fundo Onix, texto Alabastro, destaque Amarelo. */
+  --background: var(--fg-onix);
+  --foreground: var(--fg-alabastro);
+  --card: color-mix(in srgb, var(--fg-alabastro) 5%, var(--fg-onix));
+  --card-foreground: var(--fg-alabastro);
+  --popover: color-mix(in srgb, var(--fg-alabastro) 7%, var(--fg-onix));
+  --popover-foreground: var(--fg-alabastro);
+  --primary: var(--fg-amarelo);
+  --primary-foreground: var(--fg-onix);
+  --secondary: color-mix(in srgb, var(--fg-alabastro) 10%, var(--fg-onix));
+  --secondary-foreground: var(--fg-alabastro);
+  --muted: color-mix(in srgb, var(--fg-alabastro) 8%, var(--fg-onix));
+  /* Alabastro a 70% sobre Onix: contraste mínimo de 6,7:1 também sobre cartões e campos. */
+  --muted-foreground: color-mix(in srgb, var(--fg-alabastro) 70%, var(--fg-onix));
+  --accent: var(--fg-amarelo);
+  --accent-foreground: var(--fg-onix);
+  /* Único vermelho funcional: erro e ação destrutiva (ícone e texto sempre acompanham). */
+  --destructive: #ff6b63;
+  --destructive-foreground: var(--fg-onix);
+  --border: color-mix(in srgb, var(--fg-alabastro) 12%, transparent);
+  /* Contorno de campos e trilho do interruptor: 45% de Alabastro dá no mínimo 3,5:1 sobre Onix, cartão,
+     popover e campo preenchido (WCAG 1.4.11, componentes de interface exigem 3:1). */
+  --input: color-mix(in srgb, var(--fg-alabastro) 45%, transparent);
+  --ring: var(--fg-amarelo);
+
+  /* Gráficos: Amarelo e Alabastro com misturas; a série nunca depende só da cor (há padrões e marcadores). */
+  --chart-1: var(--fg-amarelo);
+  --chart-2: var(--fg-alabastro);
+  --chart-3: color-mix(in srgb, var(--fg-amarelo) 62%, var(--fg-onix));
+  --chart-4: color-mix(in srgb, var(--fg-alabastro) 58%, var(--fg-onix));
+  --chart-5: color-mix(in srgb, var(--fg-amarelo) 50%, var(--fg-alabastro));
+
+  --sidebar: color-mix(in srgb, var(--fg-alabastro) 3%, var(--fg-onix));
+  --sidebar-foreground: var(--fg-alabastro);
+  --sidebar-primary: var(--fg-amarelo);
+  --sidebar-primary-foreground: var(--fg-onix);
+  --sidebar-accent: color-mix(in srgb, var(--fg-alabastro) 10%, var(--fg-onix));
+  --sidebar-accent-foreground: var(--fg-alabastro);
+  --sidebar-border: color-mix(in srgb, var(--fg-amarelo) 20%, transparent);
+  --sidebar-ring: var(--fg-amarelo);
+
+  /* Nomes históricos da marca (mantidos para não quebrar as classes bg-brand-*, text-brand-*). */
+  --brand-black: var(--fg-onix);
+  --brand-yellow: var(--fg-amarelo);
+  --brand-grey: var(--fg-alabastro);
+  --brand-onblack: var(--fg-alabastro);
+
+  /* Gráficos: contorno das barras (some na tela escura, vira Onix no papel) e cor das linhas do dado
+     principal (Amarelo na tela; no papel o Amarelo sobre branco não se lê, então vira Onix). */
+  --contorno-grafico: transparent;
+  --linha-destaque: var(--fg-amarelo);
+
+  /* Controles nativos (caixa de seleção, barra de progresso) no Amarelo em vez do azul do sistema. */
+  accent-color: var(--fg-amarelo);
+}
+
+/*
+ * Seção clara: fundo Alabastro e texto Onix. Aplique `tema-claro` a um bloco inteiro e todos os
+ * utilitários de token (bg-background, text-foreground, border-border, bg-card...) se adaptam.
+ * O Amarelo nunca vira texto sobre Alabastro (contraste 1,09:1): use-o só como preenchimento
+ * (bg-brand-yellow com text-brand-black) ou deixe o botão primário em Onix com texto Amarelo.
+ */
+.tema-claro {
+  color-scheme: light;
+  --background: var(--fg-alabastro);
+  --foreground: var(--fg-onix);
+  --card: color-mix(in srgb, var(--fg-onix) 4%, var(--fg-alabastro));
+  --card-foreground: var(--fg-onix);
+  --popover: var(--fg-alabastro);
+  --popover-foreground: var(--fg-onix);
+  --primary: var(--fg-onix);
+  --primary-foreground: var(--fg-amarelo);
+  --secondary: color-mix(in srgb, var(--fg-onix) 8%, var(--fg-alabastro));
+  --secondary-foreground: var(--fg-onix);
+  --muted: color-mix(in srgb, var(--fg-onix) 7%, var(--fg-alabastro));
+  --muted-foreground: color-mix(in srgb, var(--fg-onix) 72%, var(--fg-alabastro));
+  --accent: var(--fg-amarelo);
+  --accent-foreground: var(--fg-onix);
+  --destructive: #a3201a;
+  --destructive-foreground: var(--fg-alabastro);
+  --border: color-mix(in srgb, var(--fg-onix) 16%, transparent);
+  /* Contorno de campos: 52% de Onix dá 3,3:1 ou mais sobre Alabastro e cartões (WCAG 1.4.11). */
+  --input: color-mix(in srgb, var(--fg-onix) 52%, transparent);
+  --ring: var(--fg-onix);
+  --brand-grey: var(--fg-onix);
+  --brand-onblack: var(--fg-onix);
+  background-color: var(--background);
+  color: var(--foreground);
+}
+
+.tema-claro :focus-visible {
+  outline-color: var(--fg-onix);
 }
 
 @layer base {
@@ -128,28 +236,78 @@
 @layer base {
   html {
     font-family: var(--font-sans);
+    /* Nenhum peso é fabricado pelo navegador: as fontes têm os pesos reais (Urbanist variável) ou peso único (New Order). */
+    font-synthesis-weight: none;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
     scroll-behavior: smooth;
+  }
+
+  /* Títulos em New Order. O peso 800 só vale se a New Order faltar (fallback Urbanist); com a fonte
+     presente a face única atende qualquer peso, sem negrito sintetizado. */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-titulo);
+    font-weight: 800;
+    font-synthesis: none;
+    text-wrap: balance;
+  }
+
+  .font-titulo,
+  .font-display {
+    font-synthesis: none;
+  }
+
+  ::selection {
+    background-color: var(--fg-amarelo);
+    color: var(--fg-onix);
   }
 
   :focus-visible {
     outline: 2px solid var(--brand-yellow);
     outline-offset: 2px;
   }
+
+  /* Dentro de um bloco Amarelo o anel de foco Amarelo some (1:1); lá o anel passa a Onix (13:1). */
+  .bg-brand-yellow :focus-visible {
+    outline-color: var(--fg-onix);
+  }
+
+  /* O preenchimento automático do Chrome pinta o campo de azul claro; aqui ele segue o cartão. */
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  textarea:-webkit-autofill,
+  select:-webkit-autofill {
+    -webkit-text-fill-color: var(--foreground);
+    caret-color: var(--foreground);
+    box-shadow: 0 0 0 1000px var(--card) inset;
+    transition: background-color 9999s ease-out 0s;
+  }
 }
 
 @layer utilities {
-  .font-display {
-    font-family: var(--font-display);
-    letter-spacing: -0.02em;
+  .font-titulo {
+    font-family: var(--font-titulo);
   }
 
   /* Textura sutil de grade, inspirada na grade de construção do logotipo. */
   .bg-grade {
     background-image:
-      linear-gradient(to right, oklch(1 0 0 / 4%) 1px, transparent 1px),
-      linear-gradient(to bottom, oklch(1 0 0 / 4%) 1px, transparent 1px);
+      linear-gradient(
+        to right,
+        color-mix(in srgb, var(--fg-alabastro) 4%, transparent) 1px,
+        transparent 1px
+      ),
+      linear-gradient(
+        to bottom,
+        color-mix(in srgb, var(--fg-alabastro) 4%, transparent) 1px,
+        transparent 1px
+      );
     background-size: 44px 44px;
   }
 
@@ -163,6 +321,16 @@
   }
   .sem-barra-rolagem::-webkit-scrollbar {
     display: none;
+  }
+
+  /* Hachura de apoio para quem não distingue cores: listras diagonais na cor do fundo, por cima do
+     preenchimento (Amarelo, Alabastro ou vermelho). No papel o fundo é branco, então as listras seguem visíveis. */
+  .hachura {
+    background-image: repeating-linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--background) 70%, transparent) 0 2px,
+      transparent 2px 6px
+    );
   }
 }
 
@@ -191,11 +359,13 @@
 }
 
 /*
- * Impressão da Central de relatórios (botão "Imprimir / salvar PDF" ou Ctrl+P): folha branca, texto
- * escuro, sem navegação nem botões (as classes `print:hidden` ficam nos componentes). Dentro de
- * [data-relatorio-raiz] as variáveis de cor do tema são trocadas por tons escuros, então tudo que
- * usa os tokens (texto, bordas, amarelo da marca, gráficos) se adapta sozinho; as regras abaixo
- * cobrem as cores fixas (branco translúcido, verde, vermelho) usadas nos cartões e chips.
+ * Impressão da Central de relatórios (botão "Imprimir / salvar PDF" ou Ctrl+P): o fundo é a cor do próprio papel
+ * (palavra-chave Canvas, em vez de um branco declarado, então só as três cores da marca existem no CSS), texto
+ * Onix, sem navegação nem botões (as classes `print:hidden` ficam nos componentes). Dentro de
+ * [data-relatorio-raiz] as variáveis de cor do tema são trocadas por Onix sobre o papel, então tudo
+ * que usa os tokens (texto, bordas, transparências de Alabastro, gráficos) se adapta sozinho.
+ * Destaques são Amarelo com texto Onix; o Amarelo nunca vira texto sobre o papel. Não há vermelho
+ * no papel: atraso e alerta se leem pelo ícone e pelo texto.
  */
 @media print {
   @page {
@@ -214,8 +384,8 @@
 
   html,
   body {
-    background: #fff !important;
-    color: #151515 !important;
+    background: transparent !important;
+    color: var(--fg-onix) !important;
   }
 
   [data-sonner-toaster] {
@@ -223,17 +393,25 @@
   }
 
   [data-relatorio-raiz] {
-    --background: #ffffff;
-    --foreground: #151515;
-    --card: #ffffff;
-    --card-foreground: #151515;
-    --popover: #ffffff;
-    --popover-foreground: #151515;
-    --muted-foreground: #4b4b4b;
-    --border: rgb(21 21 21 / 18%);
-    --brand-yellow: #8a6a00;
-    --brand-grey: #5c5c5c;
-    color: #151515;
+    --background: Canvas;
+    --foreground: var(--fg-onix);
+    --card: Canvas;
+    --card-foreground: var(--fg-onix);
+    --popover: Canvas;
+    --popover-foreground: var(--fg-onix);
+    --muted: color-mix(in srgb, var(--fg-onix) 6%, transparent);
+    --muted-foreground: color-mix(in srgb, var(--fg-onix) 74%, Canvas);
+    --secondary: color-mix(in srgb, var(--fg-onix) 8%, transparent);
+    --secondary-foreground: var(--fg-onix);
+    --border: color-mix(in srgb, var(--fg-onix) 22%, transparent);
+    --input: color-mix(in srgb, var(--fg-onix) 55%, transparent);
+    --destructive: var(--fg-onix);
+    --destructive-foreground: var(--fg-alabastro);
+    --brand-grey: var(--fg-onix);
+    --brand-onblack: var(--fg-onix);
+    --contorno-grafico: var(--fg-onix);
+    --linha-destaque: var(--fg-onix);
+    color: var(--fg-onix);
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
@@ -244,46 +422,15 @@
     transform: none !important;
   }
 
-  /* `^=` e `*=" "` pegam só a classe pura (bg-white/5), nunca variantes como hover:bg-white/5. */
-  [data-relatorio-raiz] [class^="border-white"],
-  [data-relatorio-raiz] [class*=" border-white"] {
-    border-color: rgb(21 21 21 / 18%) !important;
-  }
-  [data-relatorio-raiz] [class^="bg-white"],
-  [data-relatorio-raiz] [class*=" bg-white"] {
-    background-color: rgb(21 21 21 / 6%) !important;
-  }
-  [data-relatorio-raiz] [class^="text-white"],
-  [data-relatorio-raiz] [class*=" text-white"] {
-    color: #151515 !important;
+  /* Amarelo sobre o papel branco não se lê: texto amarelo vira Onix (com sublinhado nos links). */
+  [data-relatorio-raiz] [class*="text-brand-yellow"],
+  [data-relatorio-raiz] [class*="text-primary"] {
+    color: var(--fg-onix) !important;
   }
 
-  [data-relatorio-raiz] [class*="text-red-"] {
-    color: #b91c1c !important;
-  }
-  [data-relatorio-raiz] [class*="border-red-"] {
-    border-color: #b91c1c !important;
-  }
-  [data-relatorio-raiz] [class~="bg-red-400"] {
-    background-color: #b91c1c !important;
-  }
-  [data-relatorio-raiz] [class*="bg-red-400/"] {
-    background-color: rgb(185 28 28 / 8%) !important;
-  }
-
-  [data-relatorio-raiz] [class*="text-emerald-"] {
-    color: #047857 !important;
-  }
-  [data-relatorio-raiz] [class*="border-emerald-"] {
-    border-color: #047857 !important;
-  }
-  [data-relatorio-raiz] [class*="bg-emerald-400/"] {
-    background-color: rgb(4 120 87 / 8%) !important;
-  }
-
-  /* Selo "destaque" (amarelo cheio com texto escuro) continua legível sobre o amarelo escurecido. */
+  /* Selo "destaque" (Amarelo cheio com texto Onix) ganha contorno para existir também em preto e branco. */
   [data-relatorio-raiz] [class*="bg-brand-yellow"][class*="text-brand-black"] {
-    color: #fff !important;
+    outline: 1px solid var(--fg-onix);
   }
 
   [data-relatorio-raiz] thead {

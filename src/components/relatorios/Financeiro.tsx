@@ -139,7 +139,7 @@ function ReceitaMensal({ relatorio, modo }: PropsAba) {
           ]}
         />
         <GraficoReceitaPrevista serie={serie} resumo={frase} altura={300} />
-        <dl className="grid grid-cols-1 gap-3 border-t border-white/10 pt-4 sm:grid-cols-3">
+        <dl className="grid grid-cols-1 gap-3 border-t border-foreground/10 pt-4 sm:grid-cols-3">
           <ResumoNumero
             rotulo="Recebido em 12 meses"
             valor={formatarMoeda(resumo.totalRecebido, 0)}
@@ -210,7 +210,7 @@ function Aging({ relatorio, modo }: PropsAba) {
       {resumo.totalParcelas > 0 ? (
         <div className="space-y-4">
           <BarrasHorizontais itens={itens} />
-          <p className="border-t border-white/10 pt-3 text-sm text-muted-foreground">
+          <p className="border-t border-foreground/10 pt-3 text-sm text-muted-foreground">
             Total:{" "}
             <strong className="font-semibold text-foreground">
               {formatarMoeda(resumo.totalValor)}
@@ -295,7 +295,7 @@ function CelulaTelefone({ telefone }: { telefone: string | null }) {
   return (
     <a
       href={`tel:${digitos}`}
-      className="relative underline decoration-white/30 underline-offset-4 before:absolute before:-inset-x-1 before:-inset-y-3 hover:decoration-current"
+      className="relative underline decoration-foreground/30 underline-offset-4 before:absolute before:-inset-x-1 before:-inset-y-3 hover:decoration-current"
     >
       {texto}
     </a>

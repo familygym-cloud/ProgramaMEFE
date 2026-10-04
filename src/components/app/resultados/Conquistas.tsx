@@ -84,7 +84,7 @@ function CartaoConquista({ conquista: c }: { conquista: Conquista }) {
             "grid size-12 shrink-0 place-items-center rounded-2xl [&_svg]:size-6",
             c.desbloqueada
               ? "bg-brand-yellow text-brand-black"
-              : "bg-white/5 text-muted-foreground",
+              : "bg-foreground/5 text-muted-foreground",
           )}
         >
           <IconeConquista id={c.id} />

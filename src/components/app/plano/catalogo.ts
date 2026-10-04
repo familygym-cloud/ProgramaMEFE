@@ -1,37 +1,6 @@
-import {
-  planoDoAluno,
-  planosCatalogo,
-  type OpcaoPlano,
-  type PlanoCatalogo,
-} from "@/lib/planos-catalogo";
 import type { PagamentoAluno } from "@/lib/aluno-app/types";
-
-function normalizar(texto: string): string {
-  return texto
-    .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "")
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, " ")
-    .trim()
-    .replace(/^plano /, "");
-}
-
-/** Plano da ficha do aluno -> plano da tabela oficial. Só devolve quando a correspondência é inequívoca. */
-export function encontrarPlanoCatalogo(nome: string): PlanoCatalogo | undefined {
-  const alvo = normalizar(nome);
-  if (!alvo) return undefined;
-  const exato = planosCatalogo.find(
-    (p) => normalizar(p.nome) === alvo || p.slug === alvo.replace(/ /g, "-"),
-  );
-  if (exato) return exato;
-  const equivalente = planoDoAluno(nome.trim());
-  if (equivalente) return equivalente;
-  const parecidos = planosCatalogo.filter((p) => {
-    const n = normalizar(p.nome);
-    return n.includes(alvo) || alvo.includes(n);
-  });
-  return parecidos.length === 1 ? parecidos[0] : undefined;
-}
+import type { CategoriaPlano } from "@/lib/planos-info";
+import type { OpcaoPlano, PlanoCatalogo } from "@/lib/planos-precos";
 
 export type ContratoAluno = {
   /** Valor de cada parcela. */
@@ -78,12 +47,13 @@ function menorParcela(plano: PlanoCatalogo): OpcaoPlano | undefined {
 
 /** Um plano por categoria (o de menor parcela), sem repetir o plano atual do aluno. */
 export function sugestoesDePlanos(
-  atual: PlanoCatalogo | undefined,
+  planos: readonly PlanoCatalogo[],
+  slugAtual: string | undefined,
   limite: number,
 ): SugestaoPlano[] {
-  const porCategoria = new Map<PlanoCatalogo["categoria"], SugestaoPlano>();
-  for (const plano of planosCatalogo) {
-    if (plano.slug === atual?.slug) continue;
+  const porCategoria = new Map<CategoriaPlano, SugestaoPlano>();
+  for (const plano of planos) {
+    if (plano.slug === slugAtual) continue;
     const opcao = menorParcela(plano);
     const existente = porCategoria.get(plano.categoria);
     if (opcao && (!existente || opcao.valor < existente.opcao.valor)) {

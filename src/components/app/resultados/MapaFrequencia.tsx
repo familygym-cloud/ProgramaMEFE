@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 
 /** Cor de cada nível de intensidade (0 = sem treino), compartilhada com os mini mapas de calor. */
 export const NIVEIS_CALOR = [
-  "bg-white/[0.07]",
+  "bg-foreground/[0.07]",
   "bg-brand-yellow/25",
   "bg-brand-yellow/50",
   "bg-brand-yellow/75",
@@ -87,8 +87,8 @@ export function MapaFrequencia({ semanas, hoje }: { semanas: CelulaCalor[][]; ho
               title={futuro ? undefined : descricaoCelula(c)}
               className={cn(
                 "aspect-square w-full rounded-[4px] sm:rounded-md",
-                futuro ? "border border-dashed border-white/10" : NIVEIS_CALOR[c.nivel],
-                c.data === hoje && "ring-2 ring-white/70 ring-offset-1 ring-offset-card",
+                futuro ? "border border-dashed border-foreground/10" : NIVEIS_CALOR[c.nivel],
+                c.data === hoje && "ring-2 ring-foreground/70 ring-offset-1 ring-offset-card",
               )}
             />
           );

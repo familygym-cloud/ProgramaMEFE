@@ -20,7 +20,7 @@ export function ValidadeTermo({ termoValidoAte }: { termoValidoAte: string | nul
     <Superficie
       className={cn(
         "flex flex-col gap-4",
-        situacao?.tom === "alerta" && "border-red-400/40 bg-red-400/10",
+        situacao?.tom === "alerta" && "border-destructive/40 bg-destructive/10",
         situacao?.tom === "atencao" && "border-brand-yellow/30",
       )}
     >
@@ -33,10 +33,10 @@ export function ValidadeTermo({ termoValidoAte }: { termoValidoAte: string | nul
           aria-hidden
           className={cn(
             "grid size-12 shrink-0 place-items-center rounded-2xl [&_svg]:size-6",
-            !situacao && "bg-white/5 text-muted-foreground",
-            situacao?.tom === "ok" && "bg-emerald-400/10 text-emerald-300",
+            !situacao && "bg-foreground/5 text-muted-foreground",
+            situacao?.tom === "ok" && "bg-foreground/10 text-foreground",
             situacao?.tom === "atencao" && "bg-brand-yellow/10 text-brand-yellow",
-            situacao?.tom === "alerta" && "bg-red-400/15 text-red-300",
+            situacao?.tom === "alerta" && "bg-destructive/15 text-destructive",
           )}
         >
           <Icone />

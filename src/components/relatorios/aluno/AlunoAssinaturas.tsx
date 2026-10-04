@@ -23,7 +23,7 @@ export function AlunoHistoricoAssinaturas({ relatorio }: { relatorio: RelatorioA
       atraso={240}
     >
       {linhas.length > 0 ? (
-        <ul aria-label="Assinaturas registradas" className="divide-y divide-white/10">
+        <ul aria-label="Assinaturas registradas" className="divide-y divide-foreground/10">
           {linhas.map((linha, indice) => (
             <li
               key={`${linha.data}-${linha.referencia}-${indice}`}
@@ -117,7 +117,7 @@ export function AlunoRodape({
   return (
     <footer
       className={cn(
-        "space-y-1.5 border-t border-white/10 pt-4 text-xs leading-relaxed text-muted-foreground print:pt-2",
+        "space-y-1.5 border-t border-foreground/10 pt-4 text-xs leading-relaxed text-muted-foreground print:pt-2",
         className,
       )}
     >

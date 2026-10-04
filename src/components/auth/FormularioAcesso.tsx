@@ -145,7 +145,7 @@ export function FormularioAcesso({
       <div
         role="group"
         aria-label="Tipo de acesso"
-        className="fg-entrada grid grid-cols-2 gap-1 rounded-full border border-white/10 bg-white/[0.04] p-1"
+        className="fg-entrada grid grid-cols-2 gap-1 rounded-full border border-foreground/10 bg-foreground/[0.04] p-1"
         style={{ animationDelay: "60ms" }}
       >
         {(["login", "signup"] as const).map((m) => (
@@ -157,7 +157,7 @@ export function FormularioAcesso({
             className={cn(
               "h-11 rounded-full px-4 text-sm font-semibold transition-colors",
               modo === m
-                ? "bg-white text-brand-black"
+                ? "bg-foreground text-brand-black"
                 : "text-muted-foreground hover:text-foreground",
             )}
           >
@@ -239,7 +239,7 @@ export function FormularioAcesso({
         {erro ? (
           <p
             role="alert"
-            className="rounded-2xl border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-red-200"
+            className="rounded-2xl border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive"
           >
             {erro}
           </p>
@@ -265,14 +265,14 @@ export function FormularioAcesso({
 
       <div className="fg-entrada space-y-4" style={{ animationDelay: "180ms" }}>
         <div className="flex items-center gap-3 text-xs uppercase tracking-[0.2em] text-muted-foreground">
-          <span className="h-px flex-1 bg-white/10" />
+          <span className="h-px flex-1 bg-foreground/10" />
           ou
-          <span className="h-px flex-1 bg-white/10" />
+          <span className="h-px flex-1 bg-foreground/10" />
         </div>
         <Button
           asChild
           variant="outline"
-          className="h-12 w-full rounded-2xl border-white/15 bg-transparent text-base font-medium hover:bg-white/10"
+          className="h-12 w-full rounded-2xl border-foreground/15 bg-transparent text-base font-medium hover:bg-foreground/10"
         >
           <Link to="/app" search={{ demo: true }}>
             <PlayCircle aria-hidden />

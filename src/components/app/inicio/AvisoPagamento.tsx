@@ -34,14 +34,16 @@ export function FaixaPagamento({ resumo }: { resumo: ResumoPagamento }) {
       role="status"
       className={cn(
         "flex flex-col gap-4 rounded-3xl border p-4 sm:flex-row sm:items-center sm:p-5",
-        atrasado ? "border-red-400/40 bg-red-400/10" : "border-white/15 bg-white/[0.06]",
+        atrasado
+          ? "border-destructive/40 bg-destructive/10"
+          : "border-foreground/15 bg-foreground/[0.06]",
       )}
     >
       <span
         aria-hidden
         className={cn(
           "grid size-11 shrink-0 place-items-center rounded-2xl [&_svg]:size-5",
-          atrasado ? "bg-red-400/15 text-red-300" : "bg-brand-yellow/15 text-brand-yellow",
+          atrasado ? "bg-destructive/15 text-destructive" : "bg-brand-yellow/15 text-brand-yellow",
         )}
       >
         {atrasado ? <CircleAlert /> : <CreditCard />}
@@ -62,7 +64,7 @@ export function FaixaPagamento({ resumo }: { resumo: ResumoPagamento }) {
       <Button
         asChild
         variant="outline"
-        className="h-11 shrink-0 rounded-full border-white/20 bg-transparent px-5 hover:bg-white/10"
+        className="h-11 shrink-0 rounded-full border-foreground/20 bg-transparent px-5 hover:bg-foreground/10"
       >
         <Link to="/app/plano">
           Ver meu plano
@@ -109,7 +111,7 @@ export function CartaoPagamento({
           <p className="flex items-center gap-2 font-display text-2xl font-bold leading-tight">
             {temHistorico ? (
               <>
-                <CircleCheck className="size-6 text-emerald-300" aria-hidden />
+                <CircleCheck className="size-6 text-foreground" aria-hidden />
                 Tudo em dia
               </>
             ) : (
@@ -124,7 +126,7 @@ export function CartaoPagamento({
         </div>
       )}
       {seguintes.length > 0 ? (
-        <ul className="space-y-1.5 border-t border-white/10 pt-3 text-sm text-muted-foreground">
+        <ul className="space-y-1.5 border-t border-foreground/10 pt-3 text-sm text-muted-foreground">
           {seguintes.map((p) => (
             <li key={p.id} className="flex justify-between gap-3">
               <span>{dataVencimento(p.vencimento)}</span>
@@ -147,7 +149,7 @@ export function CartaoPagamento({
       ) : null}
       <Link
         to="/app/plano"
-        className="-ml-3 mt-auto inline-flex min-h-11 w-fit items-center gap-1.5 rounded-full px-3 text-sm font-semibold hover:bg-white/5"
+        className="-ml-3 mt-auto inline-flex min-h-11 w-fit items-center gap-1.5 rounded-full px-3 text-sm font-semibold hover:bg-foreground/5"
       >
         Ver meu plano
         <ArrowRight className="size-4" aria-hidden />

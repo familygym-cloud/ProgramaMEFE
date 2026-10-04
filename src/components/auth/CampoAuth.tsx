@@ -29,7 +29,7 @@ export function CampoAuth({ id, rotulo, icone: Icone, fim, className, ...entrada
           id={id}
           {...entrada}
           className={cn(
-            "h-12 rounded-2xl border-white/15 bg-white/[0.04] pl-11 text-base placeholder:text-muted-foreground/70 focus-visible:border-brand-yellow focus-visible:ring-2 focus-visible:ring-brand-yellow/30",
+            "h-12 rounded-2xl bg-foreground/[0.04] pl-11 text-base placeholder:text-muted-foreground focus-visible:border-brand-yellow focus-visible:ring-2 focus-visible:ring-brand-yellow/30",
             fim ? "pr-12" : "pr-4",
           )}
         />

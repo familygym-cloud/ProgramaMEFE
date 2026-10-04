@@ -53,7 +53,7 @@ export function CabecalhoTreino({ treino, ehHoje }: { treino: Treino; ehHoje: bo
             <MessageSquareText className="size-5" aria-hidden />
           </span>
           <div className="space-y-1">
-            <h2 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+            <h2 className="font-sans text-xs font-semibold uppercase tracking-widest text-muted-foreground">
               Recado do professor
             </h2>
             <p className="text-sm sm:text-base">{treino.observacoes}</p>

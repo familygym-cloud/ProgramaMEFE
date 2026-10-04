@@ -1,6 +1,6 @@
 import { CircleAlert, CircleCheck, Receipt } from "lucide-react";
 import { Eyebrow, Superficie } from "@/components/app/ui";
-import { formatarBRL } from "@/lib/planos-catalogo";
+import { formatarBRL } from "@/lib/planos-precos";
 import { cn } from "@/lib/utils";
 import { dataExtensa, plural } from "./datas";
 import type { ResumoMensalidades } from "./mensalidades";
@@ -23,7 +23,7 @@ export function ProximoVencimento({ resumo }: { resumo: ResumoMensalidades }) {
         <Eyebrow>Mensalidades</Eyebrow>
         <span
           aria-hidden
-          className="grid size-12 place-items-center rounded-2xl bg-emerald-400/10 text-emerald-300 [&_svg]:size-6"
+          className="grid size-12 place-items-center rounded-2xl bg-foreground/10 text-foreground [&_svg]:size-6"
         >
           {temHistorico ? <CircleCheck /> : <Receipt />}
         </span>
@@ -47,16 +47,16 @@ export function ProximoVencimento({ resumo }: { resumo: ResumoMensalidades }) {
       className={cn(
         "flex flex-col gap-5 md:flex-row md:items-center md:justify-between md:gap-10 xl:flex-col xl:items-stretch xl:justify-start",
         proximaAtrasada
-          ? "border-red-400/40 bg-red-400/10"
+          ? "border-destructive/40 bg-destructive/10"
           : "border-brand-yellow/40 bg-brand-yellow/10",
       )}
     >
       <div className="flex flex-col gap-5">
         <div className="flex items-start justify-between gap-3">
-          <Eyebrow className={proximaAtrasada ? "text-red-300" : ""}>
+          <Eyebrow className={proximaAtrasada ? "text-destructive" : ""}>
             {proximaAtrasada ? "Mensalidade em atraso" : "Próxima mensalidade"}
           </Eyebrow>
-          {proximaAtrasada ? <CircleAlert className="size-5 text-red-300" aria-hidden /> : null}
+          {proximaAtrasada ? <CircleAlert className="size-5 text-destructive" aria-hidden /> : null}
         </div>
 
         <div className="space-y-2">
@@ -76,7 +76,9 @@ export function ProximoVencimento({ resumo }: { resumo: ResumoMensalidades }) {
         <p
           className={cn(
             "inline-flex items-center rounded-full px-3.5 py-1.5 text-sm font-semibold",
-            proximaAtrasada ? "bg-red-400/20 text-red-200" : "bg-brand-yellow text-brand-black",
+            proximaAtrasada
+              ? "bg-destructive/20 text-destructive"
+              : "bg-brand-yellow text-brand-black",
           )}
         >
           {prazo(diasParaProxima)}

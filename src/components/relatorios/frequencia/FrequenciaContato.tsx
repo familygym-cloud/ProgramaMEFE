@@ -38,10 +38,10 @@ export function FrequenciaContato({ nome, telefone }: { nome: string; telefone: 
         type="button"
         onClick={copiar}
         aria-label={copiado ? "Telefone copiado" : `Copiar telefone de ${nome}`}
-        className="-my-3 grid size-11 shrink-0 place-items-center rounded-full text-muted-foreground transition-colors hover:bg-white/10 hover:text-foreground print:hidden"
+        className="-my-3 grid size-11 shrink-0 place-items-center rounded-full text-muted-foreground transition-colors hover:bg-foreground/10 hover:text-foreground print:hidden"
       >
         {copiado ? (
-          <Check className="size-4 text-emerald-300" aria-hidden />
+          <Check className="size-4 text-foreground" aria-hidden />
         ) : (
           <Copy className="size-4" aria-hidden />
         )}

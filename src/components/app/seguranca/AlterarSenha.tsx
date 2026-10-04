@@ -48,7 +48,7 @@ export function AlterarSenha({ demo }: { demo: boolean }) {
   return (
     <Superficie as="section" className="space-y-5">
       <div className="flex items-center gap-3.5">
-        <span className="grid size-11 shrink-0 place-items-center rounded-2xl bg-white/5">
+        <span className="grid size-11 shrink-0 place-items-center rounded-2xl bg-foreground/5">
           <KeyRound aria-hidden className="size-5" />
         </span>
         <div>
@@ -88,7 +88,7 @@ export function AlterarSenha({ demo }: { demo: boolean }) {
             aria-invalid={divergente || undefined}
           />
           {divergente ? (
-            <p role="alert" className="text-xs text-red-300">
+            <p role="alert" className="text-xs text-destructive">
               As senhas não conferem.
             </p>
           ) : null}
@@ -97,7 +97,7 @@ export function AlterarSenha({ demo }: { demo: boolean }) {
         {erro ? (
           <p
             role="alert"
-            className="rounded-2xl border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-red-200"
+            className="rounded-2xl border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive"
           >
             {erro}
           </p>

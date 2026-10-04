@@ -404,6 +404,33 @@ export type Database = {
           },
         ]
       }
+      planos_precos: {
+        Row: {
+          atualizado_em: string
+          familia: Json | null
+          matricula: number
+          observacoes: string[]
+          opcoes: Json
+          slug: string
+        }
+        Insert: {
+          atualizado_em?: string
+          familia?: Json | null
+          matricula?: number
+          observacoes?: string[]
+          opcoes?: Json
+          slug: string
+        }
+        Update: {
+          atualizado_em?: string
+          familia?: Json | null
+          matricula?: number
+          observacoes?: string[]
+          opcoes?: Json
+          slug?: string
+        }
+        Relationships: []
+      }
       reservas_aula: {
         Row: {
           aluno_id: string

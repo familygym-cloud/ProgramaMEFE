@@ -8,8 +8,8 @@ import { CONTAINER } from "./SecaoSite";
 import { useSessao } from "./sessao";
 
 const CLASSE_LINK =
-  "inline-flex h-11 items-center rounded-full px-4 text-sm font-medium text-muted-foreground transition-colors hover:bg-white/5 hover:text-foreground";
-const CLASSE_LINK_ATIVO = "bg-white/[0.07] text-foreground";
+  "inline-flex h-11 items-center rounded-full px-4 text-sm font-medium text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-foreground";
+const CLASSE_LINK_ATIVO = "bg-foreground/[0.07] text-foreground";
 
 /** Visitante abre a demonstração; quem já entrou vai direto para a própria área. */
 function LinkAreaAluno({ className, children }: { className?: string; children: ReactNode }) {
@@ -35,8 +35,11 @@ function NavegacaoDesktop() {
       >
         Modalidades
       </Link>
+      <Link to="/grade" className={CLASSE_LINK} activeProps={{ className: CLASSE_LINK_ATIVO }}>
+        Grade de aulas
+      </Link>
       <Link to="/valores" className={CLASSE_LINK} activeProps={{ className: CLASSE_LINK_ATIVO }}>
-        Planos e valores
+        Planos
       </Link>
       <LinkAreaAluno className={CLASSE_LINK}>Área do aluno</LinkAreaAluno>
     </nav>
@@ -94,18 +97,18 @@ function MenuMobile({
 }) {
   if (!aberto) return null;
   const linkMobile =
-    "flex h-12 items-center rounded-2xl px-4 text-base font-medium text-foreground/90 hover:bg-white/5";
+    "flex h-12 items-center rounded-2xl px-4 text-base font-medium text-foreground/90 hover:bg-foreground/5";
   return (
     <div className="lg:hidden">
       {/* Cortina que escurece a página e fecha o menu ao toque (o cabeçalho já é o bloco de referência do absolute). */}
       <div
         aria-hidden="true"
         onClick={aoFechar}
-        className="absolute inset-x-0 top-full h-[100dvh] bg-black/60"
+        className="absolute inset-x-0 top-full h-[100dvh] bg-background/80"
       />
       <div
         id={id}
-        className="fg-entrada absolute inset-x-0 top-full max-h-[calc(100dvh-4rem)] overflow-y-auto border-b border-white/10 bg-background shadow-2xl"
+        className="fg-entrada absolute inset-x-0 top-full max-h-[calc(100dvh-4rem)] overflow-y-auto border-b border-foreground/10 bg-background shadow-2xl"
       >
         <div className={cn(CONTAINER, "space-y-5 py-5")}>
           <nav aria-label="Principal (celular)" className="flex flex-col gap-1">
@@ -113,17 +116,25 @@ function MenuMobile({
               to="/modalidades"
               onClick={aoFechar}
               className={linkMobile}
-              activeProps={{ className: "bg-white/[0.07]" }}
+              activeProps={{ className: "bg-foreground/[0.07]" }}
             >
               Modalidades
+            </Link>
+            <Link
+              to="/grade"
+              onClick={aoFechar}
+              className={linkMobile}
+              activeProps={{ className: "bg-foreground/[0.07]" }}
+            >
+              Grade de aulas
             </Link>
             <Link
               to="/valores"
               onClick={aoFechar}
               className={linkMobile}
-              activeProps={{ className: "bg-white/[0.07]" }}
+              activeProps={{ className: "bg-foreground/[0.07]" }}
             >
-              Planos e valores
+              Planos
             </Link>
             <LinkAreaAluno className={linkMobile}>Área do aluno</LinkAreaAluno>
           </nav>
@@ -154,7 +165,7 @@ export function SiteHeader() {
   }, [aberto]);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-white/10 bg-background/75 backdrop-blur-xl">
+    <header className="sticky top-0 z-50 border-b border-foreground/10 bg-background/75 backdrop-blur-xl">
       <div className={cn(CONTAINER, "flex h-16 items-center justify-between gap-4 sm:h-[4.5rem]")}>
         <Link to="/" aria-label="Family Gym — página inicial" className="rounded-xl py-2">
           <BrandLogo variante="principal" className="h-8 sm:h-9" />
@@ -170,7 +181,7 @@ export function SiteHeader() {
           aria-expanded={aberto}
           aria-controls={painel}
           aria-label={aberto ? "Fechar menu" : "Abrir menu"}
-          className="grid size-11 place-items-center rounded-full border border-white/10 bg-white/5 text-foreground transition-colors hover:bg-white/10 lg:hidden"
+          className="grid size-11 place-items-center rounded-full border border-foreground/10 bg-foreground/5 text-foreground transition-colors hover:bg-foreground/10 lg:hidden"
         >
           {aberto ? <X className="size-5" /> : <Menu className="size-5" />}
         </button>

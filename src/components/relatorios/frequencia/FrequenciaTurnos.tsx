@@ -34,7 +34,7 @@ export function FrequenciaTurnos({ relatorio, modo }: PropsAba) {
     >
       <div className="space-y-5">
         <BarrasHorizontais itens={itens} />
-        <p className="border-t border-white/10 pt-4 text-sm leading-relaxed text-foreground/90">
+        <p className="border-t border-foreground/10 pt-4 text-sm leading-relaxed text-foreground/90">
           {maisMovimentado
             ? `${maisMovimentado.turno} concentra ${formatarPercentual(maisMovimentado.pctTreinos, 0)} dos ${pluralizar(totalTreinos, "treino")} do período.`
             : "Ainda não há treinos registrados no período."}

@@ -37,13 +37,13 @@ function CelulaDoDia({ dia, treinos }: { dia: DiaSemana; treinos: Treino[] }) {
           principal
             ? dia.hoje
               ? "bg-brand-yellow text-brand-black"
-              : "bg-white/10 text-foreground"
+              : "bg-foreground/10 text-foreground"
             : "text-muted-foreground",
         )}
       >
-        {principal ? (letra ?? "•") : <span className="size-1.5 rounded-full bg-white/20" />}
+        {principal ? (letra ?? "•") : <span className="size-1.5 rounded-full bg-foreground/20" />}
         {dia.treinou ? (
-          <span className="absolute -bottom-1 -right-1 grid size-4 place-items-center rounded-full bg-emerald-400 text-brand-black ring-2 ring-card">
+          <span className="absolute -bottom-1 -right-1 grid size-4 place-items-center rounded-full bg-foreground text-brand-black ring-2 ring-card">
             <Check className="size-2.5" strokeWidth={4} />
           </span>
         ) : null}
@@ -53,8 +53,10 @@ function CelulaDoDia({ dia, treinos }: { dia: DiaSemana; treinos: Treino[] }) {
 
   const classe = cn(
     "flex flex-col items-center gap-2 rounded-2xl border px-1 py-3 transition-colors",
-    dia.hoje ? "border-brand-yellow/50 bg-brand-yellow/10" : "border-white/10 bg-white/[0.03]",
-    principal && "hover:bg-white/10",
+    dia.hoje
+      ? "border-brand-yellow/50 bg-brand-yellow/10"
+      : "border-foreground/10 bg-foreground/[0.03]",
+    principal && "hover:bg-foreground/10",
   );
 
   return (

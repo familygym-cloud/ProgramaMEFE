@@ -62,7 +62,7 @@ export function SeletorDeDia({ dias, selecionado, hoje, onSelecionar }: Props) {
               type="button"
               onClick={() => rolar(sentido)}
               aria-label={sentido === -1 ? "Mostrar dias anteriores" : "Mostrar próximos dias"}
-              className="grid size-11 place-items-center rounded-full border border-white/10 bg-white/[0.04] transition-colors hover:bg-white/10"
+              className="grid size-11 place-items-center rounded-full border border-foreground/10 bg-foreground/[0.04] transition-colors hover:bg-foreground/10"
             >
               {sentido === -1 ? (
                 <ChevronLeft className="size-5" aria-hidden />
@@ -94,7 +94,7 @@ export function SeletorDeDia({ dias, selecionado, hoje, onSelecionar }: Props) {
                 "flex min-h-[5.75rem] w-[4.5rem] shrink-0 snap-center flex-col items-center justify-center gap-1 rounded-2xl border px-2 py-3 transition-colors sm:w-[4.75rem]",
                 ativo
                   ? "border-brand-yellow bg-brand-yellow text-brand-black shadow-[0_10px_28px_-14px] shadow-brand-yellow/70"
-                  : "border-white/10 bg-white/[0.04] hover:bg-white/10",
+                  : "border-foreground/10 bg-foreground/[0.04] hover:bg-foreground/10",
                 !ativo && dia.total === 0 && "text-muted-foreground",
               )}
             >

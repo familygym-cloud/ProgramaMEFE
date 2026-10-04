@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { MessageSquareQuote } from "lucide-react";
-import { GraficoLinhas } from "@/components/app/charts";
+import { GraficoLinhas, MarcaSerie } from "@/components/app/charts";
 import { EstadoVazio, Eyebrow, ModuloIndisponivel, Superficie } from "@/components/app/ui";
 import type { MedidaCorporal } from "@/lib/aluno-app/types";
 import { dataCurta, dataPorExtenso, formatarNumero } from "./avaliacoes";
@@ -9,7 +9,7 @@ import { Sparkline } from "./Sparkline";
 import { Variacao } from "./Variacao";
 
 const COR_CINTURA = "var(--brand-yellow)";
-const COR_QUADRIL = "oklch(0.97 0 0)";
+const COR_QUADRIL = "var(--fg-alabastro)";
 
 function CartaoMedida({ item }: { item: ItemMedida }) {
   return (
@@ -39,7 +39,7 @@ function ResumoDasMedicoes({ medidas }: { medidas: MedidaCorporal[] }) {
   const ultima = ordenadas[ordenadas.length - 1];
   if (!primeira || !ultima) return null;
   return (
-    <li className="flex flex-col justify-between gap-3 rounded-3xl border border-dashed border-white/15 p-4 sm:p-5">
+    <li className="flex flex-col justify-between gap-3 rounded-3xl border border-dashed border-foreground/15 p-4 sm:p-5">
       <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
         Acompanhamento
       </p>
@@ -69,19 +69,11 @@ function CinturaXQuadril({ medidas }: { medidas: MedidaCorporal[] }) {
         <h3 className="font-display text-lg font-semibold">Cintura e quadril</h3>
         <ul className="flex items-center gap-4 text-xs text-muted-foreground">
           <li className="flex items-center gap-2">
-            <span
-              aria-hidden
-              className="size-2.5 rounded-full"
-              style={{ background: COR_CINTURA }}
-            />
+            <MarcaSerie cor={COR_CINTURA} indice={0} />
             Cintura (cm)
           </li>
           <li className="flex items-center gap-2">
-            <span
-              aria-hidden
-              className="size-2.5 rounded-full"
-              style={{ background: COR_QUADRIL }}
-            />
+            <MarcaSerie cor={COR_QUADRIL} indice={1} />
             Quadril (cm)
           </li>
         </ul>
@@ -147,7 +139,7 @@ export function MedidasCorporais({
           </ul>
           <CinturaXQuadril medidas={medidas} />
           {anotacao ? (
-            <figure className="flex items-start gap-3 rounded-3xl border border-white/10 p-4 sm:p-5">
+            <figure className="flex items-start gap-3 rounded-3xl border border-foreground/10 p-4 sm:p-5">
               <MessageSquareQuote
                 className="mt-0.5 size-5 shrink-0 text-brand-yellow"
                 aria-hidden

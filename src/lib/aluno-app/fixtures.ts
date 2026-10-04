@@ -1,5 +1,6 @@
 import { addDays, addMonths, format, startOfMonth, subDays, subMonths } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { catalogoDemo } from "../planos-precos-demo";
 import { calcularIMC, paraISO } from "./derive";
 import type { AreaAlunoDados, AulaAgenda, CheckIn, Treino } from "./types";
 
@@ -178,7 +179,8 @@ export function criarDadosDemo(agora: Date = new Date()): AreaAlunoDados {
     }
   }
 
-  // Plano Terrestre anual: 12 x R$ 259, as 6 primeiras pagas.
+  // Plano Terrestre anual (valor fictício de planos-precos-demo.ts), as 6 primeiras pagas.
+  const parcelaDemo = catalogoDemo.find((p) => p.slug === "terrestre")?.opcoes[0]?.valor ?? 150;
   const inicioPlano = startOfMonth(subMonths(hoje, 5));
   const pagamentos = Array.from({ length: 12 }, (_, i) => {
     const venc = addMonths(inicioPlano, i);
@@ -189,7 +191,7 @@ export function criarDadosDemo(agora: Date = new Date()): AreaAlunoDados {
       referencia: format(venc, "MM/yyyy"),
       parcela: i + 1,
       totalParcelas: 12,
-      valor: 259,
+      valor: parcelaDemo,
       vencimento: paraISO(venc),
       // Parcela paga antes do vencimento (a deste mês vence no dia 10): nunca com data futura.
       pagoEm: pago ? paraISO(venc > hoje ? hoje : venc) : null,

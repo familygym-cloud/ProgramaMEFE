@@ -11,6 +11,7 @@ import { useEffect, type ReactNode } from "react";
 
 import { Toaster } from "@/components/ui/sonner";
 import appCss from "../styles.css?url";
+import urbanistLatim from "@fontsource-variable/urbanist/files/urbanist-latin-wght-normal.woff2?url";
 import { reagirAoEventoDeAuth } from "../lib/auth-sessao";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { urlAbsoluta } from "../lib/site";
@@ -109,6 +110,22 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "theme-color", content: "#151515" },
     ],
     links: [
+      // Fontes antes do CSS: Urbanist (textos, auto-hospedada) e New Order (títulos, em
+      // public/fonts, fora do git: sem o arquivo o título cai na Urbanist e o 404 é inofensivo).
+      {
+        rel: "preload",
+        as: "font",
+        type: "font/woff2",
+        href: urbanistLatim,
+        crossOrigin: "anonymous",
+      },
+      {
+        rel: "preload",
+        as: "font",
+        type: "font/otf",
+        href: "/fonts/NewOrder-Regular.otf",
+        crossOrigin: "anonymous",
+      },
       {
         rel: "stylesheet",
         href: appCss,

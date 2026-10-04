@@ -20,7 +20,7 @@ export const Route = createFileRoute("/app/resultados")({
 });
 
 const CLASSE_ABA =
-  "h-11 shrink-0 rounded-full border border-white/10 px-5 text-sm font-semibold text-muted-foreground shadow-none hover:text-foreground data-[state=active]:border-white data-[state=active]:bg-white data-[state=active]:text-brand-black data-[state=active]:shadow-none";
+  "h-11 shrink-0 rounded-full border border-foreground/10 px-5 text-sm font-semibold text-muted-foreground shadow-none hover:text-foreground data-[state=active]:border-foreground data-[state=active]:bg-foreground data-[state=active]:text-brand-black data-[state=active]:shadow-none";
 
 function Pagina() {
   const { dados } = useAlunoApp();
@@ -55,7 +55,7 @@ function Pagina() {
             <Button
               asChild
               variant="outline"
-              className="h-11 rounded-full border-white/20 bg-transparent px-5 hover:bg-white/10"
+              className="h-11 rounded-full border-foreground/20 bg-transparent px-5 hover:bg-foreground/10"
             >
               <Link to="/app/avaliacoes">Ver avaliações</Link>
             </Button>

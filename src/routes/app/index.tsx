@@ -127,7 +127,7 @@ function Pagina() {
               type="button"
               variant="outline"
               onClick={() => setRegistrando(true)}
-              className="h-11 rounded-full border-white/20 bg-transparent px-5 hover:bg-white/10"
+              className="h-11 rounded-full border-foreground/20 bg-transparent px-5 hover:bg-foreground/10"
             >
               <Plus aria-hidden />
               Registrar treino

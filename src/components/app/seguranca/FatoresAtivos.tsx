@@ -36,9 +36,9 @@ export function FatoresAtivos({
         {fatores.map((fator) => (
           <li
             key={fator.id}
-            className="flex flex-wrap items-center gap-x-4 gap-y-3 rounded-2xl border border-white/10 bg-white/[0.03] p-4"
+            className="flex flex-wrap items-center gap-x-4 gap-y-3 rounded-2xl border border-foreground/10 bg-foreground/[0.03] p-4"
           >
-            <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-white/5 text-foreground">
+            <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-foreground/5 text-foreground">
               <Smartphone aria-hidden className="size-5" />
             </span>
             <div className="min-w-0 flex-1 basis-40">
@@ -53,7 +53,7 @@ export function FatoresAtivos({
               variant="outline"
               onClick={() => setRemovendo(fator)}
               aria-label={`Remover ${fator.nome}`}
-              className="h-11 rounded-xl border-white/15 bg-transparent px-4 text-red-300 hover:bg-red-400/10 hover:text-red-200"
+              className="h-11 rounded-xl border-foreground/15 bg-transparent px-4 text-destructive hover:bg-destructive/10 hover:text-destructive"
             >
               Remover
             </Button>

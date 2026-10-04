@@ -29,7 +29,7 @@ function AvisoSimulacao() {
       <p className="text-foreground/90">
         <strong className="font-semibold">Simulação.</strong> Na demonstração nada é enviado ao
         servidor e o código aceito é{" "}
-        <code className="rounded bg-black/30 px-1.5 py-0.5 font-mono text-brand-yellow">
+        <code className="rounded bg-background/30 px-1.5 py-0.5 font-mono text-brand-yellow">
           {CODIGO_DEMO}
         </code>
         .
@@ -54,7 +54,7 @@ function PassoEscanear({
     <div className="space-y-6">
       <div className="grid gap-6 sm:grid-cols-[auto_1fr] sm:items-center">
         <div className="mx-auto space-y-3 sm:mx-0">
-          <div className="rounded-3xl bg-white p-3 shadow-lg shadow-black/30">
+          <div className="rounded-3xl bg-foreground p-3 shadow-lg shadow-background/30">
             {demo ? (
               <QrDemonstracao className="size-44" />
             ) : (
@@ -93,7 +93,7 @@ function PassoEscanear({
         <Button
           asChild
           variant="outline"
-          className="h-11 w-full rounded-xl border-white/15 bg-transparent hover:bg-white/10 md:hidden"
+          className="h-11 w-full rounded-xl border-foreground/15 bg-transparent hover:bg-foreground/10 md:hidden"
         >
           <a href={cadastro.uri}>Estou no celular: abrir no aplicativo</a>
         </Button>
@@ -112,7 +112,7 @@ function PassoEscanear({
           type="button"
           variant="ghost"
           onClick={aoCancelar}
-          className="h-11 rounded-xl px-5 text-muted-foreground hover:bg-white/5 hover:text-foreground"
+          className="h-11 rounded-xl px-5 text-muted-foreground hover:bg-foreground/5 hover:text-foreground"
         >
           Cancelar
         </Button>
@@ -185,7 +185,7 @@ function PassoConfirmar({
       {erro ? (
         <p
           role="alert"
-          className="rounded-2xl border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-red-200"
+          className="rounded-2xl border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive"
         >
           {erro}
         </p>
@@ -197,7 +197,7 @@ function PassoConfirmar({
           variant="ghost"
           onClick={aoVoltar}
           disabled={enviando}
-          className="h-11 rounded-xl px-5 text-muted-foreground hover:bg-white/5 hover:text-foreground"
+          className="h-11 rounded-xl px-5 text-muted-foreground hover:bg-foreground/5 hover:text-foreground"
         >
           <ArrowLeft aria-hidden />
           Voltar
@@ -227,7 +227,7 @@ function PassoPronto({ aoConcluir }: { aoConcluir: () => void }) {
           Ao entrar na sua conta, além da senha, vamos pedir o código do aplicativo autenticador.
         </p>
       </div>
-      <p className="max-w-md rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-left text-sm text-muted-foreground">
+      <p className="max-w-md rounded-2xl border border-foreground/10 bg-foreground/[0.03] px-4 py-3 text-left text-sm text-muted-foreground">
         <strong className="font-semibold text-foreground">Vai trocar de celular?</strong> Antes de
         se desfazer do atual, remova este aparelho aqui em Segurança e ative de novo no celular
         novo.

@@ -1,4 +1,4 @@
-# Páginas públicas (início, modalidades e valores) ficam liberadas. As áreas que exigem login ou são
+# Páginas públicas (início, modalidades, grade de aulas e planos) ficam liberadas. As áreas que exigem login ou são
 # internas não têm nada para indexar. Atenção: um robô obedece apenas ao grupo mais específico para
 # o seu nome, por isso há um único grupo "*" (grupos separados por robô ignorariam as regras abaixo).
 #

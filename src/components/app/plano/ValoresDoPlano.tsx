@@ -1,6 +1,6 @@
 import { Check, Info } from "lucide-react";
-import { Eyebrow, Superficie } from "@/components/app/ui";
-import { formatarBRL, type PlanoCatalogo } from "@/lib/planos-catalogo";
+import { Eyebrow, Selo, Superficie } from "@/components/app/ui";
+import { formatarBRL, type PlanoCatalogo } from "@/lib/planos-precos";
 import { cn } from "@/lib/utils";
 import type { ContratoAluno } from "./catalogo";
 
@@ -44,7 +44,7 @@ function Lista({
         {itens.map((item) => (
           <li key={item} className="flex items-start gap-2.5">
             {icone === "check" ? (
-              <Check className="mt-0.5 size-4 shrink-0 text-emerald-300" aria-hidden />
+              <Check className="mt-0.5 size-4 shrink-0 text-brand-yellow" aria-hidden />
             ) : (
               <Info className="mt-0.5 size-4 shrink-0 text-muted-foreground" aria-hidden />
             )}
@@ -56,20 +56,29 @@ function Lista({
   );
 }
 
-type Props = { plano: PlanoCatalogo; contrato: ContratoAluno | null; className?: string };
+type Props = {
+  plano: PlanoCatalogo;
+  contrato: ContratoAluno | null;
+  /** Marca o cartão como o plano contratado pelo aluno (na lista de todos os planos). */
+  seuPlano?: boolean;
+  className?: string;
+};
 
 /** Valores, matrícula e o que o plano inclui, conforme a tabela oficial da academia. */
-export function ValoresDoPlano({ plano, contrato, className }: Props) {
+export function ValoresDoPlano({ plano, contrato, seuPlano = false, className }: Props) {
   const tiles = montarTiles(plano, contrato);
   const modalidades = plano.modalidades?.filter((m) => m !== "entre outras") ?? [];
   const temMais = plano.modalidades?.includes("entre outras");
   return (
     <Superficie className={cn("flex flex-col gap-6", className)}>
       <div className="space-y-1.5">
-        <Eyebrow>Tabela oficial</Eyebrow>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <Eyebrow>{plano.categoria}</Eyebrow>
+          {seuPlano ? <Selo tom="destaque">Seu plano</Selo> : null}
+        </div>
         <h2 className="font-display text-2xl font-bold leading-tight">{plano.nome}</h2>
         <p className="text-sm text-muted-foreground">
-          Valor de cada parcela. Sua opção fica destacada.
+          {contrato ? "Valor de cada parcela. Sua opção fica destacada." : "Valor de cada parcela."}
         </p>
       </div>
 
@@ -79,7 +88,9 @@ export function ValoresDoPlano({ plano, contrato, className }: Props) {
             key={t.chave}
             className={cn(
               "rounded-2xl border p-4",
-              t.atual ? "border-white/40 bg-white/[0.08]" : "border-white/10 bg-white/[0.03]",
+              t.atual
+                ? "border-foreground/40 bg-foreground/[0.08]"
+                : "border-foreground/10 bg-foreground/[0.03]",
             )}
           >
             <p className="flex items-center justify-between gap-2 text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
@@ -117,7 +128,7 @@ export function ValoresDoPlano({ plano, contrato, className }: Props) {
             {modalidades.map((m) => (
               <li
                 key={m}
-                className="rounded-full border border-white/15 px-3 py-1 text-sm text-foreground/90"
+                className="rounded-full border border-foreground/15 px-3 py-1 text-sm text-foreground/90"
               >
                 {m}
               </li>

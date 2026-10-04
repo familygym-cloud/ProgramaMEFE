@@ -2,7 +2,9 @@ import { useState, type ReactNode } from "react";
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import {
   Activity,
+  BadgeDollarSign,
   CalendarDays,
+  CalendarRange,
   CreditCard,
   Dumbbell,
   Home,
@@ -28,9 +30,11 @@ type ItemNav = {
     | "/app"
     | "/app/treinos"
     | "/app/aulas"
+    | "/app/grade"
     | "/app/avaliacoes"
     | "/app/resultados"
     | "/app/plano"
+    | "/app/valores"
     | "/app/perfil"
     | "/app/seguranca";
   rotulo: string;
@@ -42,22 +46,24 @@ const NAV_PRINCIPAL: ItemNav[] = [
   { to: "/app", rotulo: "Início", icone: <Home />, exato: true },
   { to: "/app/treinos", rotulo: "Treinos", icone: <Dumbbell /> },
   { to: "/app/aulas", rotulo: "Aulas", icone: <CalendarDays /> },
+  { to: "/app/grade", rotulo: "Grade de aulas", icone: <CalendarRange /> },
   { to: "/app/avaliacoes", rotulo: "Avaliações", icone: <Ruler /> },
   { to: "/app/resultados", rotulo: "Resultados", icone: <LineChart /> },
 ];
 
 const NAV_CONTA: ItemNav[] = [
   { to: "/app/plano", rotulo: "Meu plano", icone: <CreditCard /> },
+  { to: "/app/valores", rotulo: "Valores dos planos", icone: <BadgeDollarSign /> },
   { to: "/app/perfil", rotulo: "Informações pessoais", icone: <UserRound /> },
   { to: "/app/seguranca", rotulo: "Segurança", icone: <ShieldCheck /> },
 ];
 
-const NAV_MOBILE: ItemNav[] = [
-  NAV_PRINCIPAL[0]!,
-  NAV_PRINCIPAL[1]!,
-  NAV_PRINCIPAL[2]!,
-  NAV_PRINCIPAL[4]!,
-];
+// Barra inferior do celular: só quatro atalhos; o resto fica no menu.
+const ATALHOS_MOBILE: ItemNav["to"][] = ["/app", "/app/treinos", "/app/aulas", "/app/resultados"];
+const NAV_MOBILE: ItemNav[] = ATALHOS_MOBILE.flatMap((to) => {
+  const item = NAV_PRINCIPAL.find((i) => i.to === to);
+  return item ? [item] : [];
+});
 
 function useAtivo() {
   const caminho = useRouterState({ select: (s) => s.location.pathname });
@@ -83,7 +89,7 @@ function ItemLateral({
         "group flex items-center gap-3 rounded-2xl px-3.5 py-2.5 text-sm font-medium transition-colors [&_svg]:size-[1.15rem]",
         ativo
           ? "bg-brand-yellow text-brand-black shadow-[0_8px_24px_-12px] shadow-brand-yellow/60"
-          : "text-muted-foreground hover:bg-white/5 hover:text-foreground",
+          : "text-muted-foreground hover:bg-foreground/5 hover:text-foreground",
       )}
     >
       {item.icone}
@@ -94,7 +100,7 @@ function ItemLateral({
 
 function CartaoUsuario({ perfil, demo }: { perfil: PerfilAluno; demo: boolean }) {
   return (
-    <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] p-3">
+    <div className="flex items-center gap-3 rounded-2xl border border-foreground/10 bg-foreground/[0.03] p-3">
       <span
         aria-hidden
         className="grid size-10 shrink-0 place-items-center rounded-full bg-brand-yellow font-display text-sm font-bold text-brand-black"
@@ -152,7 +158,7 @@ export function AppShell({
       </a>
 
       {/* Barra lateral (desktop) */}
-      <aside className="fixed inset-y-0 left-0 z-40 hidden w-72 flex-col gap-6 border-r border-white/10 bg-sidebar px-5 py-6 lg:flex">
+      <aside className="fixed inset-y-0 left-0 z-40 hidden w-72 flex-col gap-6 border-r border-foreground/10 bg-sidebar px-5 py-6 lg:flex">
         <Link to="/app" aria-label="Family Gym — início da área do aluno" className="px-1.5">
           <BrandLogo variante="principal" className="h-9" />
         </Link>
@@ -176,7 +182,7 @@ export function AppShell({
           <button
             type="button"
             onClick={sair}
-            className="flex w-full items-center gap-3 rounded-2xl px-3.5 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-white/5 hover:text-foreground [&_svg]:size-[1.15rem]"
+            className="flex w-full items-center gap-3 rounded-2xl px-3.5 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-foreground [&_svg]:size-[1.15rem]"
           >
             <LogOut /> {demo ? "Sair da demonstração" : "Sair"}
           </button>
@@ -184,7 +190,7 @@ export function AppShell({
       </aside>
 
       {/* Barra superior (mobile e tablet) */}
-      <header className="sticky top-0 z-40 flex items-center justify-between border-b border-white/10 bg-background/85 px-4 py-3 backdrop-blur lg:hidden">
+      <header className="sticky top-0 z-40 flex items-center justify-between border-b border-foreground/10 bg-background/85 px-4 py-3 backdrop-blur lg:hidden">
         <Link to="/app" aria-label="Family Gym — início">
           <BrandLogo variante="principal" className="h-7" />
         </Link>
@@ -192,7 +198,7 @@ export function AppShell({
           type="button"
           onClick={() => setAberto(true)}
           aria-label="Abrir menu"
-          className="grid size-10 place-items-center rounded-full border border-white/10 bg-white/5"
+          className="grid size-10 place-items-center rounded-full border border-foreground/10 bg-foreground/5"
         >
           <Menu className="size-5" />
         </button>
@@ -210,16 +216,16 @@ export function AppShell({
             type="button"
             aria-label="Fechar menu"
             onClick={fechar}
-            className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+            className="absolute inset-0 bg-background/70 backdrop-blur-sm"
           />
-          <div className="absolute inset-y-0 right-0 flex w-[min(22rem,88vw)] flex-col gap-5 overflow-y-auto border-l border-white/10 bg-sidebar px-5 py-6 fg-entrada">
+          <div className="absolute inset-y-0 right-0 flex w-[min(22rem,88vw)] flex-col gap-5 overflow-y-auto border-l border-foreground/10 bg-sidebar px-5 py-6 fg-entrada">
             <div className="flex items-center justify-between">
               <BrandLogo variante="principal" className="h-7" />
               <button
                 type="button"
                 onClick={fechar}
                 aria-label="Fechar menu"
-                className="grid size-10 place-items-center rounded-full border border-white/10 bg-white/5"
+                className="grid size-10 place-items-center rounded-full border border-foreground/10 bg-foreground/5"
               >
                 <X className="size-5" />
               </button>
@@ -233,7 +239,7 @@ export function AppShell({
             <button
               type="button"
               onClick={sair}
-              className="mt-auto flex items-center gap-3 rounded-2xl px-3.5 py-2.5 text-sm font-medium text-muted-foreground hover:bg-white/5 hover:text-foreground [&_svg]:size-[1.15rem]"
+              className="mt-auto flex items-center gap-3 rounded-2xl px-3.5 py-2.5 text-sm font-medium text-muted-foreground hover:bg-foreground/5 hover:text-foreground [&_svg]:size-[1.15rem]"
             >
               <LogOut /> {demo ? "Sair da demonstração" : "Sair"}
             </button>
@@ -262,7 +268,7 @@ export function AppShell({
       {/* Barra inferior (mobile) */}
       <nav
         aria-label="Navegação rápida"
-        className="fixed inset-x-0 bottom-0 z-40 border-t border-white/10 bg-background/90 px-2 pt-2 backdrop-blur pb-seguro lg:hidden"
+        className="fixed inset-x-0 bottom-0 z-40 border-t border-foreground/10 bg-background/90 px-2 pt-2 backdrop-blur pb-seguro lg:hidden"
       >
         <ul className="mx-auto flex max-w-md items-stretch justify-between">
           {NAV_MOBILE.map((item) => {

@@ -35,7 +35,7 @@ export function FrequenciaModalidades({ relatorio, modo }: PropsAba) {
       {itens.length > 0 ? (
         <div className="space-y-4">
           <BarrasHorizontais itens={itens} limite={LIMITE_VISIVEL} />
-          <p className="border-t border-white/10 pt-3 text-sm text-muted-foreground">
+          <p className="border-t border-foreground/10 pt-3 text-sm text-muted-foreground">
             Total:{" "}
             <strong className="font-semibold text-foreground">
               {pluralizar(totalPresencas, "presença")}

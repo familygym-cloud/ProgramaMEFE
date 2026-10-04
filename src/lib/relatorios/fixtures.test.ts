@@ -1,6 +1,6 @@
 import { parseISO } from "date-fns";
 import { describe, expect, it } from "vitest";
-import { planosCatalogo } from "../planos-catalogo";
+import { catalogoDemo } from "../planos-precos-demo";
 import { agregarRelatorioAluno, agregarRelatorioGeral } from "./agregar";
 import {
   criarEntradaDemo,
@@ -47,8 +47,8 @@ describe("criarEntradaDemo", () => {
     expect(e.alunos.some((a) => a.telefone === null)).toBe(true);
   });
 
-  it("usa os planos e valores do catálogo oficial", () => {
-    const porNome = new Map(planosCatalogo.map((p) => [p.nome, p] as const));
+  it("usa os planos oficiais com os valores fictícios de demonstração", () => {
+    const porNome = new Map(catalogoDemo.map((p) => [p.nome, p] as const));
     const planoDoAluno = new Map(e.alunos.map((a) => [a.id, a.plano] as const));
     for (const a of e.alunos) expect(porNome.has(a.plano)).toBe(true);
     for (const p of e.pagamentos) {

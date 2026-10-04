@@ -25,7 +25,7 @@ export function ChaveSecreta({ segredo }: { segredo: string }) {
   }
 
   return (
-    <div className="flex items-center gap-2 rounded-2xl border border-white/10 bg-black/30 p-1.5 pl-4">
+    <div className="flex items-center gap-2 rounded-2xl border border-foreground/10 bg-background/30 p-1.5 pl-4">
       <code
         aria-label="Chave secreta"
         className="min-w-0 flex-1 select-all break-all font-mono text-sm tracking-wider text-foreground"
@@ -36,7 +36,7 @@ export function ChaveSecreta({ segredo }: { segredo: string }) {
         type="button"
         variant="outline"
         onClick={copiar}
-        className="h-11 shrink-0 rounded-xl border-white/15 bg-transparent px-4 hover:bg-white/10"
+        className="h-11 shrink-0 rounded-xl border-foreground/15 bg-transparent px-4 hover:bg-foreground/10"
       >
         {copiada ? <Check aria-hidden /> : <Copy aria-hidden />}
         {copiada ? "Copiada" : "Copiar"}

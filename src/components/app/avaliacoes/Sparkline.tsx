@@ -24,7 +24,7 @@ export function Sparkline({ valores }: { valores: number[] }) {
           strokeLinecap="round"
           strokeLinejoin="round"
           vectorEffect="non-scaling-stroke"
-          className="stroke-white/50"
+          className="stroke-foreground/50"
         />
       </svg>
       {ultimo ? (

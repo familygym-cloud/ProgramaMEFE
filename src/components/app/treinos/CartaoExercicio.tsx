@@ -19,7 +19,7 @@ type Props = {
   aoAlternarSerie: (indice: number) => void;
 };
 
-const TILE = "rounded-2xl border border-white/10 bg-white/[0.03] p-2.5 sm:p-4";
+const TILE = "rounded-2xl border border-foreground/10 bg-foreground/[0.03] p-2.5 sm:p-4";
 const VALOR = "whitespace-nowrap text-lg sm:text-2xl";
 
 function BotaoSerie({
@@ -41,7 +41,7 @@ function BotaoSerie({
       </span>
       <span
         aria-hidden
-        className="grid size-12 place-items-center sm:size-14 rounded-full border-2 border-white/20 font-display text-lg font-bold text-muted-foreground transition-colors hover:border-white/40 peer-checked:border-brand-yellow peer-checked:bg-brand-yellow peer-checked:text-brand-black peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-brand-yellow motion-safe:active:scale-95"
+        className="grid size-12 place-items-center sm:size-14 rounded-full border-2 border-input font-display text-lg font-bold text-muted-foreground transition-colors hover:border-foreground/70 peer-checked:border-brand-yellow peer-checked:bg-brand-yellow peer-checked:text-brand-black peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-brand-yellow motion-safe:active:scale-95"
       >
         {marcada ? (
           <Check
@@ -75,7 +75,7 @@ export function CartaoExercicio({
             aria-hidden
             className={cn(
               "grid size-11 shrink-0 place-items-center rounded-full font-display text-lg font-bold transition-colors",
-              completo ? "bg-brand-yellow text-brand-black" : "bg-white/10",
+              completo ? "bg-brand-yellow text-brand-black" : "bg-foreground/10",
             )}
           >
             {completo ? <Check className="size-5" strokeWidth={3} /> : posicao}
@@ -83,7 +83,7 @@ export function CartaoExercicio({
           <div className="min-w-0 flex-1 space-y-2">
             <div className="flex flex-wrap items-center gap-2">
               <Selo>{exercicio.grupoMuscular}</Selo>
-              {emFoco ? <Selo tom="atencao">Agora</Selo> : null}
+              {emFoco ? <Selo tom="realce">Agora</Selo> : null}
               {completo ? <Selo tom="ok">Concluído</Selo> : null}
             </div>
             <h3 className="font-display text-xl font-bold leading-tight tracking-tight sm:text-2xl">

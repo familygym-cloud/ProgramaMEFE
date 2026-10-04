@@ -98,7 +98,7 @@ export function EtapaSegundoFator({
         {erro ? (
           <p
             role="alert"
-            className="rounded-2xl border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-red-200"
+            className="rounded-2xl border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive"
           >
             {erro}
           </p>

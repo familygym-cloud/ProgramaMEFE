@@ -16,7 +16,7 @@ function Ponto({
     <li className="flex items-start gap-3.5">
       <span
         aria-hidden
-        className="grid size-10 shrink-0 place-items-center rounded-xl bg-white/[0.06] text-muted-foreground [&_svg]:size-[1.15rem]"
+        className="grid size-10 shrink-0 place-items-center rounded-xl bg-foreground/[0.06] text-muted-foreground [&_svg]:size-[1.15rem]"
       >
         {icone}
       </span>

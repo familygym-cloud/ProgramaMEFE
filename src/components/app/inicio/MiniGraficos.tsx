@@ -17,7 +17,10 @@ export function MiniBarras({
         <span
           // A posição é a identidade de cada barra (um valor por dia).
           key={i}
-          className={cn("flex-1 rounded-[3px]", i === destaque ? "bg-foreground" : "bg-white/20")}
+          className={cn(
+            "flex-1 rounded-[3px]",
+            i === destaque ? "bg-foreground" : "bg-foreground/20",
+          )}
           style={{ height: `${Math.max(8, (v / maximo) * 100)}%` }}
         />
       ))}
@@ -45,7 +48,7 @@ export function MiniLinha({ valores, rotulo }: { valores: number[]; rotulo: stri
         <polyline
           points={pontos.map((p) => `${p.x},${p.y}`).join(" ")}
           fill="none"
-          className="stroke-white/50"
+          className="stroke-foreground/50"
           strokeWidth={2}
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -66,10 +69,10 @@ export function MiniLinha({ valores, rotulo }: { valores: number[]; rotulo: stri
 const IMC_MIN = 15;
 const IMC_MAX = 40;
 const FAIXAS_IMC = [
-  { ate: 18.5, classe: "bg-white/15" },
-  { ate: 25, classe: "bg-emerald-400/50" },
-  { ate: 30, classe: "bg-white/15" },
-  { ate: IMC_MAX, classe: "bg-white/15" },
+  { ate: 18.5, classe: "bg-foreground/15" },
+  { ate: 25, classe: "bg-foreground/70" },
+  { ate: 30, classe: "bg-foreground/15" },
+  { ate: IMC_MAX, classe: "bg-foreground/15" },
 ] as const;
 
 /** Escala do IMC (abaixo do peso, saudável, sobrepeso, obesidade) com a posição atual. */

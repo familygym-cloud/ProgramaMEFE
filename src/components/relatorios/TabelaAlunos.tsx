@@ -63,7 +63,7 @@ function EmAtraso({ aluno }: { aluno: AlunoResumo }) {
   if (aluno.parcelasEmAtraso === 0) return <span className="text-muted-foreground">{TRACO}</span>;
   return (
     <div className="space-y-0.5">
-      <p className="font-semibold text-red-300">{formatarMoeda(aluno.valorEmAtraso)}</p>
+      <p className="font-semibold text-destructive">{formatarMoeda(aluno.valorEmAtraso)}</p>
       <p className="text-xs text-muted-foreground">
         {pluralizar(aluno.parcelasEmAtraso, "parcela")}
       </p>
@@ -240,7 +240,7 @@ export function TabelaAlunos({
         {visiveis.map((aluno) => (
           <li
             key={aluno.alunoId}
-            className="rounded-2xl border border-white/10 bg-white/[0.03] p-4"
+            className="rounded-2xl border border-foreground/10 bg-foreground/[0.03] p-4"
           >
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0 break-words">
@@ -276,14 +276,14 @@ export function TabelaAlunos({
         role="region"
         aria-label="Tabela de alunos"
         tabIndex={0}
-        className="hidden overflow-x-auto rounded-2xl border border-white/10 md:block print:block print:overflow-visible"
+        className="hidden overflow-x-auto rounded-2xl border border-foreground/10 md:block print:block print:overflow-visible"
       >
         <table className="w-full min-w-[56rem] border-collapse text-sm print:min-w-0">
           <caption className="sr-only">
             Alunos, com situação, último treino, termo e parcelas em atraso
           </caption>
           <thead>
-            <tr className="border-b border-white/10 bg-white/[0.03]">
+            <tr className="border-b border-foreground/10 bg-foreground/[0.03]">
               {COLUNAS.map((coluna) => (
                 <CabecalhoColuna
                   key={coluna.id}
@@ -299,7 +299,7 @@ export function TabelaAlunos({
               <tr
                 key={aluno.alunoId}
                 className={cn(
-                  "border-b border-white/5 transition-colors last:border-b-0 hover:bg-white/[0.03] print:break-inside-avoid",
+                  "border-b border-foreground/5 transition-colors last:border-b-0 hover:bg-foreground/[0.03] print:break-inside-avoid",
                   indice >= limite && "hidden print:table-row",
                 )}
               >
@@ -333,7 +333,7 @@ export function TabelaAlunos({
             type="button"
             variant="ghost"
             onClick={aoMostrarMais}
-            className="-mr-3 h-11 gap-2 rounded-full px-3 text-sm text-foreground/90 hover:bg-white/10 hover:text-foreground sm:h-9"
+            className="-mr-3 h-11 gap-2 rounded-full px-3 text-sm text-foreground/90 hover:bg-foreground/10 hover:text-foreground sm:h-9"
           >
             Mostrar mais {formatarNumero(Math.min(restantes, ALUNOS_POR_PAGINA))}
             <ChevronDown aria-hidden />

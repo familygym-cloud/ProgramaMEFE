@@ -46,7 +46,7 @@ export function SequenciaSemana({
             "grid size-12 place-items-center rounded-2xl",
             sequencia > 0
               ? "bg-brand-yellow/15 text-brand-yellow"
-              : "bg-white/5 text-muted-foreground",
+              : "bg-foreground/5 text-muted-foreground",
           )}
         >
           <Flame className={cn("size-6", sequencia > 0 && "fill-brand-yellow/30")} />
@@ -61,7 +61,7 @@ export function SequenciaSemana({
           : "Treine hoje e comece uma nova sequência."}
       </p>
 
-      <div className="space-y-4 border-t border-white/10 pt-5">
+      <div className="space-y-4 border-t border-foreground/10 pt-5">
         {anteriores.length > 0 ? (
           <div
             role="img"
@@ -91,9 +91,9 @@ export function SequenciaSemana({
                   d.treinou
                     ? "border-brand-yellow/50 bg-brand-yellow/15 text-brand-yellow"
                     : d.data < hoje
-                      ? "border-white/10 bg-white/5 text-muted-foreground"
-                      : "border-dashed border-white/15 text-muted-foreground",
-                  d.hoje && "ring-2 ring-white/80 ring-offset-2 ring-offset-card",
+                      ? "border-foreground/10 bg-foreground/5 text-muted-foreground"
+                      : "border-dashed border-foreground/15 text-muted-foreground",
+                  d.hoje && "ring-2 ring-foreground/80 ring-offset-2 ring-offset-card",
                 )}
               >
                 {d.treinou ? <Check className="size-4" strokeWidth={3} aria-hidden /> : null}

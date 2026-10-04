@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { Link } from "@tanstack/react-router";
 import { ArrowDownRight, ArrowUpRight, Info } from "lucide-react";
-import { GraficoLinhas, GraficoTendencia } from "@/components/app/charts";
+import { GraficoLinhas, MarcaSerie, GraficoTendencia } from "@/components/app/charts";
 import { EstadoVazio, Eyebrow, ModuloIndisponivel, Selo, Superficie } from "@/components/app/ui";
 import { Button } from "@/components/ui/button";
 import { classificarIMC, ordenarAvaliacoes, resumoPeso } from "@/lib/aluno-app/derive";
@@ -17,7 +17,7 @@ import {
 } from "./dados";
 
 const COR_CINTURA = "var(--brand-yellow)";
-const COR_QUADRIL = "oklch(0.97 0 0)";
+const COR_QUADRIL = "var(--fg-alabastro)";
 
 export function Corpo({ dados }: { dados: AreaAlunoDados }) {
   const info = useMemo(() => {
@@ -47,7 +47,7 @@ export function Corpo({ dados }: { dados: AreaAlunoDados }) {
           <Button
             asChild
             variant="outline"
-            className="h-11 rounded-full border-white/20 bg-transparent px-5 hover:bg-white/10"
+            className="h-11 rounded-full border-foreground/20 bg-transparent px-5 hover:bg-foreground/10"
           >
             <Link to="/app/avaliacoes">Ver avaliações</Link>
           </Button>
@@ -125,19 +125,11 @@ export function Corpo({ dados }: { dados: AreaAlunoDados }) {
                   <Eyebrow>Cintura e quadril</Eyebrow>
                   <ul className="flex items-center gap-4 text-xs text-muted-foreground">
                     <li className="flex items-center gap-2">
-                      <span
-                        aria-hidden
-                        className="size-2.5 rounded-full"
-                        style={{ background: COR_CINTURA }}
-                      />
+                      <MarcaSerie cor={COR_CINTURA} indice={0} />
                       Cintura (cm)
                     </li>
                     <li className="flex items-center gap-2">
-                      <span
-                        aria-hidden
-                        className="size-2.5 rounded-full"
-                        style={{ background: COR_QUADRIL }}
-                      />
+                      <MarcaSerie cor={COR_QUADRIL} indice={1} />
                       Quadril (cm)
                     </li>
                   </ul>
@@ -155,7 +147,7 @@ export function Corpo({ dados }: { dados: AreaAlunoDados }) {
         )}
       </section>
 
-      <p className="flex items-start gap-2 rounded-2xl border border-white/10 px-4 py-3 text-xs text-muted-foreground">
+      <p className="flex items-start gap-2 rounded-2xl border border-foreground/10 px-4 py-3 text-xs text-muted-foreground">
         <Info className="mt-0.5 size-4 shrink-0" aria-hidden />O IMC é um indicador geral e não
         considera massa muscular. Converse com seu professor para interpretar seus resultados de
         acordo com o seu objetivo.
@@ -183,7 +175,7 @@ function CartaoMedida({ item }: { item: ItemMedida }) {
       <p
         className={cn(
           "mt-2 flex items-center gap-1 text-xs",
-          evoluiu ? "font-semibold text-emerald-300" : "text-muted-foreground",
+          evoluiu ? "font-semibold text-foreground" : "text-muted-foreground",
         )}
       >
         {variacao === null ? (

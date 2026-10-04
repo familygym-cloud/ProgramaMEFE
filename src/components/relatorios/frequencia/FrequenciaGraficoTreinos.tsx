@@ -12,11 +12,15 @@ import {
 import {
   AMARELO,
   CINZA,
+  CONTORNO,
+  CURSOR_VERTICAL,
   CaixaTooltip,
   EIXO,
   GRADE,
+  LINHA,
   LinhaTooltip,
   Moldura,
+  PONTO_ATIVO,
   TabelaAcessivel,
 } from "@/components/relatorios/graficos";
 import { useAnimar } from "@/components/relatorios/useAnimar";
@@ -100,7 +104,7 @@ export function FrequenciaGraficoTreinos({
           width={30}
           tickFormatter={(v: number) => formatarNumero(v, Number.isInteger(v) ? 0 : 1)}
         />
-        <Tooltip cursor={{ fill: "var(--border)", opacity: 0.4 }} content={<TooltipTreinos />} />
+        <Tooltip cursor={CURSOR_VERTICAL} content={<TooltipTreinos />} />
         <Bar
           yAxisId="treinos"
           dataKey="treinos"
@@ -113,7 +117,7 @@ export function FrequenciaGraficoTreinos({
               key={p.chave}
               fill={AMARELO}
               fillOpacity={p.emAndamento ? 0.4 : 1}
-              stroke={p.emAndamento ? AMARELO : "none"}
+              stroke={p.emAndamento ? LINHA : CONTORNO}
               strokeDasharray={p.emAndamento ? "4 3" : undefined}
             />
           ))}
@@ -126,7 +130,7 @@ export function FrequenciaGraficoTreinos({
           strokeWidth={2}
           strokeDasharray="5 4"
           dot={{ r: 3, fill: CINZA, stroke: "none" }}
-          activeDot={{ r: 5 }}
+          activeDot={PONTO_ATIVO}
           isAnimationActive={animar}
         />
         <Line
@@ -134,7 +138,7 @@ export function FrequenciaGraficoTreinos({
           dataKey="parcial"
           stroke="none"
           dot={{ r: 3.5, fill: "var(--card)", stroke: CINZA, strokeWidth: 2 }}
-          activeDot={{ r: 5 }}
+          activeDot={PONTO_ATIVO}
           isAnimationActive={animar}
         />
       </ComposedChart>

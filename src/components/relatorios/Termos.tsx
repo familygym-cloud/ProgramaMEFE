@@ -181,7 +181,7 @@ function Assinaturas({ relatorio }: { relatorio: PropsAba["relatorio"] }) {
             de {cadastrados}.
           </p>
         </div>
-        <GradeDados colunas={2} className="border-t border-white/10 pt-5">
+        <GradeDados colunas={2} className="border-t border-foreground/10 pt-5">
           <Dado
             rotulo="Assinaturas"
             valor={formatarNumero(assinaturas.total)}
@@ -268,14 +268,14 @@ function FiltroSituacao({
               "inline-flex min-h-11 items-center gap-2 rounded-full border px-4 text-sm transition-colors sm:min-h-9",
               ativo
                 ? "border-brand-yellow bg-brand-yellow font-semibold text-brand-black"
-                : "border-white/20 text-foreground/90 hover:bg-white/10",
+                : "border-foreground/20 text-foreground/90 hover:bg-foreground/10",
             )}
           >
             {ROTULO_FILTRO_TERMOS[id]}
             <span
               className={cn(
                 "rounded-full px-2 py-0.5 text-xs font-semibold tabular-nums",
-                ativo ? "bg-brand-black/15" : "bg-white/10 text-muted-foreground",
+                ativo ? "bg-brand-black/15" : "bg-foreground/10 text-muted-foreground",
               )}
             >
               {formatarNumero(contagem[id])}

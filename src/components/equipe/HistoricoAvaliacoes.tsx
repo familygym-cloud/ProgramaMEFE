@@ -40,7 +40,7 @@ function ItemHistorico({
   });
 
   return (
-    <li className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+    <li className="rounded-2xl border border-foreground/10 bg-foreground/[0.03] p-4">
       <div className="grid grid-cols-2 gap-x-4 gap-y-3 sm:grid-cols-[10rem_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1.2fr)] sm:items-start">
         <div className="col-span-2 sm:col-span-1">
           <Rotulo>Data</Rotulo>
@@ -69,7 +69,7 @@ function ItemHistorico({
               {medidas.map(({ chave, valor }) => (
                 <li
                   key={chave}
-                  className="rounded-full bg-white/[0.07] px-2.5 py-1 text-xs tabular-nums text-foreground/90"
+                  className="rounded-full bg-foreground/[0.07] px-2.5 py-1 text-xs tabular-nums text-foreground/90"
                 >
                   {MEDIDAS[chave].rotulo} {formatarNumero(valor)} {MEDIDAS[chave].unidade}
                 </li>
@@ -81,7 +81,7 @@ function ItemHistorico({
         </div>
       </div>
       {avaliacao.observacoes ? (
-        <p className="mt-3 border-t border-white/10 pt-3 text-sm text-muted-foreground">
+        <p className="mt-3 border-t border-foreground/10 pt-3 text-sm text-muted-foreground">
           {avaliacao.observacoes}
         </p>
       ) : null}
@@ -119,13 +119,13 @@ export function HistoricoAvaliacoes({
 
       {carregando ? (
         <div className="space-y-3" role="status" aria-label="Carregando avaliações">
-          <Skeleton className="h-24 rounded-2xl bg-white/[0.06] motion-reduce:animate-none" />
-          <Skeleton className="h-24 rounded-2xl bg-white/[0.06] motion-reduce:animate-none" />
+          <Skeleton className="h-24 rounded-2xl bg-foreground/[0.06] motion-reduce:animate-none" />
+          <Skeleton className="h-24 rounded-2xl bg-foreground/[0.06] motion-reduce:animate-none" />
         </div>
       ) : erro ? (
         <p
           role="alert"
-          className="rounded-2xl border border-red-400/40 bg-red-400/10 px-4 py-3 text-sm text-red-300"
+          className="rounded-2xl border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive"
         >
           {erro}
         </p>
@@ -139,7 +139,7 @@ export function HistoricoAvaliacoes({
         <>
           {serie.length >= 2 ? (
             <Superficie className="p-4 sm:p-5">
-              <h3 className="px-1 text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+              <h3 className="font-sans px-1 text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
                 Evolução do peso
               </h3>
               <div className="mt-3">

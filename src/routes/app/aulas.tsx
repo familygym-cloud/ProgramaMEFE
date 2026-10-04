@@ -37,7 +37,7 @@ function AvisoSomenteLeitura() {
   return (
     <p
       role="note"
-      className="flex items-start gap-3 rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-muted-foreground"
+      className="flex items-start gap-3 rounded-2xl border border-foreground/10 bg-foreground/[0.04] px-4 py-3 text-sm text-muted-foreground"
     >
       <Info className="mt-0.5 size-4 shrink-0 text-brand-yellow" aria-hidden />
       <span>

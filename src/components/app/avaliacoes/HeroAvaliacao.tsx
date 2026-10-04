@@ -51,7 +51,7 @@ export function HeroAvaliacao({
           </div>
 
           {saudavel ? (
-            <p className="flex items-start gap-3 rounded-2xl border border-white/10 px-4 py-3 text-sm text-muted-foreground">
+            <p className="flex items-start gap-3 rounded-2xl border border-foreground/10 px-4 py-3 text-sm text-muted-foreground">
               <Scale className="mt-0.5 size-4 shrink-0" aria-hidden />
               <span>
                 Para {formatarNumero(alturaCm / 100, 2)} m de altura, o peso com IMC na faixa
@@ -64,7 +64,7 @@ export function HeroAvaliacao({
             </p>
           ) : null}
 
-          <dl className="mt-auto grid grid-cols-3 gap-3 border-t border-white/10 pt-5">
+          <dl className="mt-auto grid grid-cols-3 gap-3 border-t border-foreground/10 pt-5">
             <div>
               <dt>
                 <Rotulo>Início</Rotulo>
@@ -90,7 +90,7 @@ export function HeroAvaliacao({
           </dl>
         </div>
 
-        <div className="space-y-6 border-t border-white/10 p-5 sm:p-8 lg:border-l lg:border-t-0">
+        <div className="space-y-6 border-t border-foreground/10 p-5 sm:p-8 lg:border-l lg:border-t-0">
           <div className="flex flex-wrap items-end justify-between gap-x-4 gap-y-2">
             <div className="space-y-2">
               <Rotulo>Índice de massa corporal</Rotulo>
@@ -105,7 +105,7 @@ export function HeroAvaliacao({
         </div>
       </div>
 
-      <p className="flex items-start gap-2.5 border-t border-white/10 bg-white/[0.03] px-5 py-4 text-xs leading-relaxed text-muted-foreground sm:px-8">
+      <p className="flex items-start gap-2.5 border-t border-foreground/10 bg-foreground/[0.03] px-5 py-4 text-xs leading-relaxed text-muted-foreground sm:px-8">
         <Info className="mt-0.5 size-4 shrink-0" aria-hidden />
         <span>
           O IMC é uma referência geral: ele não mede massa muscular nem onde a gordura fica e não

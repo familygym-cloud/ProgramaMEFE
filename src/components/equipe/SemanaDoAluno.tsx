@@ -26,11 +26,11 @@ export function SemanaDoAluno({
     // No celular sem cartão: cada dia precisa de ao menos ~44px de largura para o toque.
     <section
       aria-labelledby="titulo-semana-aluno"
-      className="sm:rounded-3xl sm:border sm:border-white/10 sm:bg-card/80 sm:p-4"
+      className="sm:rounded-3xl sm:border sm:border-foreground/10 sm:bg-card/80 sm:p-4"
     >
       <h2
         id="titulo-semana-aluno"
-        className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground"
+        className="font-sans text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground"
       >
         Semana do aluno
       </h2>
@@ -55,8 +55,8 @@ export function SemanaDoAluno({
                   aberto
                     ? "border-brand-yellow/60 bg-brand-yellow/10"
                     : principal
-                      ? "border-white/10 bg-white/[0.06] hover:border-white/25"
-                      : "border-dashed border-white/15 hover:border-white/30 hover:bg-white/[0.04]",
+                      ? "border-foreground/10 bg-foreground/[0.06] hover:border-foreground/25"
+                      : "border-dashed border-foreground/15 hover:border-foreground/30 hover:bg-foreground/[0.04]",
                 )}
               >
                 <span className="text-[0.65rem] font-semibold uppercase tracking-wider text-muted-foreground">

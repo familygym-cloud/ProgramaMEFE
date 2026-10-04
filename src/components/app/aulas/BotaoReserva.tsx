@@ -29,7 +29,7 @@ export function BotaoReserva({ aula, ocupado, onAlternar, className }: Props) {
         onClick={() => onAlternar(aula)}
         className={cn(
           BASE,
-          "border-white/20 bg-transparent hover:bg-white/10 hover:text-foreground",
+          "border-foreground/20 bg-transparent hover:bg-foreground/10 hover:text-foreground",
           className,
         )}
       >
@@ -46,7 +46,7 @@ export function BotaoReserva({ aula, ocupado, onAlternar, className }: Props) {
         variant="outline"
         disabled
         aria-label={`${detalhe}: turma lotada`}
-        className={cn(BASE, "border-white/10 bg-transparent", className)}
+        className={cn(BASE, "border-foreground/10 bg-transparent", className)}
       >
         Turma lotada
       </Button>
@@ -60,7 +60,7 @@ export function BotaoReserva({ aula, ocupado, onAlternar, className }: Props) {
       aria-busy={ocupado}
       aria-label={`Reservar vaga em ${detalhe}`}
       onClick={() => onAlternar(aula)}
-      className={cn(BASE, "bg-white text-brand-black hover:bg-white/85", className)}
+      className={cn(BASE, "bg-foreground text-brand-black hover:bg-foreground/85", className)}
     >
       {ocupado ? <Loader2 className="animate-spin" aria-hidden /> : <CalendarCheck aria-hidden />}
       {ocupado ? "Reservando…" : "Reservar vaga"}

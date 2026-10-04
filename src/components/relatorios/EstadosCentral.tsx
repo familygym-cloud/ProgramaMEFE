@@ -5,20 +5,20 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { classificarErro } from "@/lib/relatorios/erros";
 
-const BLOCO = "rounded-3xl bg-white/[0.06] motion-reduce:animate-none";
+const BLOCO = "rounded-3xl bg-foreground/[0.06] motion-reduce:animate-none";
 
 /** Esqueleto da Central: mesma estrutura da tela pronta (cabeçalho, abas, indicadores e gráficos). */
 export function CarregandoCentral({ rotulo = "Carregando os relatórios" }: { rotulo?: string }) {
   return (
     <div role="status" aria-live="polite" aria-label={rotulo} className="space-y-6 sm:space-y-8">
       <div className="space-y-5">
-        <Skeleton className="h-9 w-40 rounded-lg bg-white/[0.06] motion-reduce:animate-none" />
+        <Skeleton className="h-9 w-40 rounded-lg bg-foreground/[0.06] motion-reduce:animate-none" />
         <div className="space-y-3">
-          <Skeleton className="h-10 w-72 max-w-full rounded-xl bg-white/[0.06] motion-reduce:animate-none" />
-          <Skeleton className="h-4 w-56 max-w-full rounded-full bg-white/[0.06] motion-reduce:animate-none" />
+          <Skeleton className="h-10 w-72 max-w-full rounded-xl bg-foreground/[0.06] motion-reduce:animate-none" />
+          <Skeleton className="h-4 w-56 max-w-full rounded-full bg-foreground/[0.06] motion-reduce:animate-none" />
         </div>
       </div>
-      <Skeleton className="h-13 w-full rounded-full bg-white/[0.06] motion-reduce:animate-none sm:w-[34rem]" />
+      <Skeleton className="h-13 w-full rounded-full bg-foreground/[0.06] motion-reduce:animate-none sm:w-[34rem]" />
       <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         {Array.from({ length: 8 }, (_, i) => (
           <Skeleton key={i} className={`h-36 ${BLOCO}`} />
@@ -66,7 +66,7 @@ export function ErroCentral({
               type="button"
               variant="outline"
               onClick={aoSair}
-              className="h-11 gap-2 rounded-full border-white/20 bg-transparent px-5 hover:bg-white/10 hover:text-foreground"
+              className="h-11 gap-2 rounded-full border-foreground/20 bg-transparent px-5 hover:bg-foreground/10 hover:text-foreground"
             >
               <LogOut aria-hidden /> {tipo === "sessao" ? "Entrar de novo" : "Sair"}
             </Button>

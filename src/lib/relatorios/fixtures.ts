@@ -16,7 +16,8 @@ import {
   subMonths,
 } from "date-fns";
 import { calcularIMC, paraISO } from "../aluno-app/derive";
-import { planosCatalogo, type PlanoCatalogo } from "../planos-catalogo";
+import type { PlanoCatalogo } from "../planos-precos";
+import { catalogoDemo } from "../planos-precos-demo";
 import type {
   AlunoBruto,
   AssinaturaBruta,
@@ -272,7 +273,7 @@ const DURACAO: Record<string, readonly [number, number]> = {
 };
 
 function planoPorSlug(slug: string): PlanoCatalogo {
-  return planosCatalogo.find((p) => p.slug === slug) ?? (planosCatalogo[0] as PlanoCatalogo);
+  return catalogoDemo.find((p) => p.slug === slug) ?? (catalogoDemo[0] as PlanoCatalogo);
 }
 
 const doisDigitos = (n: number): string => String(n).padStart(2, "0");

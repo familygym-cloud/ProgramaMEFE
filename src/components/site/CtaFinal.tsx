@@ -9,12 +9,15 @@ import { useSessao } from "./sessao";
 export function CtaFinal({
   titulo = "Pronto para treinar em família?",
   texto = "Crie a sua conta e acompanhe treinos, aulas e resultados. Ou dê uma volta pela área do aluno antes, sem compromisso.",
-  mostrarValores = false,
+  mostrarPlanos = false,
+  mostrarGrade = false,
 }: {
   titulo?: string;
   texto?: string;
-  /** Inclui o atalho para /valores (útil em páginas que ainda não falaram de preços). */
-  mostrarValores?: boolean;
+  /** Inclui o atalho para /valores, a página de planos (útil em páginas que ainda não falaram deles). */
+  mostrarPlanos?: boolean;
+  /** Inclui o atalho para a grade de aulas (/grade). */
+  mostrarGrade?: boolean;
 }) {
   const { logado } = useSessao();
 
@@ -45,9 +48,14 @@ export function CtaFinal({
                 Criar conta <ArrowRight />
               </Link>
             )}
-            {mostrarValores ? (
+            {mostrarPlanos ? (
               <Link to="/valores" className={botaoMarca("contorno-escuro", "lg")}>
-                Ver planos e valores
+                Ver os planos
+              </Link>
+            ) : null}
+            {mostrarGrade ? (
+              <Link to="/grade" className={botaoMarca("contorno-escuro", "lg")}>
+                Ver a grade de aulas
               </Link>
             ) : null}
             <Link to="/app" search={{ demo: true }} className={botaoMarca("contorno-escuro", "lg")}>

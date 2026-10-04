@@ -11,9 +11,8 @@ import {
 } from "lucide-react";
 import { BrandLogo } from "@/components/BrandLogo";
 import { cn } from "@/lib/utils";
-import { planosCatalogo, categoriasPlanos } from "@/lib/planos-catalogo";
+import { categoriasPlanos, planoInfoPorSlug, planosInfo } from "@/lib/planos-info";
 import { botaoMarca } from "./botoes";
-import { MATRICULA_BASE, reais } from "./precos";
 import { CONTAINER } from "./SecaoSite";
 import { useSessao } from "./sessao";
 
@@ -45,9 +44,9 @@ function PalcoLogo() {
       className="relative mx-auto aspect-square w-full max-w-[30rem] sm:max-w-[34rem]"
       aria-hidden="true"
     >
-      <div className="absolute inset-[3%] rounded-full border border-white/10" />
-      <div className="absolute inset-[17%] rounded-full border border-white/[0.07]" />
-      <div className="absolute inset-[31%] rounded-full border border-white/[0.05]" />
+      <div className="absolute inset-[3%] rounded-full border border-foreground/10" />
+      <div className="absolute inset-[17%] rounded-full border border-foreground/[0.07]" />
+      <div className="absolute inset-[31%] rounded-full border border-foreground/[0.05]" />
       <div className="absolute inset-[22%] rounded-full bg-brand-yellow/20 blur-3xl motion-safe:animate-pulse [animation-duration:5s]" />
 
       <div
@@ -56,7 +55,7 @@ function PalcoLogo() {
       >
         <BrandLogo
           variante="vertical"
-          className="h-auto w-full drop-shadow-[0_18px_40px_rgba(0,0,0,0.5)]"
+          className="h-auto w-full drop-shadow-[0_18px_40px_var(--brand-black)]"
         />
       </div>
 
@@ -65,7 +64,7 @@ function PalcoLogo() {
           key={rotulo}
           style={{ animationDelay: atraso }}
           className={cn(
-            "fg-entrada absolute items-center gap-2 rounded-full border border-white/10 bg-card/90 px-3.5 py-2 text-xs font-medium shadow-xl backdrop-blur sm:text-sm",
+            "fg-entrada absolute items-center gap-2 rounded-full border border-foreground/10 bg-card/90 px-3.5 py-2 text-xs font-medium shadow-xl backdrop-blur sm:text-sm",
             soDesktop ? "hidden sm:inline-flex" : "inline-flex",
             posicao,
           )}
@@ -78,9 +77,14 @@ function PalcoLogo() {
   );
 }
 
+// "entre outras" não é uma modalidade: só as nomeadas entram na conta.
+const aulasDoTerrestre = (planoInfoPorSlug("terrestre")?.modalidades ?? []).filter(
+  (m) => m !== "entre outras",
+).length;
+
 function Fato({ valor, rotulo }: { valor: string; rotulo: string }) {
   return (
-    <div className="flex flex-col-reverse justify-end gap-1.5 border-white/10 px-5 py-5 max-sm:nth-[-n+2]:border-b max-sm:odd:border-r sm:border-r sm:px-7 sm:py-6 sm:last:border-r-0">
+    <div className="flex flex-col-reverse justify-end gap-1.5 border-foreground/10 px-5 py-5 max-sm:nth-[-n+2]:border-b max-sm:odd:border-r sm:border-r sm:px-7 sm:py-6 sm:last:border-r-0">
       <dt className="text-xs leading-snug text-muted-foreground sm:text-sm">{rotulo}</dt>
       <dd className="font-display text-3xl font-bold leading-none tracking-tight sm:text-4xl">
         {valor}
@@ -110,7 +114,7 @@ export function HeroLanding() {
         )}
       >
         <div className="space-y-8">
-          <p className="fg-entrada inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3.5 py-1.5 text-[0.8rem] font-medium text-muted-foreground">
+          <p className="fg-entrada inline-flex items-center gap-2 rounded-full border border-foreground/10 bg-foreground/5 px-3.5 py-1.5 text-[0.8rem] font-medium text-muted-foreground">
             <span aria-hidden="true" className="size-1.5 rounded-full bg-brand-yellow" />
             Academia Family Gym · saúde para toda a família
           </p>
@@ -158,7 +162,7 @@ export function HeroLanding() {
               search={{ demo: true }}
               className="group inline-flex min-h-11 items-center justify-center gap-3 rounded-full px-2 text-sm font-semibold text-foreground/90 transition-colors hover:text-foreground sm:justify-start"
             >
-              <span className="grid size-9 place-items-center rounded-full border border-white/15 bg-white/5 transition-colors group-hover:border-brand-yellow/60 group-hover:text-brand-yellow">
+              <span className="grid size-9 place-items-center rounded-full border border-foreground/15 bg-foreground/5 transition-colors group-hover:border-brand-yellow/60 group-hover:text-brand-yellow">
                 <Play className="size-3.5 translate-x-px fill-current" />
               </span>
               Ver a área do aluno em ação
@@ -171,12 +175,12 @@ export function HeroLanding() {
 
       <div className={cn(CONTAINER, "pb-6")}>
         <dl
-          className="fg-entrada grid grid-cols-2 overflow-hidden rounded-3xl border border-white/10 bg-card/60 backdrop-blur sm:grid-cols-4"
+          className="fg-entrada grid grid-cols-2 overflow-hidden rounded-3xl border border-foreground/10 bg-card/60 backdrop-blur sm:grid-cols-4"
           style={{ animationDelay: "320ms" }}
         >
-          <Fato valor={String(planosCatalogo.length)} rotulo="planos para escolher" />
+          <Fato valor={String(planosInfo.length)} rotulo="planos para escolher" />
           <Fato valor={String(categoriasPlanos.length)} rotulo="categorias, de musculação a kids" />
-          <Fato valor={reais(MATRICULA_BASE)} rotulo="de matrícula na maioria dos planos" />
+          <Fato valor={`${aulasDoTerrestre}+`} rotulo="modalidades no Plano Terrestre" />
           <Fato valor="3 anos" rotulo="idade mínima na natação infantil" />
         </dl>
       </div>

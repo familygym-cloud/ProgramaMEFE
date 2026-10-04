@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, Check, Play } from "lucide-react";
+import { ArrowRight, Play } from "lucide-react";
 import { Eyebrow, Selo, Superficie } from "@/components/app/ui";
 import { resumoTreino } from "@/lib/aluno-app/derive";
 import type { Treino } from "@/lib/aluno-app/types";
@@ -38,7 +38,7 @@ export function CartaoTreino({ treino, dias, situacao }: Props) {
       <Superficie
         brilho={destaque}
         className={cn(
-          "flex h-full flex-col gap-5 transition-[border-color,background-color,transform] duration-300 group-hover:border-white/25 motion-safe:group-hover:-translate-y-0.5",
+          "flex h-full flex-col gap-5 transition-[border-color,background-color,transform] duration-300 group-hover:border-foreground/25 motion-safe:group-hover:-translate-y-0.5",
           destaque &&
             "border-brand-yellow/40 bg-brand-yellow/[0.06] group-hover:border-brand-yellow/70",
         )}
@@ -46,7 +46,7 @@ export function CartaoTreino({ treino, dias, situacao }: Props) {
         {letra ? (
           <span
             aria-hidden
-            className="pointer-events-none absolute -right-1 -top-7 select-none font-display text-[9rem] font-bold leading-none text-white/[0.04]"
+            className="pointer-events-none absolute -right-1 -top-7 select-none font-display text-[9rem] font-bold leading-none text-foreground/[0.04]"
           >
             {letra}
           </span>
@@ -68,20 +68,15 @@ export function CartaoTreino({ treino, dias, situacao }: Props) {
 
         <div className="relative flex min-h-6 flex-wrap items-center gap-2">
           <NivelSelo nivel={treino.nivel} />
-          {situacao.tipo === "concluida" ? (
-            <Selo tom="ok">
-              <Check className="size-3" strokeWidth={3} aria-hidden />
-              Feito hoje
-            </Selo>
-          ) : null}
+          {situacao.tipo === "concluida" ? <Selo tom="ok">Feito hoje</Selo> : null}
           {situacao.tipo === "andamento" ? (
-            <Selo tom="atencao">
+            <Selo tom="realce">
               Em andamento · {situacao.feitas}/{situacao.total}
             </Selo>
           ) : null}
         </div>
 
-        <dl className="relative mt-auto grid grid-cols-3 gap-3 border-t border-white/10 pt-4">
+        <dl className="relative mt-auto grid grid-cols-3 gap-3 border-t border-foreground/10 pt-4">
           <Metrica valor={exercicios} rotulo={exercicios === 1 ? "Exercício" : "Exercícios"} />
           <Metrica valor={series} rotulo="Séries" />
           <Metrica valor={minutos} unidade="min" rotulo="Estimado" />
@@ -96,7 +91,7 @@ export function CartaoTreino({ treino, dias, situacao }: Props) {
             "relative inline-flex h-12 items-center justify-between rounded-full border px-5 text-sm font-semibold transition-colors",
             destaque
               ? "border-brand-yellow bg-brand-yellow text-brand-black"
-              : "border-white/20 group-hover:bg-white/10",
+              : "border-foreground/20 group-hover:bg-foreground/10",
           )}
         >
           <span className="inline-flex items-center gap-2">

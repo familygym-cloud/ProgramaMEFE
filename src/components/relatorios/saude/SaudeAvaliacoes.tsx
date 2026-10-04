@@ -57,7 +57,7 @@ export function SaudeAvaliacoes({
             </p>
           </div>
         )}
-        <GradeDados colunas={2} className="border-t border-white/10 pt-4">
+        <GradeDados colunas={2} className="border-t border-foreground/10 pt-4">
           <Dado
             rotulo="Com avaliação"
             valor={formatarNumero(r.comAvaliacao)}

@@ -1,12 +1,13 @@
 import { CartesianGrid, LabelList, Line, LineChart, Tooltip, XAxis, YAxis } from "recharts";
 import type { TooltipProps } from "recharts";
 import {
-  AMARELO,
   CaixaTooltip,
   EIXO,
   GRADE,
+  LINHA,
   LinhaTooltip,
   Moldura,
+  PONTO_ATIVO,
   TabelaAcessivel,
 } from "@/components/relatorios/graficos";
 import { useAnimar } from "@/components/relatorios/useAnimar";
@@ -89,10 +90,10 @@ export function GraficoPesoAluno({
         <Line
           dataKey="peso"
           type="monotone"
-          stroke={AMARELO}
+          stroke={LINHA}
           strokeWidth={3}
-          dot={{ r: 4.5, fill: AMARELO, stroke: "var(--card)", strokeWidth: 2 }}
-          activeDot={{ r: 6 }}
+          dot={{ r: 4.5, fill: LINHA, stroke: "var(--card)", strokeWidth: 2 }}
+          activeDot={{ ...PONTO_ATIVO, r: 6 }}
           isAnimationActive={animar}
         >
           {comRotulos ? (

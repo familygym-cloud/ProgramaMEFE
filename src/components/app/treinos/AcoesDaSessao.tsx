@@ -15,7 +15,11 @@ export function BotaoCronometro({ sessao, className }: { sessao: Sessao; classNa
         type="button"
         variant="outline"
         onClick={sessao.pausar}
-        className={cn(BOTAO, "border-white/20 bg-transparent hover:bg-white/10", className)}
+        className={cn(
+          BOTAO,
+          "border-foreground/20 bg-transparent hover:bg-foreground/10",
+          className,
+        )}
       >
         <Pause className="fill-current" aria-hidden />
         Pausar
@@ -30,7 +34,7 @@ export function BotaoCronometro({ sessao, className }: { sessao: Sessao; classNa
         BOTAO,
         !sessao.iniciada && "shadow-[0_12px_32px_-12px] shadow-brand-yellow/80",
         sessao.iniciada &&
-          "border border-white/20 bg-transparent text-foreground hover:bg-white/10",
+          "border border-foreground/20 bg-transparent text-foreground hover:bg-foreground/10",
         className,
       )}
     >
@@ -51,7 +55,7 @@ export function BotaoConcluir({ sessao, className }: { sessao: Sessao; className
         BOTAO,
         sessao.iniciada
           ? "shadow-[0_12px_32px_-12px] shadow-brand-yellow/80"
-          : "border border-white/20 bg-transparent text-foreground hover:bg-white/10",
+          : "border border-foreground/20 bg-transparent text-foreground hover:bg-foreground/10",
         className,
       )}
     >

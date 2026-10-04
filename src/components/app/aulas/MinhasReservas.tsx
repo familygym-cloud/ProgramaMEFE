@@ -47,7 +47,7 @@ function CartaoReserva({
       <div className="flex min-w-0 flex-1 items-center gap-4">
         <div
           aria-hidden
-          className="grid size-14 shrink-0 place-items-center rounded-2xl border border-white/10 bg-white/5 text-center leading-none"
+          className="grid size-14 shrink-0 place-items-center rounded-2xl border border-foreground/10 bg-foreground/5 text-center leading-none"
         >
           <div>
             <p className="font-display text-xl font-bold tabular-nums">{format(data, "dd")}</p>
@@ -59,7 +59,7 @@ function CartaoReserva({
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
             <h3 className="font-display text-lg font-semibold leading-tight">{aula.modalidade}</h3>
-            {destaque ? <Selo tom="atencao">Próxima</Selo> : null}
+            {destaque ? <Selo tom="realce">Próxima</Selo> : null}
           </div>
           <p className="text-sm font-medium first-letter:uppercase">{quando(aula, hoje)}</p>
           <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
@@ -101,7 +101,7 @@ export function MinhasReservas({ reservas, hoje, agora, pendentes, onAlternar }:
       </div>
 
       {reservas.length === 0 ? (
-        <div className="flex items-center gap-4 rounded-3xl border border-dashed border-white/15 p-5">
+        <div className="flex items-center gap-4 rounded-3xl border border-dashed border-foreground/15 p-5">
           <span
             aria-hidden
             className="grid size-12 shrink-0 place-items-center rounded-2xl bg-brand-yellow/10 text-brand-yellow"

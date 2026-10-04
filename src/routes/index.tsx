@@ -12,7 +12,7 @@ import { marcasCanonicas } from "@/lib/site";
 
 const TITULO = "Academia Family Gym | Treine em família. Evolua sempre.";
 const DESCRICAO =
-  "Musculação, aulas coletivas, lutas, natação, melhor idade e kids em uma academia pensada para toda a família. Veja planos e valores e conheça a área do aluno.";
+  "Musculação, aulas coletivas, lutas, natação, melhor idade e kids em uma academia pensada para toda a família. Conheça os planos, a grade de aulas e a área do aluno.";
 
 const dadosEstruturados = {
   "@context": "https://schema.org",

@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { Eyebrow, Selo, Superficie } from "@/components/app/ui";
-import { formatarBRL } from "@/lib/planos-catalogo";
+import { formatarBRL } from "@/lib/planos-precos";
 import type { SugestaoPlano } from "./catalogo";
 
 const FOCO = "group block h-full rounded-3xl focus-visible:outline-offset-4";
@@ -9,8 +9,8 @@ const FOCO = "group block h-full rounded-3xl focus-visible:outline-offset-4";
 function CartaoSugestao({ sugestao }: { sugestao: SugestaoPlano }) {
   const { plano, opcao } = sugestao;
   return (
-    <Link to="/valores" search={{ categoria: plano.categoria }} className={FOCO}>
-      <Superficie className="flex h-full flex-col gap-4 transition-colors group-hover:border-white/25 group-hover:bg-card">
+    <Link to="/app/valores" search={{ categoria: plano.categoria }} className={FOCO}>
+      <Superficie className="flex h-full flex-col gap-4 transition-colors group-hover:border-foreground/25 group-hover:bg-card">
         <div className="flex items-center justify-between gap-3">
           <Selo>{plano.categoria}</Selo>
           <ArrowUpRight
@@ -24,7 +24,7 @@ function CartaoSugestao({ sugestao }: { sugestao: SugestaoPlano }) {
           </h3>
           <p className="text-sm text-muted-foreground">{plano.resumo}</p>
         </div>
-        <div className="mt-auto border-t border-white/10 pt-4">
+        <div className="mt-auto border-t border-foreground/10 pt-4">
           <p className="text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
             A partir de
           </p>
@@ -43,7 +43,7 @@ function CartaoSugestao({ sugestao }: { sugestao: SugestaoPlano }) {
   );
 }
 
-/** Vitrine curta da tabela oficial, com um plano por categoria e atalho para /valores. */
+/** Vitrine curta da tabela oficial, com um plano por categoria e atalho para /app/valores. */
 export function OutrosPlanos({ sugestoes }: { sugestoes: SugestaoPlano[] }) {
   return (
     <section aria-labelledby="titulo-outros-planos" className="space-y-5">
@@ -64,8 +64,8 @@ export function OutrosPlanos({ sugestoes }: { sugestoes: SugestaoPlano[] }) {
           </li>
         ))}
         <li>
-          <Link to="/valores" className={FOCO}>
-            <div className="flex h-full min-h-48 flex-col justify-between gap-6 rounded-3xl border border-dashed border-white/20 p-5 transition-colors group-hover:border-brand-yellow/50 group-hover:bg-brand-yellow/5 sm:p-6">
+          <Link to="/app/valores" className={FOCO}>
+            <div className="flex h-full min-h-48 flex-col justify-between gap-6 rounded-3xl border border-dashed border-foreground/20 p-5 transition-colors group-hover:border-brand-yellow/50 group-hover:bg-brand-yellow/5 sm:p-6">
               <div className="space-y-1.5">
                 <h3 className="font-display text-lg font-semibold">Ver todos os planos</h3>
                 <p className="text-sm text-muted-foreground">

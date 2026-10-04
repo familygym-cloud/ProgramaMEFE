@@ -25,8 +25,8 @@ export function EquipeLayout({
     cn(
       CLASSE_ABA,
       atual
-        ? "bg-white/10 text-foreground"
-        : "text-muted-foreground hover:bg-white/5 hover:text-foreground",
+        ? "bg-foreground/10 text-foreground"
+        : "text-muted-foreground hover:bg-foreground/5 hover:text-foreground",
     );
 
   return (
@@ -38,7 +38,7 @@ export function EquipeLayout({
         Ir para o conteúdo
       </a>
 
-      <header className="z-30 border-b border-white/10 bg-background/80 backdrop-blur-xl sm:sticky sm:top-0">
+      <header className="z-30 border-b border-foreground/10 bg-background/80 backdrop-blur-xl sm:sticky sm:top-0">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3 sm:px-6">
           <Link
             to="/dashboard"
@@ -50,7 +50,7 @@ export function EquipeLayout({
 
           <nav
             aria-label="Ferramentas da equipe"
-            className="order-3 flex w-full items-center gap-1 rounded-full bg-white/[0.04] p-1 sm:order-2 sm:ml-2 sm:w-auto"
+            className="order-3 flex w-full items-center gap-1 rounded-full bg-foreground/[0.04] p-1 sm:order-2 sm:ml-2 sm:w-auto"
           >
             <Link
               to="/prescricao-treinos"
@@ -72,7 +72,7 @@ export function EquipeLayout({
 
           <Link
             to="/dashboard"
-            className="order-2 ml-auto inline-flex min-h-11 items-center gap-2 rounded-full border border-white/15 px-4 text-sm font-medium text-foreground/90 transition-colors hover:border-white/30 hover:bg-white/5 sm:order-3"
+            className="order-2 ml-auto inline-flex min-h-11 items-center gap-2 rounded-full border border-foreground/15 px-4 text-sm font-medium text-foreground/90 transition-colors hover:border-foreground/30 hover:bg-foreground/5 sm:order-3"
           >
             <ArrowLeft className="size-4" aria-hidden /> Painel
           </Link>

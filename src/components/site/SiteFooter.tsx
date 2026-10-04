@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import { BrandLogo } from "@/components/BrandLogo";
 import { cn } from "@/lib/utils";
+import { DadosDeContato } from "./Matricular";
 import { CONTAINER } from "./SecaoSite";
 
 const CLASSE_LINK =
@@ -20,7 +21,7 @@ function Coluna({ titulo, children }: { titulo: string; children: ReactNode }) {
 
 export function SiteFooter() {
   return (
-    <footer className="relative border-t border-white/10 bg-sidebar/70">
+    <footer className="relative border-t border-foreground/10 bg-sidebar/70">
       <div
         className={cn(
           CONTAINER,
@@ -33,6 +34,7 @@ export function SiteFooter() {
             Treine em família. Evolua sempre. Musculação, aulas coletivas, lutas, natação, melhor
             idade e kids.
           </p>
+          <DadosDeContato />
         </div>
 
         <Coluna titulo="Conheça">
@@ -42,8 +44,13 @@ export function SiteFooter() {
             </Link>
           </li>
           <li>
+            <Link to="/grade" className={CLASSE_LINK}>
+              Grade de aulas
+            </Link>
+          </li>
+          <li>
             <Link to="/valores" className={CLASSE_LINK}>
-              Planos e valores
+              Planos
             </Link>
           </li>
         </Coluna>
@@ -75,7 +82,7 @@ export function SiteFooter() {
         </Coluna>
       </div>
 
-      <div className="border-t border-white/10">
+      <div className="border-t border-foreground/10">
         <div
           className={cn(
             CONTAINER,
@@ -83,7 +90,7 @@ export function SiteFooter() {
           )}
         >
           <p>© {new Date().getFullYear()} Academia Family Gym. Todos os direitos reservados.</p>
-          <p>Valores conforme a tabela informada pela academia (setembro de 2026).</p>
+          <p>Os valores dos planos ficam na área do aluno.</p>
         </div>
       </div>
     </footer>

@@ -1,4 +1,4 @@
-import { Check, Info, Radio, UserRound } from "lucide-react";
+import { Info, Radio, UserRound } from "lucide-react";
 import { Selo, Superficie } from "@/components/app/ui";
 import type { AulaAgenda } from "@/lib/aluno-app/types";
 import { cn } from "@/lib/utils";
@@ -43,10 +43,7 @@ export function CartaoAula({
             </span>
           </p>
           {aula.reservada ? (
-            <Selo tom="atencao">
-              <Check className="size-3" aria-hidden />
-              Reservada
-            </Selo>
+            <Selo tom="ok">Reservada</Selo>
           ) : emAndamento ? (
             <Selo>
               <Radio className="size-3" aria-hidden />

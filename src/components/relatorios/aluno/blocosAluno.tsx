@@ -110,14 +110,14 @@ export function Indicador({
   tom?: "neutro" | "alerta";
 }) {
   return (
-    <div className="min-w-0 rounded-2xl border border-white/10 bg-white/[0.03] p-3 sm:p-4 print:p-2.5">
+    <div className="min-w-0 rounded-2xl border border-foreground/10 bg-foreground/[0.03] p-3 sm:p-4 print:p-2.5">
       <dt className="min-h-7 text-[0.68rem] font-semibold uppercase leading-tight tracking-wider text-muted-foreground sm:min-h-0">
         {rotulo}
       </dt>
       <dd
         className={cn(
           "mt-1 break-words font-display text-xl font-bold leading-tight tabular-nums sm:text-2xl print:text-xl",
-          tom === "alerta" && "text-red-300",
+          tom === "alerta" && "text-destructive",
         )}
       >
         {valor}

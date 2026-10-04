@@ -50,8 +50,8 @@ export function AlunoFrequencia({ relatorio }: { relatorio: RelatorioAluno }) {
           <Indicador rotulo="Último treino" valor={ultimo.valor} detalhe={ultimo.detalhe} />
         </GradeIndicadores>
 
-        <div className="space-y-3 break-inside-avoid border-t border-white/10 pt-4 print:pt-3">
-          <h3 className="text-[0.7rem] font-semibold uppercase tracking-[0.2em] text-brand-yellow">
+        <div className="space-y-3 break-inside-avoid border-t border-foreground/10 pt-4 print:pt-3">
+          <h3 className="font-sans text-[0.7rem] font-semibold uppercase tracking-[0.2em] text-brand-yellow">
             Modalidades treinadas
           </h3>
           {frequencia.porModalidade.length > 0 ? (

@@ -40,7 +40,7 @@ export function Dado({
       <dd
         className={cn(
           "mt-1 font-display text-2xl font-bold tabular-nums",
-          tom === "alerta" && "text-red-300",
+          tom === "alerta" && "text-destructive",
         )}
       >
         {valor}

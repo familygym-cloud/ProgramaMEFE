@@ -30,7 +30,7 @@ export function MenuImprimir({
       </DropdownMenuTrigger>
       <DropdownMenuContent
         align="end"
-        className="w-72 rounded-2xl border-white/15 p-1.5 print:hidden"
+        className="w-72 rounded-2xl border-foreground/15 p-1.5 print:hidden"
       >
         <DropdownMenuItem
           onSelect={() => aoImprimir("aba")}

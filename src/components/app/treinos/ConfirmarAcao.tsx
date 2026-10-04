@@ -24,7 +24,7 @@ export function ConfirmarAcao({ gatilho, titulo, descricao, rotuloConfirmar, aoC
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>{gatilho}</AlertDialogTrigger>
-      <AlertDialogContent className="max-w-[calc(100vw-2rem)] gap-6 rounded-3xl border-white/10 bg-card p-6 sm:max-w-md sm:rounded-3xl sm:p-7">
+      <AlertDialogContent className="max-w-[calc(100vw-2rem)] gap-6 rounded-3xl border-foreground/10 bg-card p-6 sm:max-w-md sm:rounded-3xl sm:p-7">
         <AlertDialogHeader className="space-y-2">
           <AlertDialogTitle className="font-display text-2xl font-bold leading-tight">
             {titulo}
@@ -32,7 +32,7 @@ export function ConfirmarAcao({ gatilho, titulo, descricao, rotuloConfirmar, aoC
           <AlertDialogDescription className="text-base">{descricao}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter className="gap-2 sm:space-x-0">
-          <AlertDialogCancel className="mt-0 h-12 rounded-full border-white/20 bg-transparent px-6 text-base hover:bg-white/10">
+          <AlertDialogCancel className="mt-0 h-12 rounded-full border-foreground/20 bg-transparent px-6 text-base hover:bg-foreground/10">
             Voltar
           </AlertDialogCancel>
           <AlertDialogAction

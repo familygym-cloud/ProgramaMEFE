@@ -47,12 +47,12 @@ export function UltimasConquistas({
       {proxima ? (
         <div
           className={cn(
-            "space-y-2 rounded-2xl border border-dashed border-white/15 p-3",
+            "space-y-2 rounded-2xl border border-dashed border-foreground/15 p-3",
             recentes.length === 0 && "mt-1",
           )}
         >
           <div className="flex items-center gap-3">
-            <span className="grid size-10 shrink-0 place-items-center rounded-2xl bg-white/5 text-muted-foreground [&_svg]:size-5">
+            <span className="grid size-10 shrink-0 place-items-center rounded-2xl bg-foreground/5 text-muted-foreground [&_svg]:size-5">
               <IconeConquista id={proxima.id} />
             </span>
             <div className="min-w-0">
@@ -74,7 +74,7 @@ export function UltimasConquistas({
       <Link
         to="/app/resultados"
         search={{ aba: "conquistas" }}
-        className="-ml-3 mt-auto inline-flex min-h-11 w-fit items-center gap-1.5 rounded-full px-3 text-sm font-semibold hover:bg-white/5"
+        className="-ml-3 mt-auto inline-flex min-h-11 w-fit items-center gap-1.5 rounded-full px-3 text-sm font-semibold hover:bg-foreground/5"
       >
         Ver todas
         <ArrowRight className="size-4" aria-hidden />

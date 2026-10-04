@@ -12,7 +12,7 @@ import { Metrica } from "./Pecas";
 import type { ResumoConclusao } from "./sessao-armazenamento";
 import "./treinos.css";
 
-const CORES = ["bg-brand-yellow", "bg-white", "bg-brand-grey"] as const;
+const CORES = ["bg-brand-yellow", "bg-foreground", "bg-brand-grey"] as const;
 
 // Confete em leque: posições fixas, para a animação ser a mesma a cada renderização.
 const CONFETES = Array.from({ length: 22 }, (_, i) => {
@@ -98,21 +98,21 @@ export function TreinoConcluido({ treino, resumo, aoRefazer }: Props) {
 
         <dl className="relative grid w-full max-w-lg grid-cols-3 gap-2 sm:gap-3">
           <Metrica
-            className="items-center rounded-2xl border border-white/10 bg-white/[0.04] px-2 py-4"
+            className="items-center rounded-2xl border border-foreground/10 bg-foreground/[0.04] px-2 py-4"
             valorClassName="text-4xl"
             rotulo="Tempo"
             valor={<Numero valor={resumo.duracaoMin} />}
             unidade="min"
           />
           <Metrica
-            className="items-center rounded-2xl border border-white/10 bg-white/[0.04] px-2 py-4"
+            className="items-center rounded-2xl border border-foreground/10 bg-foreground/[0.04] px-2 py-4"
             valorClassName="text-4xl"
             rotulo="Séries"
             valor={<Numero valor={resumo.seriesFeitas} />}
             unidade={`/${resumo.totalSeries}`}
           />
           <Metrica
-            className="items-center rounded-2xl border border-white/10 bg-white/[0.04] px-2 py-4"
+            className="items-center rounded-2xl border border-foreground/10 bg-foreground/[0.04] px-2 py-4"
             valorClassName="text-4xl"
             rotulo="Sequência"
             valor={<Numero valor={sequencia} />}
@@ -131,7 +131,7 @@ export function TreinoConcluido({ treino, resumo, aoRefazer }: Props) {
           <Button
             asChild
             variant="outline"
-            className="h-12 w-full rounded-full border-white/20 bg-transparent px-6 text-base hover:bg-white/10 sm:w-auto"
+            className="h-12 w-full rounded-full border-foreground/20 bg-transparent px-6 text-base hover:bg-foreground/10 sm:w-auto"
           >
             <Link to="/app/resultados">
               Ver minha evolução

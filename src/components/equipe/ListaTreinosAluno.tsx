@@ -22,13 +22,13 @@ function CartaoTreino({
         "flex w-full items-center gap-4 rounded-2xl border p-3.5 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-yellow/60",
         aberto
           ? "border-brand-yellow/60 bg-brand-yellow/10"
-          : "border-white/10 bg-white/[0.03] hover:border-white/25 hover:bg-white/[0.06]",
+          : "border-foreground/10 bg-foreground/[0.03] hover:border-foreground/25 hover:bg-foreground/[0.06]",
         !treino.ativo && !aberto && "opacity-70",
       )}
     >
       <span
         aria-hidden
-        className="grid size-14 shrink-0 place-items-center rounded-2xl bg-white/[0.07] text-center"
+        className="grid size-14 shrink-0 place-items-center rounded-2xl bg-foreground/[0.07] text-center"
       >
         {treino.diaSemana === null ? (
           <Shuffle className="size-5 text-muted-foreground" />
@@ -75,13 +75,13 @@ export function ListaTreinosAluno({
         <button
           type="button"
           onClick={onNovo}
-          className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-white/20 px-4 text-sm font-medium transition-colors hover:border-brand-yellow/60 hover:text-brand-yellow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-yellow/60"
+          className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-foreground/20 px-4 text-sm font-medium transition-colors hover:border-brand-yellow/60 hover:text-brand-yellow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-yellow/60"
         >
           <Plus className="size-4" aria-hidden /> Novo treino
         </button>
       </div>
       {treinos.length === 0 ? (
-        <p className="rounded-2xl border border-dashed border-white/15 px-4 py-6 text-center text-sm text-muted-foreground">
+        <p className="rounded-2xl border border-dashed border-foreground/15 px-4 py-6 text-center text-sm text-muted-foreground">
           Nenhum treino prescrito ainda.
         </p>
       ) : (

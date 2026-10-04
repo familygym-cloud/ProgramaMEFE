@@ -39,7 +39,10 @@ export function PreviaAvaliacao({
 
       {imc === null || peso === null ? (
         <div className="mt-6 space-y-3">
-          <p className="font-display text-6xl font-bold leading-none text-white/20" aria-hidden>
+          <p
+            className="font-display text-6xl font-bold leading-none text-foreground/20"
+            aria-hidden
+          >
             --,-
           </p>
           <p className="text-sm text-muted-foreground">
@@ -63,7 +66,7 @@ export function PreviaAvaliacao({
           </div>
 
           {menorDeIdade ? (
-            <p className="mt-4 flex gap-2 rounded-2xl bg-white/[0.05] px-4 py-3 text-sm text-muted-foreground">
+            <p className="mt-4 flex gap-2 rounded-2xl bg-foreground/[0.05] px-4 py-3 text-sm text-muted-foreground">
               <Info className="mt-0.5 size-4 shrink-0" aria-hidden />
               Para menores de 18 anos o IMC é avaliado em curvas por idade e sexo. Use a referência
               pediátrica do profissional em vez das faixas de adulto.
@@ -74,7 +77,7 @@ export function PreviaAvaliacao({
             </div>
           )}
 
-          <dl className="mt-2 divide-y divide-white/10 border-t border-white/10">
+          <dl className="mt-2 divide-y divide-foreground/10 border-t border-foreground/10">
             <Linha rotulo="Peso nesta avaliação">
               <span className="font-display text-lg font-semibold tabular-nums">
                 {formatarNumero(peso)} kg

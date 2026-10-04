@@ -23,7 +23,7 @@ export function ProximaAula({ aula, className }: { aula: AulaAgenda | null; clas
           <div className="flex items-center gap-4">
             <div
               aria-hidden
-              className="grid size-16 shrink-0 place-items-center rounded-2xl border border-white/10 bg-white/5 text-center leading-none"
+              className="grid size-16 shrink-0 place-items-center rounded-2xl border border-foreground/10 bg-foreground/5 text-center leading-none"
             >
               <div>
                 <p className="font-display text-2xl font-bold tabular-nums">
@@ -60,7 +60,7 @@ export function ProximaAula({ aula, className }: { aula: AulaAgenda | null; clas
           />
           <Link
             to="/app/aulas"
-            className="-ml-3 mt-auto inline-flex min-h-11 w-fit items-center gap-1.5 rounded-full px-3 text-sm font-semibold hover:bg-white/5"
+            className="-ml-3 mt-auto inline-flex min-h-11 w-fit items-center gap-1.5 rounded-full px-3 text-sm font-semibold hover:bg-foreground/5"
           >
             Ver agenda
             <ArrowRight className="size-4" aria-hidden />
@@ -79,7 +79,7 @@ export function ProximaAula({ aula, className }: { aula: AulaAgenda | null; clas
           <Button
             asChild
             variant="outline"
-            className="mt-auto h-11 w-fit rounded-full border-white/20 bg-transparent px-5 hover:bg-white/10"
+            className="mt-auto h-11 w-fit rounded-full border-foreground/20 bg-transparent px-5 hover:bg-foreground/10"
           >
             <Link to="/app/aulas">
               <CalendarDays aria-hidden />

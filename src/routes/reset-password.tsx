@@ -147,7 +147,7 @@ function ResetPage() {
             role="alert"
             className="space-y-4 rounded-3xl border border-destructive/40 bg-destructive/10 p-5 text-sm"
           >
-            <p className="text-red-200">
+            <p className="text-destructive">
               {erroDoLink ??
                 "Não encontramos um link de redefinição válido. Abra esta página pelo link do e-mail ou peça um novo na tela de acesso."}
             </p>
@@ -158,7 +158,7 @@ function ResetPage() {
         ) : validando ? (
           <div
             role="status"
-            className="space-y-4 rounded-3xl border border-white/10 bg-white/[0.03] p-5 text-sm"
+            className="space-y-4 rounded-3xl border border-foreground/10 bg-foreground/[0.03] p-5 text-sm"
           >
             <p className="flex items-center gap-3 text-muted-foreground">
               <Loader2 aria-hidden className="size-4 animate-spin" />
@@ -201,7 +201,7 @@ function ResetPage() {
             {erro ? (
               <p
                 role="alert"
-                className="rounded-2xl border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-red-200"
+                className="rounded-2xl border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive"
               >
                 {erro}
               </p>

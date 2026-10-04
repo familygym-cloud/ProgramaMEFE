@@ -173,6 +173,45 @@ on conflict (user_id, role) do nothing;
 
 Alternativa sem SQL: defina `STAFF_BOOTSTRAP_EMAIL` no servidor com o e-mail da conta; enquanto não existir nenhum staff, essa conta (com e-mail confirmado) vê na tela de vínculos o botão para ativar o perfil da equipe.
 
+## Identidade visual: cores e fontes
+
+### Cores
+
+A interface usa **somente três cores**, declaradas uma única vez em `src/styles.css` (`:root`):
+
+| Nome            | Variável         | Valor                         |
+| --------------- | ---------------- | ----------------------------- |
+| Preto Onix      | `--fg-onix`      | `#151515` (RGB 21, 21, 21)    |
+| Amarelo Real    | `--fg-amarelo`   | `#F9DB5D` (RGB 249, 219, 93)  |
+| Cinza Alabastro | `--fg-alabastro` | `#E5E5E4` (RGB 229, 229, 228) |
+
+Qualquer outro tom é transparência ou mistura entre elas (`color-mix`, opacidade `/10`, `/20`...). Os tokens do shadcn/Tailwind (`background`, `foreground`, `card`, `primary`, `muted`, `border`, `chart-1..5`, `brand-*`...) apontam para essas três variáveis; não escreva hexadecimal, `rgb()`, `oklch()` nem classes de paleta do Tailwind (`red-400`, `emerald-300`, `white`, `black`...) nos componentes.
+
+- **Tema escuro é o padrão**: fundo Onix, texto Alabastro, destaque Amarelo. Para um bloco claro (fundo Alabastro, texto Onix), aplique a classe `tema-claro` ao bloco: os tokens se invertem sozinhos.
+- **Amarelo nunca é texto sobre Alabastro** (contraste de 1,09:1). Sobre Alabastro ele só aparece como preenchimento, com texto Onix. Amarelo como texto só sobre Onix.
+- **Estados**: sucesso (pago, em dia, concluído) usa Alabastro com ícone de verificação; atenção (pendente, vencendo, em risco) usa Amarelo com ícone de triângulo; a informação nunca fica só na cor, sempre há ícone e texto (veja `Selo` em `src/components/app/ui.tsx`). O único vermelho do sistema é o token `destructive`, reservado a erro, ação destrutiva, atraso e situação crítica.
+- **Gráficos** (`src/components/app/charts.tsx`, `src/components/relatorios/graficos.tsx`) distinguem as séries também por barra x linha, traço contínuo x tracejado, marcador (círculo x losango) e a classe `hachura` (listras), com legenda desenhada igual à série.
+- **Impressão e PDF** dos relatórios (`@media print` em `src/styles.css`): papel branco, texto Onix, destaques em Amarelo com texto e contorno Onix, sem vermelho. Atraso e alerta continuam legíveis pelo ícone e pelo texto.
+- **Logos** (`src/assets/brand/*.svg`): "branco" desenha em Alabastro, "preto" em Onix, e o amarelo é o Amarelo Real exato. O favicon, os ícones do aplicativo e a imagem de compartilhamento (`public/`) seguem a mesma paleta.
+
+### Fontes
+
+- **Títulos: New Order** (peso único, Regular). Vale para `h1` a `h6` e para as classes `font-titulo` e `font-display`.
+- **Textos: Urbanist** (variável, auto-hospedada pelo pacote `@fontsource-variable/urbanist`). Vale para todo o restante: parágrafos, botões, campos, tabelas e os rótulos em caixa-alta.
+- Não há outras famílias. Mesmo `font-mono` usa a Urbanist (com algarismos tabulares).
+
+**A New Order não está no repositório.** O arquivo OTF deve ficar em:
+
+```
+public/fonts/NewOrder-Regular.otf
+```
+
+Ele é licenciado, o repositório é público e a licença de uso na web ainda não foi confirmada; por isso `public/fonts/*.otf` e `public/fonts/*.woff2` estão no `.gitignore` e o arquivo **não é versionado**. Copie-o para essa pasta em cada máquina e em cada build de publicação (o `@font-face` aponta para `/fonts/NewOrder-Regular.otf`).
+
+- Sem o arquivo, nada quebra: o título cai automaticamente na Urbanist em peso 800 (`--font-titulo: "New Order", "Urbanist Variable", ...`), e o único efeito visível é o 404 do arquivo no console em desenvolvimento.
+- Se o repositório for privado, ou se a licença permitir uso web, versione o arquivo com `git add -f public/fonts/NewOrder-Regular.otf` (o `-f` é necessário porque o `.gitignore` o ignora) e, se quiser, remova as duas linhas de `public/fonts/` do `.gitignore`.
+- O `@font-face` declara o intervalo de pesos `100 900` para a face única, então `font-bold`/`font-semibold` em títulos não geram negrito sintetizado (reforçado por `font-synthesis: none`).
+
 ## Deploy no Cloudflare Workers
 
 O build gera o Worker em `.output/` (preset `cloudflare-module` do Nitro, com `nodejs_compat`) e um `.wrangler/deploy/config.json` que aponta para `.output/server/wrangler.json`.

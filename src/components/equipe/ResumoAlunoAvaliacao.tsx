@@ -4,7 +4,7 @@ import { dataCompleta } from "./formatar";
 
 function Dado({ rotulo, children }: { rotulo: string; children: ReactNode }) {
   return (
-    <div className="rounded-2xl bg-white/[0.04] px-4 py-3">
+    <div className="rounded-2xl bg-foreground/[0.04] px-4 py-3">
       <dt className="text-[0.7rem] font-semibold uppercase tracking-wider text-muted-foreground">
         {rotulo}
       </dt>

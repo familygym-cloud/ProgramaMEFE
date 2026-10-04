@@ -1,4 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
+import { CalendarDays } from "lucide-react";
+import { botaoMarca } from "@/components/site/botoes";
 import { CabecalhoPagina } from "@/components/site/CabecalhoPagina";
 import { CtaFinal } from "@/components/site/CtaFinal";
 import { frentesTreino } from "@/components/site/frentes";
@@ -31,21 +34,26 @@ export const Route = createFileRoute("/modalidades")({
 
 function IndiceModalidades() {
   return (
-    <nav aria-label="Ir para uma modalidade">
-      <ul className="grid grid-cols-2 gap-3">
-        {frentesTreino.map(({ id, titulo, icone: Icone }) => (
-          <li key={id}>
-            <a
-              href={`#${id}`}
-              className="group flex min-h-14 items-center gap-3 rounded-2xl border border-white/10 bg-card/60 px-4 py-3 text-sm font-medium backdrop-blur transition-all hover:-translate-y-0.5 hover:border-brand-yellow/40 hover:bg-card"
-            >
-              <Icone className="size-5 shrink-0 text-brand-yellow" />
-              {titulo}
-            </a>
-          </li>
-        ))}
-      </ul>
-    </nav>
+    <div className="space-y-5">
+      <nav aria-label="Ir para uma modalidade">
+        <ul className="grid grid-cols-2 gap-3">
+          {frentesTreino.map(({ id, titulo, icone: Icone }) => (
+            <li key={id}>
+              <a
+                href={`#${id}`}
+                className="group flex min-h-14 items-center gap-3 rounded-2xl border border-foreground/10 bg-card/60 px-4 py-3 text-sm font-medium backdrop-blur transition-all hover:-translate-y-0.5 hover:border-brand-yellow/40 hover:bg-card"
+              >
+                <Icone aria-hidden="true" className="size-5 shrink-0 text-brand-yellow" />
+                {titulo}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+      <Link to="/grade" className={botaoMarca("secundario", "lg", "w-full sm:w-auto")}>
+        <CalendarDays aria-hidden="true" /> Ver a grade de aulas
+      </Link>
+    </div>
   );
 }
 
@@ -63,8 +71,9 @@ function Modalidades() {
       ))}
       <CtaFinal
         titulo="Encontrou a sua modalidade?"
-        texto="Veja quanto custa cada plano ou crie a sua conta para começar. Horários e vagas das aulas ficam na agenda da área do aluno."
-        mostrarValores
+        texto="Veja os planos que incluem cada modalidade, confira a grade de aulas ou crie a sua conta para começar. Horários e vagas das aulas ficam na agenda da área do aluno."
+        mostrarPlanos
+        mostrarGrade
       />
     </SiteLayout>
   );

@@ -30,8 +30,8 @@ export function FiltroModalidade({ modalidades, selecionada, onSelecionar }: Pro
             className={cn(
               "min-h-11 shrink-0 rounded-full border px-4 text-sm font-medium transition-colors",
               ativo
-                ? "border-white bg-white text-brand-black"
-                : "border-white/15 bg-transparent text-foreground/85 hover:bg-white/10",
+                ? "border-foreground bg-foreground text-brand-black"
+                : "border-foreground/15 bg-transparent text-foreground/85 hover:bg-foreground/10",
             )}
           >
             {rotulo}

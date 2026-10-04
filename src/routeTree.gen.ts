@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AppRouteImport } from './routes/app'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as EquipeDemoRouteImport } from './routes/equipe-demo'
+import { Route as GradeRouteImport } from './routes/grade'
 import { Route as ModalidadesRouteImport } from './routes/modalidades'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as ValoresRouteImport } from './routes/valores'
@@ -28,10 +29,12 @@ import { Route as AuthenticatedVinculosRouteImport } from './routes/_authenticat
 import { Route as AppIndexRouteImport } from './routes/app/index'
 import { Route as AppAulasRouteImport } from './routes/app/aulas'
 import { Route as AppAvaliacoesRouteImport } from './routes/app/avaliacoes'
+import { Route as AppGradeRouteImport } from './routes/app/grade'
 import { Route as AppPerfilRouteImport } from './routes/app/perfil'
 import { Route as AppPlanoRouteImport } from './routes/app/plano'
 import { Route as AppResultadosRouteImport } from './routes/app/resultados'
 import { Route as AppSegurancaRouteImport } from './routes/app/seguranca'
+import { Route as AppValoresRouteImport } from './routes/app/valores'
 import { Route as AuthenticatedRelatorioAlunoAlunoIdRouteImport } from './routes/_authenticated/relatorio-aluno.$alunoId'
 import { Route as AppTreinosIndexRouteImport } from './routes/app/treinos/index'
 import { Route as AppTreinosTreinoIdRouteImport } from './routes/app/treinos/$treinoId'
@@ -59,6 +62,11 @@ const AuthRoute = AuthRouteImport.update({
 const EquipeDemoRoute = EquipeDemoRouteImport.update({
   id: '/equipe-demo',
   path: '/equipe-demo',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GradeRoute = GradeRouteImport.update({
+  id: '/grade',
+  path: '/grade',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ModalidadesRoute = ModalidadesRouteImport.update({
@@ -133,6 +141,11 @@ const AppAvaliacoesRoute = AppAvaliacoesRouteImport.update({
   path: '/avaliacoes',
   getParentRoute: () => AppRoute,
 } as any)
+const AppGradeRoute = AppGradeRouteImport.update({
+  id: '/grade',
+  path: '/grade',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppPerfilRoute = AppPerfilRouteImport.update({
   id: '/perfil',
   path: '/perfil',
@@ -151,6 +164,11 @@ const AppResultadosRoute = AppResultadosRouteImport.update({
 const AppSegurancaRoute = AppSegurancaRouteImport.update({
   id: '/seguranca',
   path: '/seguranca',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppValoresRoute = AppValoresRouteImport.update({
+  id: '/valores',
+  path: '/valores',
   getParentRoute: () => AppRoute,
 } as any)
 const AuthenticatedRelatorioAlunoAlunoIdRoute =
@@ -180,6 +198,7 @@ export interface FileRoutesByFullPath {
   '/app': typeof AppRouteWithChildren
   '/auth': typeof AuthRoute
   '/equipe-demo': typeof EquipeDemoRoute
+  '/grade': typeof GradeRoute
   '/modalidades': typeof ModalidadesRoute
   '/reset-password': typeof ResetPasswordRoute
   '/valores': typeof ValoresRoute
@@ -193,10 +212,12 @@ export interface FileRoutesByFullPath {
   '/vinculos': typeof AuthenticatedVinculosRoute
   '/app/aulas': typeof AppAulasRoute
   '/app/avaliacoes': typeof AppAvaliacoesRoute
+  '/app/grade': typeof AppGradeRoute
   '/app/perfil': typeof AppPerfilRoute
   '/app/plano': typeof AppPlanoRoute
   '/app/resultados': typeof AppResultadosRoute
   '/app/seguranca': typeof AppSegurancaRoute
+  '/app/valores': typeof AppValoresRoute
   '/app/': typeof AppIndexRoute
   '/relatorio-aluno/$alunoId': typeof AuthenticatedRelatorioAlunoAlunoIdRoute
   '/app/treinos/$treinoId': typeof AppTreinosTreinoIdRoute
@@ -207,6 +228,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/equipe-demo': typeof EquipeDemoRoute
+  '/grade': typeof GradeRoute
   '/modalidades': typeof ModalidadesRoute
   '/reset-password': typeof ResetPasswordRoute
   '/valores': typeof ValoresRoute
@@ -220,10 +242,12 @@ export interface FileRoutesByTo {
   '/vinculos': typeof AuthenticatedVinculosRoute
   '/app/aulas': typeof AppAulasRoute
   '/app/avaliacoes': typeof AppAvaliacoesRoute
+  '/app/grade': typeof AppGradeRoute
   '/app/perfil': typeof AppPerfilRoute
   '/app/plano': typeof AppPlanoRoute
   '/app/resultados': typeof AppResultadosRoute
   '/app/seguranca': typeof AppSegurancaRoute
+  '/app/valores': typeof AppValoresRoute
   '/app': typeof AppIndexRoute
   '/relatorio-aluno/$alunoId': typeof AuthenticatedRelatorioAlunoAlunoIdRoute
   '/app/treinos/$treinoId': typeof AppTreinosTreinoIdRoute
@@ -237,6 +261,7 @@ export interface FileRoutesById {
   '/app': typeof AppRouteWithChildren
   '/auth': typeof AuthRoute
   '/equipe-demo': typeof EquipeDemoRoute
+  '/grade': typeof GradeRoute
   '/modalidades': typeof ModalidadesRoute
   '/reset-password': typeof ResetPasswordRoute
   '/valores': typeof ValoresRoute
@@ -250,10 +275,12 @@ export interface FileRoutesById {
   '/_authenticated/vinculos': typeof AuthenticatedVinculosRoute
   '/app/aulas': typeof AppAulasRoute
   '/app/avaliacoes': typeof AppAvaliacoesRoute
+  '/app/grade': typeof AppGradeRoute
   '/app/perfil': typeof AppPerfilRoute
   '/app/plano': typeof AppPlanoRoute
   '/app/resultados': typeof AppResultadosRoute
   '/app/seguranca': typeof AppSegurancaRoute
+  '/app/valores': typeof AppValoresRoute
   '/app/': typeof AppIndexRoute
   '/_authenticated/relatorio-aluno/$alunoId': typeof AuthenticatedRelatorioAlunoAlunoIdRoute
   '/app/treinos/$treinoId': typeof AppTreinosTreinoIdRoute
@@ -267,6 +294,7 @@ export interface FileRouteTypes {
     | '/app'
     | '/auth'
     | '/equipe-demo'
+    | '/grade'
     | '/modalidades'
     | '/reset-password'
     | '/valores'
@@ -280,10 +308,12 @@ export interface FileRouteTypes {
     | '/vinculos'
     | '/app/aulas'
     | '/app/avaliacoes'
+    | '/app/grade'
     | '/app/perfil'
     | '/app/plano'
     | '/app/resultados'
     | '/app/seguranca'
+    | '/app/valores'
     | '/app/'
     | '/relatorio-aluno/$alunoId'
     | '/app/treinos/$treinoId'
@@ -294,6 +324,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/equipe-demo'
+    | '/grade'
     | '/modalidades'
     | '/reset-password'
     | '/valores'
@@ -307,10 +338,12 @@ export interface FileRouteTypes {
     | '/vinculos'
     | '/app/aulas'
     | '/app/avaliacoes'
+    | '/app/grade'
     | '/app/perfil'
     | '/app/plano'
     | '/app/resultados'
     | '/app/seguranca'
+    | '/app/valores'
     | '/app'
     | '/relatorio-aluno/$alunoId'
     | '/app/treinos/$treinoId'
@@ -323,6 +356,7 @@ export interface FileRouteTypes {
     | '/app'
     | '/auth'
     | '/equipe-demo'
+    | '/grade'
     | '/modalidades'
     | '/reset-password'
     | '/valores'
@@ -336,10 +370,12 @@ export interface FileRouteTypes {
     | '/_authenticated/vinculos'
     | '/app/aulas'
     | '/app/avaliacoes'
+    | '/app/grade'
     | '/app/perfil'
     | '/app/plano'
     | '/app/resultados'
     | '/app/seguranca'
+    | '/app/valores'
     | '/app/'
     | '/_authenticated/relatorio-aluno/$alunoId'
     | '/app/treinos/$treinoId'
@@ -353,6 +389,7 @@ export interface RootRouteChildren {
   AppRoute: typeof AppRouteWithChildren
   AuthRoute: typeof AuthRoute
   EquipeDemoRoute: typeof EquipeDemoRoute
+  GradeRoute: typeof GradeRoute
   ModalidadesRoute: typeof ModalidadesRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   ValoresRoute: typeof ValoresRoute
@@ -394,6 +431,13 @@ declare module '@tanstack/react-router' {
       path: '/equipe-demo'
       fullPath: '/equipe-demo'
       preLoaderRoute: typeof EquipeDemoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/grade': {
+      id: '/grade'
+      path: '/grade'
+      fullPath: '/grade'
+      preLoaderRoute: typeof GradeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/modalidades': {
@@ -494,6 +538,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAvaliacoesRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/grade': {
+      id: '/app/grade'
+      path: '/grade'
+      fullPath: '/app/grade'
+      preLoaderRoute: typeof AppGradeRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/perfil': {
       id: '/app/perfil'
       path: '/perfil'
@@ -520,6 +571,13 @@ declare module '@tanstack/react-router' {
       path: '/seguranca'
       fullPath: '/app/seguranca'
       preLoaderRoute: typeof AppSegurancaRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/valores': {
+      id: '/app/valores'
+      path: '/valores'
+      fullPath: '/app/valores'
+      preLoaderRoute: typeof AppValoresRouteImport
       parentRoute: typeof AppRoute
     }
     '/_authenticated/relatorio-aluno/$alunoId': {
@@ -584,10 +642,12 @@ const AuthenticatedRouteRouteWithChildren =
 interface AppRouteChildren {
   AppAulasRoute: typeof AppAulasRoute
   AppAvaliacoesRoute: typeof AppAvaliacoesRoute
+  AppGradeRoute: typeof AppGradeRoute
   AppPerfilRoute: typeof AppPerfilRoute
   AppPlanoRoute: typeof AppPlanoRoute
   AppResultadosRoute: typeof AppResultadosRoute
   AppSegurancaRoute: typeof AppSegurancaRoute
+  AppValoresRoute: typeof AppValoresRoute
   AppIndexRoute: typeof AppIndexRoute
   AppTreinosTreinoIdRoute: typeof AppTreinosTreinoIdRoute
   AppTreinosIndexRoute: typeof AppTreinosIndexRoute
@@ -596,10 +656,12 @@ interface AppRouteChildren {
 const AppRouteChildren: AppRouteChildren = {
   AppAulasRoute: AppAulasRoute,
   AppAvaliacoesRoute: AppAvaliacoesRoute,
+  AppGradeRoute: AppGradeRoute,
   AppPerfilRoute: AppPerfilRoute,
   AppPlanoRoute: AppPlanoRoute,
   AppResultadosRoute: AppResultadosRoute,
   AppSegurancaRoute: AppSegurancaRoute,
+  AppValoresRoute: AppValoresRoute,
   AppIndexRoute: AppIndexRoute,
   AppTreinosTreinoIdRoute: AppTreinosTreinoIdRoute,
   AppTreinosIndexRoute: AppTreinosIndexRoute,
@@ -613,6 +675,7 @@ const rootRouteChildren: RootRouteChildren = {
   AppRoute: AppRouteWithChildren,
   AuthRoute: AuthRoute,
   EquipeDemoRoute: EquipeDemoRoute,
+  GradeRoute: GradeRoute,
   ModalidadesRoute: ModalidadesRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   ValoresRoute: ValoresRoute,
