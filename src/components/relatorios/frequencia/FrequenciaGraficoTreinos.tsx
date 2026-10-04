@@ -124,6 +124,7 @@ export function FrequenciaGraficoTreinos({
           type="monotone"
           stroke={CINZA}
           strokeWidth={2}
+          strokeDasharray="5 4"
           dot={{ r: 3, fill: CINZA, stroke: "none" }}
           activeDot={{ r: 5 }}
           isAnimationActive={animar}

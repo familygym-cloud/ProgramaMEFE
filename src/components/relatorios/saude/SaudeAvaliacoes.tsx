@@ -45,10 +45,9 @@ export function SaudeAvaliacoes({
           </ProgressRing>
           <p className="min-w-0 text-sm leading-relaxed text-foreground/90">
             <strong className="font-semibold text-foreground">
-              {formatarNumero(r.emDia)} de {formatarNumero(r.ativos)}
+              {formatarPercentual(r.pctEmDia, 0)} dos alunos ativos
             </strong>{" "}
-            alunos ativos estão com a avaliação em dia, incluindo quem entrou há menos de{" "}
-            {DIAS_SEM_AVALIACAO} dias e ainda não foi avaliado.
+            estão com a avaliação em dia ({formatarNumero(r.emDia)} de {formatarNumero(r.ativos)}).
           </p>
         </div>
         <GradeDados colunas={2} className="border-t border-white/10 pt-4">
@@ -63,9 +62,15 @@ export function SaudeAvaliacoes({
             detalhe="sem nenhuma avaliação"
           />
           <Dado
-            rotulo={`Sem avaliação há +${DIAS_SEM_AVALIACAO} dias`}
+            rotulo="Em dia"
+            valor={formatarNumero(r.emDia)}
+            detalhe={`inclui quem entrou há menos de ${DIAS_SEM_AVALIACAO} dias`}
+          />
+          <Dado
+            rotulo={`Atrasadas (+${DIAS_SEM_AVALIACAO} dias)`}
             valor={formatarNumero(r.atrasadas)}
             detalhe={`${formatarPercentual(r.pctAtrasadas, 0)} dos ativos`}
+            tom={r.atrasadas > 0 ? "alerta" : "neutro"}
           />
         </GradeDados>
         {modo === "real" ? (

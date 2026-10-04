@@ -4,7 +4,7 @@ import { BotaoExportarCsv, SecaoRelatorio } from "@/components/relatorios/blocos
 import { Dado, GradeDados } from "@/components/relatorios/DadosResumo";
 import type { PropsAba } from "@/components/relatorios/tipos";
 import { csvFaixasImc, nomeExportacao } from "@/lib/relatorios/exportacoes-visao-financeiro";
-import { formatarNumero, formatarPercentual, pluralizar } from "@/lib/relatorios/formatar";
+import { formatarPercentual, pluralizar } from "@/lib/relatorios/formatar";
 import { detalharFaixasImc, type FaixaImcDetalhada } from "@/lib/relatorios/saude";
 import { cn } from "@/lib/utils";
 
@@ -99,7 +99,7 @@ export function SaudeFaixasImc({
     >
       {resumo.comImc > 0 ? (
         <div className="space-y-5">
-          <GradeDados colunas={3}>
+          <GradeDados colunas={2}>
             <Dado
               rotulo="Peso saudável"
               valor={formatarPercentual(resumo.pctSaudavel, 0)}
@@ -109,11 +109,6 @@ export function SaudeFaixasImc({
               rotulo="Sobrepeso ou obesidade"
               valor={formatarPercentual(resumo.pctAcimaDoPeso, 0)}
               detalhe="somando as quatro faixas acima do saudável"
-            />
-            <Dado
-              rotulo="Sem IMC registrado"
-              valor={formatarNumero(resumo.semImc)}
-              detalhe="alunos ativos sem IMC válido na avaliação nem no cadastro"
             />
           </GradeDados>
           <BarraEmpilhada faixas={faixas} />
@@ -125,6 +120,12 @@ export function SaudeFaixasImc({
               <LinhaFaixa key={f.faixa} faixa={f} />
             ))}
           </ul>
+          {resumo.semImc > 0 ? (
+            <p className="text-sm leading-relaxed text-muted-foreground">
+              {pluralizar(resumo.semImc, "aluno ativo", "alunos ativos")} sem IMC válido na
+              avaliação nem no cadastro não entram nos percentuais.
+            </p>
+          ) : null}
         </div>
       ) : (
         <EstadoVazio

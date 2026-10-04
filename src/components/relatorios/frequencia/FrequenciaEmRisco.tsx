@@ -104,7 +104,7 @@ export function FrequenciaEmRisco({ relatorio, modo }: PropsAba) {
                 detalhe={entreListados ?? "cadastrados e sem nenhum treino"}
               />
               <Dado
-                rotulo="Parados há 30 dias ou mais"
+                rotulo="Parados há 30+ dias"
                 valor={formatarNumero(resumo.paradosHa30Dias)}
                 detalhe={entreListados ?? "já treinaram, mas sumiram"}
               />

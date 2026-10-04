@@ -16,8 +16,8 @@ export function Saude({ relatorio, modo }: PropsAba) {
         <SaudeAvaliacoes relatorio={relatorio} modo={modo} />
       </Entrada>
       <Entrada atraso={160} className="grid gap-4 sm:gap-6 lg:grid-cols-3">
-        <SaudeOrientacao className="lg:col-span-2" />
         <SaudeAssinaturas relatorio={relatorio} />
+        <SaudeOrientacao className="lg:col-span-2" />
       </Entrada>
     </div>
   );
