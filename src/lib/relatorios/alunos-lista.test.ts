@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   alternarOrdem,
+  descreverFiltro,
   filtrarAlunos,
   haFiltroAtivo,
   normalizarBusca,
@@ -136,6 +137,31 @@ describe("haFiltroAtivo", () => {
     expect(haFiltroAtivo({ ...SEM_FILTRO, busca: "ana" })).toBe(true);
     expect(haFiltroAtivo({ ...SEM_FILTRO, turno: "Noite" })).toBe(true);
     expect(haFiltroAtivo({ ...SEM_FILTRO, alerta: "em-risco" })).toBe(true);
+  });
+});
+
+describe("descreverFiltro", () => {
+  it("sem filtro não diz nada", () => {
+    expect(descreverFiltro(SEM_FILTRO)).toEqual([]);
+    expect(descreverFiltro({ ...SEM_FILTRO, busca: "   " })).toEqual([]);
+  });
+
+  it("uma frase por filtro em uso, na ordem da tela", () => {
+    expect(
+      descreverFiltro({
+        busca: "  ana   lima ",
+        plano: "Plano Kids",
+        turno: "Noite",
+        situacao: "Ativo",
+        alerta: "em-risco",
+      }),
+    ).toEqual([
+      "Busca: “ana lima”",
+      "Plano: Plano Kids",
+      "Turno: Noite",
+      "Situação: Ativo",
+      "Alerta: Em risco de evasão",
+    ]);
   });
 });
 

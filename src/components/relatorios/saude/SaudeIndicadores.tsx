@@ -1,12 +1,7 @@
 import { CalendarClock, ClipboardCheck, FileSignature, Scale } from "lucide-react";
 import { GradeKpis, KpiRelatorio } from "@/components/relatorios/blocos";
 import { DIAS_SEM_AVALIACAO, JANELA_RECENTE_DIAS } from "@/lib/relatorios/agregar";
-import {
-  TRACO,
-  formatarNumero,
-  formatarPercentual,
-  pluralizar,
-} from "@/lib/relatorios/formatar";
+import { TRACO, formatarNumero, formatarPercentual, pluralizar } from "@/lib/relatorios/formatar";
 import { faixaDoImcMedio, resumirAvaliacoes, resumirAssinaturas } from "@/lib/relatorios/saude";
 import type { RelatorioGeral } from "@/lib/relatorios/types";
 

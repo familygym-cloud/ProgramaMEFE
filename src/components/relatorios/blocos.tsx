@@ -20,7 +20,7 @@ export function Entrada({
   children,
 }: {
   atraso?: number;
-  className?: string;
+  className?: string | undefined;
   children: ReactNode;
 }) {
   const estilo: CSSProperties = { animationDelay: `${atraso}ms` };
@@ -243,7 +243,7 @@ export function SecaoRelatorio({
   /** Botões compactos ao lado do título (o "Exportar CSV" vira só o ícone no celular). */
   acoes?: ReactNode;
   children: ReactNode;
-  className?: string;
+  className?: string | undefined;
   /** Impressão: mantém a seção inteira numa página (desligue em listas longas). */
   evitarQuebra?: boolean;
 }) {

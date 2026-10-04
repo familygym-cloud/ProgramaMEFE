@@ -53,7 +53,10 @@ function BarraEmpilhada({ faixas }: { faixas: readonly FaixaImcDetalhada[] }) {
 function LinhaFaixa({ faixa }: { faixa: FaixaImcDetalhada }) {
   return (
     <li className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 print:break-inside-avoid">
-      <span aria-hidden className={cn("size-3.5 shrink-0 rounded-[5px]", corDaFaixa(faixa.faixa))} />
+      <span
+        aria-hidden
+        className={cn("size-3.5 shrink-0 rounded-[5px]", corDaFaixa(faixa.faixa))}
+      />
       <div className="min-w-0 flex-1">
         <p className="text-sm font-medium leading-tight">{faixa.faixa}</p>
         {faixa.intervalo ? (
@@ -76,7 +79,7 @@ export function SaudeFaixasImc({
   relatorio,
   modo,
   className,
-}: PropsAba & { className?: string }) {
+}: PropsAba & { className?: string | undefined }) {
   const resumo = detalharFaixasImc(relatorio.saude.imc, relatorio.kpis.alunosAtivos);
   const { faixas } = resumo;
 
@@ -110,7 +113,7 @@ export function SaudeFaixasImc({
             <Dado
               rotulo="Sem IMC registrado"
               valor={formatarNumero(resumo.semImc)}
-              detalhe="alunos ativos sem peso ou altura válidos"
+              detalhe="alunos ativos sem IMC válido na avaliação nem no cadastro"
             />
           </GradeDados>
           <BarraEmpilhada faixas={faixas} />

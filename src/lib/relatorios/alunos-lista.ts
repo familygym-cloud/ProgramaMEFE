@@ -21,6 +21,10 @@ export const ROTULO_ALERTA: Record<AlertaAluno, string> = {
 
 export const ALERTAS_ALUNO = Object.keys(ROTULO_ALERTA) as AlertaAluno[];
 
+export function ehAlerta(valor: unknown): valor is AlertaAluno {
+  return typeof valor === "string" && (ALERTAS_ALUNO as readonly string[]).includes(valor);
+}
+
 export function temAlerta(aluno: AlunoResumo, alerta: AlertaAluno): boolean {
   switch (alerta) {
     case "em-risco":
@@ -89,6 +93,18 @@ export function haFiltroAtivo(filtro: FiltroAlunos): boolean {
     filtro.situacao !== null ||
     filtro.alerta !== null
   );
+}
+
+/** Frases dos filtros em uso ("Plano: Kids"), para dizer no papel o que a lista impressa mostra. */
+export function descreverFiltro(filtro: FiltroAlunos): string[] {
+  const busca = filtro.busca.replace(/\s+/g, " ").trim();
+  return [
+    busca ? `Busca: “${busca}”` : null,
+    filtro.plano !== null ? `Plano: ${filtro.plano}` : null,
+    filtro.turno !== null ? `Turno: ${filtro.turno}` : null,
+    filtro.situacao !== null ? `Situação: ${filtro.situacao}` : null,
+    filtro.alerta !== null ? `Alerta: ${ROTULO_ALERTA[filtro.alerta]}` : null,
+  ].filter((frase): frase is string => frase !== null);
 }
 
 export function filtrarAlunos(
@@ -174,6 +190,10 @@ export const ROTULO_COLUNA_ORDEM: Record<ColunaOrdemAlunos, string> = {
 };
 
 export const COLUNAS_ORDEM_ALUNOS = Object.keys(ROTULO_COLUNA_ORDEM) as ColunaOrdemAlunos[];
+
+export function ehColunaOrdem(valor: unknown): valor is ColunaOrdemAlunos {
+  return typeof valor === "string" && (COLUNAS_ORDEM_ALUNOS as readonly string[]).includes(valor);
+}
 
 function valorDaColuna(aluno: AlunoResumo, coluna: ColunaOrdemAlunos): number {
   switch (coluna) {

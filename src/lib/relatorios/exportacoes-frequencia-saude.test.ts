@@ -11,7 +11,7 @@ import type { AlunoRisco, PontoMensal } from "./types";
 
 /** Tira o BOM e separa as linhas, para comparar o conteúdo. */
 function linhas(csv: string): string[] {
-  return csv.replace(/^﻿/, "").split("\r\n");
+  return csv.replace(/^\uFEFF/, "").split("\r\n");
 }
 
 describe("csvTreinosMensais", () => {

@@ -18,8 +18,8 @@ import {
   LinhaTooltip,
   Moldura,
   TabelaAcessivel,
-  useAnimar,
 } from "@/components/relatorios/graficos";
+import { useAnimar } from "@/components/relatorios/useAnimar";
 import type { PontoTreinos } from "@/lib/relatorios/frequencia";
 import { formatarNumero } from "@/lib/relatorios/formatar";
 

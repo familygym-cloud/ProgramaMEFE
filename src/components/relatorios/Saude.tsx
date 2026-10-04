@@ -1,35 +1,24 @@
-import { GradeKpis, KpiRelatorio, SecaoRelatorio } from "@/components/relatorios/blocos";
+import { Entrada } from "@/components/relatorios/blocos";
+import { SaudeAssinaturas } from "@/components/relatorios/saude/SaudeAssinaturas";
+import { SaudeAvaliacoes } from "@/components/relatorios/saude/SaudeAvaliacoes";
+import { SaudeFaixasImc } from "@/components/relatorios/saude/SaudeFaixasImc";
+import { SaudeIndicadores } from "@/components/relatorios/saude/SaudeIndicadores";
+import { SaudeOrientacao } from "@/components/relatorios/saude/SaudeOrientacao";
 import type { PropsAba } from "@/components/relatorios/tipos";
-import { TRACO, formatarNumero } from "@/lib/relatorios/formatar";
 
-/** Aba provisória: mostra só o resumo de saúde até o detalhamento ficar pronto. */
-export function Saude({ relatorio }: PropsAba) {
-  const { saude } = relatorio;
+/** Aba Saúde: IMC da turma, avaliações em dia, assinaturas e como ler esses números. */
+export function Saude({ relatorio, modo }: PropsAba) {
   return (
-    <SecaoRelatorio
-      titulo="Saúde"
-      descricao="O detalhamento de avaliações e faixas de IMC ainda está em preparação."
-    >
-      <GradeKpis rotulo="Indicadores de saúde">
-        <KpiRelatorio
-          rotulo="IMC médio"
-          valor={saude.imcMedio === null ? TRACO : formatarNumero(saude.imcMedio, 1)}
-          detalhe="dos alunos ativos"
-          dica="Média do IMC da avaliação mais recente de cada aluno ativo (ou o do cadastro, se nunca foi avaliado)."
-        />
-        <KpiRelatorio
-          rotulo="Com avaliação"
-          valor={formatarNumero(saude.comAvaliacao)}
-          detalhe="alunos com ao menos uma avaliação"
-          dica="Alunos ativos com ao menos uma avaliação registrada."
-        />
-        <KpiRelatorio
-          rotulo="Avaliação há +90 dias"
-          valor={formatarNumero(saude.semAvaliacaoHa90d)}
-          detalhe="alunos com a última avaliação atrasada"
-          dica="Última avaliação há mais de 90 dias. Quem nunca foi avaliado conta a partir do cadastro."
-        />
-      </GradeKpis>
-    </SecaoRelatorio>
+    <div className="space-y-4 sm:space-y-6">
+      <SaudeIndicadores relatorio={relatorio} />
+      <Entrada atraso={120} className="grid gap-4 sm:gap-6 lg:grid-cols-3">
+        <SaudeFaixasImc relatorio={relatorio} modo={modo} className="lg:col-span-2" />
+        <SaudeAvaliacoes relatorio={relatorio} modo={modo} />
+      </Entrada>
+      <Entrada atraso={160} className="grid gap-4 sm:gap-6 lg:grid-cols-3">
+        <SaudeOrientacao className="lg:col-span-2" />
+        <SaudeAssinaturas relatorio={relatorio} />
+      </Entrada>
+    </div>
   );
 }
