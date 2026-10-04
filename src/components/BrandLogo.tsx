@@ -1,49 +1,45 @@
-import { useEffect, useRef, useState } from "react";
-import logoAsset from "@/assets/family-gym-logo.jpg.asset.json";
+import principalBranco from "@/assets/brand/principal-branco.svg";
+import principalPreto from "@/assets/brand/principal-preto.svg";
+import secundarioBranco from "@/assets/brand/secundario-branco.svg";
+import secundarioPreto from "@/assets/brand/secundario-preto.svg";
+import verticalBranco from "@/assets/brand/vertical-branco.svg";
+import verticalPreto from "@/assets/brand/vertical-preto.svg";
+import marcaBranco from "@/assets/brand/marca-branco.svg";
+import marcaPreto from "@/assets/brand/marca-preto.svg";
+import { cn } from "@/lib/utils";
 
-// Arquivo local opcional: basta colocar o logo em src/assets/family-gym-logo.(jpg|png|webp|svg).
-const localLogos = import.meta.glob("@/assets/family-gym-logo.{jpg,jpeg,png,webp,svg}", {
-  eager: true,
-  query: "?url",
-  import: "default",
-}) as Record<string, string>;
+const LOGOS = {
+  principal: { branco: principalBranco, preto: principalPreto },
+  secundario: { branco: secundarioBranco, preto: secundarioPreto },
+  vertical: { branco: verticalBranco, preto: verticalPreto },
+  marca: { branco: marcaBranco, preto: marcaPreto },
+} as const;
 
-// Ordem: arquivo local -> URL hospedada pelo Lovable -> wordmark em texto.
-const sources = [...Object.values(localLogos), logoAsset.url];
+export type VarianteLogo = keyof typeof LOGOS;
 
-export function BrandLogo({ className = "h-14" }: { className?: string }) {
-  const [index, setIndex] = useState(0);
-  const src = sources[index];
-  const imgRef = useRef<HTMLImageElement>(null);
-
-  // Com SSR, o erro de carregamento pode ocorrer antes da hidratação e o onError se perde.
-  useEffect(() => {
-    const img = imgRef.current;
-    if (img && img.complete && img.naturalWidth === 0) setIndex((i) => i + 1);
-  }, [src]);
-
+/**
+ * Logos oficiais da Family Gym.
+ * - principal: horizontal (menus e cabeçalhos)
+ * - secundario: compacto, símbolo acima do nome
+ * - vertical: símbolo grande com nome empilhado (capas e login)
+ * - marca: somente o símbolo (ícones e espaços pequenos)
+ * `tom` é a cor do desenho: "branco" para fundos escuros, "preto" para fundos claros.
+ */
+export function BrandLogo({
+  variante = "principal",
+  tom = "branco",
+  className = "h-10",
+}: {
+  variante?: VarianteLogo;
+  tom?: "branco" | "preto";
+  className?: string;
+}) {
   return (
-    <span className="inline-flex items-center justify-center rounded-2xl bg-brand-onblack p-2 shadow-lg ring-1 ring-brand-yellow/40">
-      {src ? (
-        <img
-          key={src}
-          ref={imgRef}
-          src={src}
-          alt="Logo da Academia Family Gym"
-          className={`${className} w-auto object-contain`}
-          loading="lazy"
-          onError={() => setIndex((i) => i + 1)}
-        />
-      ) : (
-        <span
-          role="img"
-          aria-label="Logo da Academia Family Gym"
-          className={`${className} inline-flex items-center px-3 text-[0.9em] font-black italic uppercase leading-none tracking-tight text-black`}
-          style={{ fontSize: "1.1rem" }}
-        >
-          Family&nbsp;<span className="text-brand-yellow">Gym</span>
-        </span>
-      )}
-    </span>
+    <img
+      src={LOGOS[variante][tom]}
+      alt="Family Gym"
+      className={cn("w-auto select-none object-contain", className)}
+      draggable={false}
+    />
   );
 }

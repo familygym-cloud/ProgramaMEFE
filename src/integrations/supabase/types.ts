@@ -164,6 +164,7 @@ export type Database = {
           observacoes: string
           professor: string
           updated_at: string
+          vagas: number
         }
         Insert: {
           created_at?: string
@@ -174,6 +175,7 @@ export type Database = {
           observacoes?: string
           professor?: string
           updated_at?: string
+          vagas?: number
         }
         Update: {
           created_at?: string
@@ -184,6 +186,7 @@ export type Database = {
           observacoes?: string
           professor?: string
           updated_at?: string
+          vagas?: number
         }
         Relationships: []
       }
@@ -310,6 +313,233 @@ export type Database = {
           },
         ]
       }
+      medidas_corporais: {
+        Row: {
+          aluno_id: string
+          braco_cm: number | null
+          cintura_cm: number | null
+          coxa_cm: number | null
+          created_at: string
+          data: string
+          gordura_pct: number | null
+          id: string
+          massa_magra_kg: number | null
+          observacoes: string
+          peito_cm: number | null
+          quadril_cm: number | null
+        }
+        Insert: {
+          aluno_id: string
+          braco_cm?: number | null
+          cintura_cm?: number | null
+          coxa_cm?: number | null
+          created_at?: string
+          data?: string
+          gordura_pct?: number | null
+          id?: string
+          massa_magra_kg?: number | null
+          observacoes?: string
+          peito_cm?: number | null
+          quadril_cm?: number | null
+        }
+        Update: {
+          aluno_id?: string
+          braco_cm?: number | null
+          cintura_cm?: number | null
+          coxa_cm?: number | null
+          created_at?: string
+          data?: string
+          gordura_pct?: number | null
+          id?: string
+          massa_magra_kg?: number | null
+          observacoes?: string
+          peito_cm?: number | null
+          quadril_cm?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "medidas_corporais_aluno_id_fkey"
+            columns: ["aluno_id"]
+            isOneToOne: false
+            referencedRelation: "alunos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      metas_aluno: {
+        Row: {
+          aluno_id: string
+          alvo: number
+          concluida: boolean
+          created_at: string
+          id: string
+          prazo: string | null
+          tipo: string
+        }
+        Insert: {
+          aluno_id: string
+          alvo: number
+          concluida?: boolean
+          created_at?: string
+          id?: string
+          prazo?: string | null
+          tipo: string
+        }
+        Update: {
+          aluno_id?: string
+          alvo?: number
+          concluida?: boolean
+          created_at?: string
+          id?: string
+          prazo?: string | null
+          tipo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "metas_aluno_aluno_id_fkey"
+            columns: ["aluno_id"]
+            isOneToOne: false
+            referencedRelation: "alunos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reservas_aula: {
+        Row: {
+          aluno_id: string
+          aula_id: string
+          created_at: string
+          id: string
+          status: string
+        }
+        Insert: {
+          aluno_id: string
+          aula_id: string
+          created_at?: string
+          id?: string
+          status?: string
+        }
+        Update: {
+          aluno_id?: string
+          aula_id?: string
+          created_at?: string
+          id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reservas_aula_aluno_id_fkey"
+            columns: ["aluno_id"]
+            isOneToOne: false
+            referencedRelation: "alunos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reservas_aula_aula_id_fkey"
+            columns: ["aula_id"]
+            isOneToOne: false
+            referencedRelation: "aulas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      treino_exercicios: {
+        Row: {
+          carga_kg: number | null
+          created_at: string
+          descanso_seg: number
+          grupo_muscular: string
+          id: string
+          nome: string
+          observacoes: string
+          ordem: number
+          repeticoes: string
+          series: number
+          treino_id: string
+        }
+        Insert: {
+          carga_kg?: number | null
+          created_at?: string
+          descanso_seg?: number
+          grupo_muscular?: string
+          id?: string
+          nome: string
+          observacoes?: string
+          ordem?: number
+          repeticoes?: string
+          series?: number
+          treino_id: string
+        }
+        Update: {
+          carga_kg?: number | null
+          created_at?: string
+          descanso_seg?: number
+          grupo_muscular?: string
+          id?: string
+          nome?: string
+          observacoes?: string
+          ordem?: number
+          repeticoes?: string
+          series?: number
+          treino_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "treino_exercicios_treino_id_fkey"
+            columns: ["treino_id"]
+            isOneToOne: false
+            referencedRelation: "treinos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      treinos: {
+        Row: {
+          aluno_id: string
+          ativo: boolean
+          created_at: string
+          dia_semana: number | null
+          foco: string
+          id: string
+          nivel: string
+          nome: string
+          observacoes: string
+          updated_at: string
+        }
+        Insert: {
+          aluno_id: string
+          ativo?: boolean
+          created_at?: string
+          dia_semana?: number | null
+          foco?: string
+          id?: string
+          nivel?: string
+          nome: string
+          observacoes?: string
+          updated_at?: string
+        }
+        Update: {
+          aluno_id?: string
+          ativo?: boolean
+          created_at?: string
+          dia_semana?: number | null
+          foco?: string
+          id?: string
+          nivel?: string
+          nome?: string
+          observacoes?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "treinos_aluno_id_fkey"
+            columns: ["aluno_id"]
+            isOneToOne: false
+            referencedRelation: "alunos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -336,7 +566,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      atualizar_meu_contato: {
+        Args: { _email: string; _telefone: string }
+        Returns: undefined
+      }
+      vagas_ocupadas: {
+        Args: { _aula_ids: string[] }
+        Returns: { aula_id: string; ocupadas: number }[]
+      }
     }
     Enums: {
       app_role: "staff" | "aluno"

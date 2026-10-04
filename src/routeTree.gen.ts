@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AppRouteImport } from './routes/app'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AuthenticatedAulasRouteImport } from './routes/_authenticated/aulas'
@@ -19,6 +20,15 @@ import { Route as AuthenticatedFinanceiroRouteImport } from './routes/_authentic
 import { Route as AuthenticatedPlanosRouteImport } from './routes/_authenticated/planos'
 import { Route as AuthenticatedTermosRouteImport } from './routes/_authenticated/termos'
 import { Route as AuthenticatedVinculosRouteImport } from './routes/_authenticated/vinculos'
+import { Route as AppIndexRouteImport } from './routes/app/index'
+import { Route as AppAulasRouteImport } from './routes/app/aulas'
+import { Route as AppAvaliacoesRouteImport } from './routes/app/avaliacoes'
+import { Route as AppPerfilRouteImport } from './routes/app/perfil'
+import { Route as AppPlanoRouteImport } from './routes/app/plano'
+import { Route as AppResultadosRouteImport } from './routes/app/resultados'
+import { Route as AppSegurancaRouteImport } from './routes/app/seguranca'
+import { Route as AppTreinosIndexRouteImport } from './routes/app/treinos/index'
+import { Route as AppTreinosTreinoIdRouteImport } from './routes/app/treinos/$treinoId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -27,6 +37,11 @@ const IndexRoute = IndexRouteImport.update({
 } as any)
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppRoute = AppRouteImport.update({
+  id: '/app',
+  path: '/app',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -69,9 +84,55 @@ const AuthenticatedVinculosRoute = AuthenticatedVinculosRouteImport.update({
   path: '/vinculos',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AppIndexRoute = AppIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAulasRoute = AppAulasRouteImport.update({
+  id: '/aulas',
+  path: '/aulas',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAvaliacoesRoute = AppAvaliacoesRouteImport.update({
+  id: '/avaliacoes',
+  path: '/avaliacoes',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppPerfilRoute = AppPerfilRouteImport.update({
+  id: '/perfil',
+  path: '/perfil',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppPlanoRoute = AppPlanoRouteImport.update({
+  id: '/plano',
+  path: '/plano',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppResultadosRoute = AppResultadosRouteImport.update({
+  id: '/resultados',
+  path: '/resultados',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSegurancaRoute = AppSegurancaRouteImport.update({
+  id: '/seguranca',
+  path: '/seguranca',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppTreinosIndexRoute = AppTreinosIndexRouteImport.update({
+  id: '/treinos/',
+  path: '/treinos/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppTreinosTreinoIdRoute = AppTreinosTreinoIdRouteImport.update({
+  id: '/treinos/$treinoId',
+  path: '/treinos/$treinoId',
+  getParentRoute: () => AppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/app': typeof AppRouteWithChildren
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
   '/aulas': typeof AuthenticatedAulasRoute
@@ -80,6 +141,15 @@ export interface FileRoutesByFullPath {
   '/planos': typeof AuthenticatedPlanosRoute
   '/termos': typeof AuthenticatedTermosRoute
   '/vinculos': typeof AuthenticatedVinculosRoute
+  '/app/aulas': typeof AppAulasRoute
+  '/app/avaliacoes': typeof AppAvaliacoesRoute
+  '/app/perfil': typeof AppPerfilRoute
+  '/app/plano': typeof AppPlanoRoute
+  '/app/resultados': typeof AppResultadosRoute
+  '/app/seguranca': typeof AppSegurancaRoute
+  '/app/': typeof AppIndexRoute
+  '/app/treinos/$treinoId': typeof AppTreinosTreinoIdRoute
+  '/app/treinos/': typeof AppTreinosIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -91,11 +161,21 @@ export interface FileRoutesByTo {
   '/planos': typeof AuthenticatedPlanosRoute
   '/termos': typeof AuthenticatedTermosRoute
   '/vinculos': typeof AuthenticatedVinculosRoute
+  '/app/aulas': typeof AppAulasRoute
+  '/app/avaliacoes': typeof AppAvaliacoesRoute
+  '/app/perfil': typeof AppPerfilRoute
+  '/app/plano': typeof AppPlanoRoute
+  '/app/resultados': typeof AppResultadosRoute
+  '/app/seguranca': typeof AppSegurancaRoute
+  '/app': typeof AppIndexRoute
+  '/app/treinos/$treinoId': typeof AppTreinosTreinoIdRoute
+  '/app/treinos': typeof AppTreinosIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/app': typeof AppRouteWithChildren
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
   '/_authenticated/aulas': typeof AuthenticatedAulasRoute
@@ -104,11 +184,21 @@ export interface FileRoutesById {
   '/_authenticated/planos': typeof AuthenticatedPlanosRoute
   '/_authenticated/termos': typeof AuthenticatedTermosRoute
   '/_authenticated/vinculos': typeof AuthenticatedVinculosRoute
+  '/app/aulas': typeof AppAulasRoute
+  '/app/avaliacoes': typeof AppAvaliacoesRoute
+  '/app/perfil': typeof AppPerfilRoute
+  '/app/plano': typeof AppPlanoRoute
+  '/app/resultados': typeof AppResultadosRoute
+  '/app/seguranca': typeof AppSegurancaRoute
+  '/app/': typeof AppIndexRoute
+  '/app/treinos/$treinoId': typeof AppTreinosTreinoIdRoute
+  '/app/treinos/': typeof AppTreinosIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/app'
     | '/auth'
     | '/reset-password'
     | '/aulas'
@@ -117,6 +207,15 @@ export interface FileRouteTypes {
     | '/planos'
     | '/termos'
     | '/vinculos'
+    | '/app/aulas'
+    | '/app/avaliacoes'
+    | '/app/perfil'
+    | '/app/plano'
+    | '/app/resultados'
+    | '/app/seguranca'
+    | '/app/'
+    | '/app/treinos/$treinoId'
+    | '/app/treinos/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -128,10 +227,20 @@ export interface FileRouteTypes {
     | '/planos'
     | '/termos'
     | '/vinculos'
+    | '/app/aulas'
+    | '/app/avaliacoes'
+    | '/app/perfil'
+    | '/app/plano'
+    | '/app/resultados'
+    | '/app/seguranca'
+    | '/app'
+    | '/app/treinos/$treinoId'
+    | '/app/treinos'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/app'
     | '/auth'
     | '/reset-password'
     | '/_authenticated/aulas'
@@ -140,11 +249,21 @@ export interface FileRouteTypes {
     | '/_authenticated/planos'
     | '/_authenticated/termos'
     | '/_authenticated/vinculos'
+    | '/app/aulas'
+    | '/app/avaliacoes'
+    | '/app/perfil'
+    | '/app/plano'
+    | '/app/resultados'
+    | '/app/seguranca'
+    | '/app/'
+    | '/app/treinos/$treinoId'
+    | '/app/treinos/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AppRoute: typeof AppRouteWithChildren
   AuthRoute: typeof AuthRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
 }
@@ -163,6 +282,13 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: '/'
       preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app': {
+      id: '/app'
+      path: '/app'
+      fullPath: '/app'
+      preLoaderRoute: typeof AppRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -221,6 +347,69 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedVinculosRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/app/': {
+      id: '/app/'
+      path: '/'
+      fullPath: '/app/'
+      preLoaderRoute: typeof AppIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/aulas': {
+      id: '/app/aulas'
+      path: '/aulas'
+      fullPath: '/app/aulas'
+      preLoaderRoute: typeof AppAulasRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/avaliacoes': {
+      id: '/app/avaliacoes'
+      path: '/avaliacoes'
+      fullPath: '/app/avaliacoes'
+      preLoaderRoute: typeof AppAvaliacoesRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/perfil': {
+      id: '/app/perfil'
+      path: '/perfil'
+      fullPath: '/app/perfil'
+      preLoaderRoute: typeof AppPerfilRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/plano': {
+      id: '/app/plano'
+      path: '/plano'
+      fullPath: '/app/plano'
+      preLoaderRoute: typeof AppPlanoRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/resultados': {
+      id: '/app/resultados'
+      path: '/resultados'
+      fullPath: '/app/resultados'
+      preLoaderRoute: typeof AppResultadosRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/seguranca': {
+      id: '/app/seguranca'
+      path: '/seguranca'
+      fullPath: '/app/seguranca'
+      preLoaderRoute: typeof AppSegurancaRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/treinos/': {
+      id: '/app/treinos/'
+      path: '/treinos'
+      fullPath: '/app/treinos/'
+      preLoaderRoute: typeof AppTreinosIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/treinos/$treinoId': {
+      id: '/app/treinos/$treinoId'
+      path: '/treinos/$treinoId'
+      fullPath: '/app/treinos/$treinoId'
+      preLoaderRoute: typeof AppTreinosTreinoIdRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
@@ -245,9 +434,36 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
+interface AppRouteChildren {
+  AppAulasRoute: typeof AppAulasRoute
+  AppAvaliacoesRoute: typeof AppAvaliacoesRoute
+  AppPerfilRoute: typeof AppPerfilRoute
+  AppPlanoRoute: typeof AppPlanoRoute
+  AppResultadosRoute: typeof AppResultadosRoute
+  AppSegurancaRoute: typeof AppSegurancaRoute
+  AppIndexRoute: typeof AppIndexRoute
+  AppTreinosTreinoIdRoute: typeof AppTreinosTreinoIdRoute
+  AppTreinosIndexRoute: typeof AppTreinosIndexRoute
+}
+
+const AppRouteChildren: AppRouteChildren = {
+  AppAulasRoute: AppAulasRoute,
+  AppAvaliacoesRoute: AppAvaliacoesRoute,
+  AppPerfilRoute: AppPerfilRoute,
+  AppPlanoRoute: AppPlanoRoute,
+  AppResultadosRoute: AppResultadosRoute,
+  AppSegurancaRoute: AppSegurancaRoute,
+  AppIndexRoute: AppIndexRoute,
+  AppTreinosTreinoIdRoute: AppTreinosTreinoIdRoute,
+  AppTreinosIndexRoute: AppTreinosIndexRoute,
+}
+
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AppRoute: AppRouteWithChildren,
   AuthRoute: AuthRoute,
   ResetPasswordRoute: ResetPasswordRoute,
 }
