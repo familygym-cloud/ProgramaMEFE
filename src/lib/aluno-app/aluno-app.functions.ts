@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { hojeBrasilia } from "@/lib/datas";
 import type {
   AreaAlunoDados,
   AulaAgenda,
@@ -30,9 +31,7 @@ function moduloAusente(error: ErroSupabase): boolean {
   );
 }
 
-function hojeISO(): string {
-  return new Date().toISOString().slice(0, 10);
-}
+const hojeISO = hojeBrasilia;
 
 async function buscarAluno(
   supabase: import("@supabase/supabase-js").SupabaseClient<
