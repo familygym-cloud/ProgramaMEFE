@@ -2,6 +2,7 @@ import { Trophy } from "lucide-react";
 import { EstadoVazio } from "@/components/app/ui";
 import { BotaoExportarCsv, SecaoRelatorio } from "@/components/relatorios/blocos";
 import type { PropsAba } from "@/components/relatorios/tipos";
+import { TAMANHO_RANKING } from "@/lib/relatorios/agregar";
 import { csvRanking } from "@/lib/relatorios/exportacoes-frequencia-saude";
 import { nomeExportacao } from "@/lib/relatorios/exportacoes-visao-financeiro";
 import {
@@ -65,7 +66,7 @@ export function FrequenciaRanking({ relatorio, modo }: PropsAba) {
   return (
     <SecaoRelatorio
       titulo="Mais assíduos do mês"
-      descricao={`Os 10 alunos com mais dias de treino em ${formatarMesAno(relatorio.hoje)}, até hoje. No empate, vale o maior tempo treinado.`}
+      descricao={`Até ${TAMANHO_RANKING} alunos com mais dias de treino em ${formatarMesAno(relatorio.hoje)}, contando até hoje. No empate, vale o maior tempo treinado.`}
       acoes={
         <BotaoExportarCsv
           arquivo={nomeExportacao("mais-assiduos", relatorio.geradoEm, modo)}

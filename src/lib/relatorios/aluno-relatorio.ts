@@ -104,7 +104,9 @@ export type LinhaEvolucao = {
 const valorValido = (n: number): number | null => (Number.isFinite(n) && n > 0 ? n : null);
 
 /** Avaliações do mais antigo ao mais recente, cada uma com a variação de peso sobre a anterior. */
-export function linhasDeEvolucao(avaliacoes: RelatorioAluno["corpo"]["avaliacoes"]): LinhaEvolucao[] {
+export function linhasDeEvolucao(
+  avaliacoes: RelatorioAluno["corpo"]["avaliacoes"],
+): LinhaEvolucao[] {
   let pesoAnterior: number | null = null;
   return avaliacoes.map((a) => {
     const peso = valorValido(a.peso);

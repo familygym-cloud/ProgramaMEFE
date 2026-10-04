@@ -54,7 +54,11 @@ export function csvAlunos(lista: readonly AlunoResumo[]): string {
       { titulo: "Treinos no mês", chave: "treinosNoMes", formato: "numero", decimais: 0 },
       { titulo: "Em risco de evasão", chave: "emRisco" },
       { titulo: "Termo válido até", chave: "termoValidoAte", formato: "data" },
-      { titulo: "Situação do termo", valor: (a) => formatarPrazoTermo(a.diasTermo) },
+      {
+        titulo: "Situação do termo",
+        // Igual à tela: quem não está ativo não precisa de termo em dia.
+        valor: (a) => (a.ativo ? formatarPrazoTermo(a.diasTermo) : "Não se aplica (aluno inativo)"),
+      },
       {
         titulo: "Parcelas em atraso",
         chave: "parcelasEmAtraso",

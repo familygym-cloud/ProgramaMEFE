@@ -6,6 +6,7 @@ import { JANELA_RECENTE_DIAS } from "@/lib/relatorios/agregar";
 import { formatarNumero } from "@/lib/relatorios/formatar";
 import { resumirAssinaturas } from "@/lib/relatorios/saude";
 
+/** Item da lista de descrição: o termo, o número grande à direita e a explicação embaixo. */
 function LinhaAssinatura({
   rotulo,
   detalhe,
@@ -16,12 +17,14 @@ function LinhaAssinatura({
   valor: string;
 }) {
   return (
-    <div className="flex items-center justify-between gap-4 border-b border-white/10 py-3 first:pt-0 last:border-b-0 last:pb-0">
-      <div className="min-w-0">
-        <dt className="text-sm font-medium">{rotulo}</dt>
-        <dd className="mt-0.5 text-xs leading-snug text-muted-foreground">{detalhe}</dd>
-      </div>
-      <p className="shrink-0 font-display text-2xl font-bold tabular-nums">{valor}</p>
+    <div className="grid grid-cols-[1fr_auto] items-center gap-x-4 border-b border-white/10 py-3 first:pt-0 last:border-b-0 last:pb-0">
+      <dt className="col-start-1 row-start-1 min-w-0 text-sm font-medium">{rotulo}</dt>
+      <dd className="col-start-1 row-start-2 mt-0.5 min-w-0 text-xs leading-snug text-muted-foreground">
+        {detalhe}
+      </dd>
+      <dd className="col-start-2 row-span-2 row-start-1 font-display text-2xl font-bold tabular-nums">
+        {valor}
+      </dd>
     </div>
   );
 }
@@ -34,7 +37,7 @@ export function SaudeAssinaturas({
 
   return (
     <SecaoRelatorio
-      titulo="Assinaturas de relatório"
+      titulo="Assinaturas de relatórios"
       className={className}
       descricao="Assinaturas registradas nos relatórios individuais de evolução dos alunos."
     >

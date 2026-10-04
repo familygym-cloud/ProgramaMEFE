@@ -6,7 +6,7 @@ import type { AlunoResumo } from "./types";
 // O CSV começa com BOM (acentos no Excel) e usa CRLF; as linhas abaixo ignoram o BOM.
 function linhas(csv: string): string[][] {
   return csv
-    .replace(/^﻿/, "")
+    .replace(/^\uFEFF/, "")
     .split("\r\n")
     .map((l) => l.split(";"));
 }
@@ -67,7 +67,9 @@ describe("csvTermos", () => {
   });
 
   it("sem termo: validade e dias ficam em branco", () => {
-    const [, linha] = linhas(csvTermos([termo({ termoValidoAte: null, dias: null, telefone: null })]));
+    const [, linha] = linhas(
+      csvTermos([termo({ termoValidoAte: null, dias: null, telefone: null })]),
+    );
     expect(linha).toEqual(["Ana Lima", "Plano Terrestre", "Sem termo registrado", "", "", ""]);
   });
 
@@ -76,7 +78,7 @@ describe("csvTermos", () => {
   });
 
   it("nome que parece fórmula é neutralizado", () => {
-    const [, linha] = linhas(csvTermos([termo({ nome: "=HYPERLINK(\"x\")" })]));
+    const [, linha] = linhas(csvTermos([termo({ nome: '=HYPERLINK("x")' })]));
     expect(linha?.[0]?.startsWith("'") || linha?.[0]?.startsWith("\"'")).toBe(true);
   });
 });
@@ -121,6 +123,14 @@ describe("csvAlunos", () => {
     expect(linha?.[6]).toBe("");
     expect(linha?.[7]).toBe("");
     expect(linha?.[9]).toBe("Sim");
+  });
+
+  it("aluno inativo: o termo não se aplica (como na tela), mas a validade continua no arquivo", () => {
+    const [, linha] = linhas(
+      csvAlunos([aluno({ ativo: false, status: "Inativo", diasTermo: -90 })]),
+    );
+    expect(linha?.[10]).toBe("31/01/2027");
+    expect(linha?.[11]).toBe("Não se aplica (aluno inativo)");
   });
 
   it("uma linha por aluno, na ordem recebida", () => {

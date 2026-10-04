@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { DIAS_SEM_AVALIACAO } from "@/lib/relatorios/agregar";
 import { csvResumoSaude } from "@/lib/relatorios/exportacoes-frequencia-saude";
 import { nomeExportacao } from "@/lib/relatorios/exportacoes-visao-financeiro";
-import { formatarNumero, formatarPercentual } from "@/lib/relatorios/formatar";
+import { formatarDias, formatarNumero, formatarPercentual } from "@/lib/relatorios/formatar";
 import { resumirAvaliacoes } from "@/lib/relatorios/saude";
 
 export function SaudeAvaliacoes({
@@ -22,7 +22,7 @@ export function SaudeAvaliacoes({
     <SecaoRelatorio
       titulo="Avaliações em dia"
       className={className}
-      descricao={`Quem foi avaliado nos últimos ${DIAS_SEM_AVALIACAO} dias e quem está esperando uma nova avaliação.`}
+      descricao={`Quem foi avaliado nos últimos ${formatarDias(DIAS_SEM_AVALIACAO)} e quem espera uma nova avaliação.`}
       acoes={
         <BotaoExportarCsv
           arquivo={nomeExportacao("resumo-saude", relatorio.geradoEm, modo)}
@@ -32,24 +32,31 @@ export function SaudeAvaliacoes({
       }
     >
       <div className="space-y-5">
-        <div className="flex items-center gap-4">
-          <ProgressRing
-            valor={r.pctEmDia}
-            tamanho={96}
-            espessura={9}
-            rotulo={`Avaliações em dia: ${formatarPercentual(r.pctEmDia, 0)} dos alunos ativos`}
-          >
-            <span className="font-display text-xl font-bold tabular-nums">
-              {formatarPercentual(r.pctEmDia, 0)}
-            </span>
-          </ProgressRing>
-          <p className="min-w-0 text-sm leading-relaxed text-foreground/90">
-            <strong className="font-semibold text-foreground">
-              {formatarPercentual(r.pctEmDia, 0)} dos alunos ativos
-            </strong>{" "}
-            estão com a avaliação em dia ({formatarNumero(r.emDia)} de {formatarNumero(r.ativos)}).
+        {r.ativos === 0 ? (
+          <p className="text-sm leading-relaxed text-muted-foreground">
+            Não há alunos ativos para avaliar no momento.
           </p>
-        </div>
+        ) : (
+          <div className="flex items-center gap-4">
+            <ProgressRing
+              valor={r.pctEmDia}
+              tamanho={96}
+              espessura={9}
+              rotulo={`Avaliações em dia: ${formatarPercentual(r.pctEmDia, 0)} dos alunos ativos`}
+            >
+              <span className="font-display text-xl font-bold tabular-nums">
+                {formatarPercentual(r.pctEmDia, 0)}
+              </span>
+            </ProgressRing>
+            <p className="min-w-0 text-sm leading-relaxed text-foreground/90">
+              <strong className="font-semibold text-foreground">
+                {formatarPercentual(r.pctEmDia, 0)} dos alunos ativos
+              </strong>{" "}
+              estão com a avaliação em dia ({formatarNumero(r.emDia)} de {formatarNumero(r.ativos)}
+              ).
+            </p>
+          </div>
+        )}
         <GradeDados colunas={2} className="border-t border-white/10 pt-4">
           <Dado
             rotulo="Com avaliação"
@@ -64,12 +71,12 @@ export function SaudeAvaliacoes({
           <Dado
             rotulo="Em dia"
             valor={formatarNumero(r.emDia)}
-            detalhe={`inclui quem entrou há menos de ${DIAS_SEM_AVALIACAO} dias`}
+            detalhe={`inclui quem entrou há menos de ${formatarDias(DIAS_SEM_AVALIACAO)}`}
           />
           <Dado
-            rotulo={`Atrasadas (+${DIAS_SEM_AVALIACAO} dias)`}
+            rotulo="Atrasadas"
             valor={formatarNumero(r.atrasadas)}
-            detalhe={`${formatarPercentual(r.pctAtrasadas, 0)} dos ativos`}
+            detalhe={`${formatarPercentual(r.pctAtrasadas, 0)} dos ativos · mais de ${formatarDias(DIAS_SEM_AVALIACAO)} sem avaliação`}
             tom={r.atrasadas > 0 ? "alerta" : "neutro"}
           />
         </GradeDados>

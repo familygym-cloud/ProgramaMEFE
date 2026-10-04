@@ -6,6 +6,9 @@ import { nomeExportacao, csvModalidades } from "@/lib/relatorios/exportacoes-vis
 import { resumirModalidades } from "@/lib/relatorios/frequencia";
 import { formatarPercentual, pluralizar } from "@/lib/relatorios/formatar";
 
+/** Modalidades à vista antes do "Ver todos" (a exportação leva todas). */
+const LIMITE_VISIVEL = 10;
+
 export function FrequenciaModalidades({ relatorio, modo }: PropsAba) {
   const { modalidades, totalPresencas } = resumirModalidades(relatorio.porModalidade);
   const itens: ItemBarraHorizontal[] = modalidades.map((m) => ({
@@ -31,7 +34,7 @@ export function FrequenciaModalidades({ relatorio, modo }: PropsAba) {
     >
       {itens.length > 0 ? (
         <div className="space-y-4">
-          <BarrasHorizontais itens={itens} limite={8} />
+          <BarrasHorizontais itens={itens} limite={LIMITE_VISIVEL} />
           <p className="border-t border-white/10 pt-3 text-sm text-muted-foreground">
             Total:{" "}
             <strong className="font-semibold text-foreground">

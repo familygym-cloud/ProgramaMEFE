@@ -15,7 +15,7 @@ export function GradeDados({
   children,
 }: {
   colunas?: keyof typeof COLUNAS;
-  className?: string;
+  className?: string | undefined;
   children: ReactNode;
 }) {
   return <dl className={cn("grid gap-x-4 gap-y-5", COLUNAS[colunas], className)}>{children}</dl>;

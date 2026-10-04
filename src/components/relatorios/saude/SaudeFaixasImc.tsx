@@ -27,25 +27,21 @@ function descricaoDaFaixa(f: FaixaImcDetalhada): string {
 
 /** Barra única dividida em fatias proporcionais: o retrato da turma de uma olhada. */
 function BarraEmpilhada({ faixas }: { faixas: readonly FaixaImcDetalhada[] }) {
+  const comAlunos = faixas.filter((f) => f.alunos > 0);
   return (
     <div
       role="img"
-      aria-label={`Distribuição por faixa de IMC. ${faixas
-        .filter((f) => f.alunos > 0)
-        .map(descricaoDaFaixa)
-        .join("; ")}.`}
+      aria-label={`Distribuição por faixa de IMC. ${comAlunos.map(descricaoDaFaixa).join("; ")}.`}
       className="flex h-4 w-full gap-0.5 overflow-hidden rounded-full"
     >
-      {faixas
-        .filter((f) => f.alunos > 0)
-        .map((f) => (
-          <div
-            key={f.faixa}
-            title={descricaoDaFaixa(f)}
-            style={{ flex: `${f.alunos} 1 0%` }}
-            className={cn("min-w-1.5", corDaFaixa(f.faixa))}
-          />
-        ))}
+      {comAlunos.map((f) => (
+        <div
+          key={f.faixa}
+          title={descricaoDaFaixa(f)}
+          style={{ flex: `${f.alunos} 1 0%` }}
+          className={cn("min-w-1.5", corDaFaixa(f.faixa))}
+        />
+      ))}
     </div>
   );
 }
@@ -106,9 +102,9 @@ export function SaudeFaixasImc({
               detalhe="dos alunos com IMC conhecido"
             />
             <Dado
-              rotulo="Sobrepeso ou obesidade"
+              rotulo="Acima do saudável"
               valor={formatarPercentual(resumo.pctAcimaDoPeso, 0)}
-              detalhe="somando as quatro faixas acima do saudável"
+              detalhe="sobrepeso e os três graus de obesidade somados"
             />
           </GradeDados>
           <BarraEmpilhada faixas={faixas} />
@@ -120,6 +116,13 @@ export function SaudeFaixasImc({
               <LinhaFaixa key={f.faixa} faixa={f} />
             ))}
           </ul>
+          {resumo.predominante ? (
+            <p className="text-sm leading-relaxed text-foreground/90">
+              {resumo.predominante.faixa} é a faixa mais comum:{" "}
+              {pluralizar(resumo.predominante.alunos, "aluno")} (
+              {formatarPercentual(resumo.predominante.pct, 0)}).
+            </p>
+          ) : null}
           {resumo.semImc > 0 ? (
             <p className="text-sm leading-relaxed text-muted-foreground">
               {pluralizar(resumo.semImc, "aluno ativo", "alunos ativos")} sem IMC válido na

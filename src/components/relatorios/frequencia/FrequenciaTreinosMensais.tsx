@@ -6,7 +6,7 @@ import type { PropsAba } from "@/components/relatorios/tipos";
 import { csvTreinosMensais } from "@/lib/relatorios/exportacoes-frequencia-saude";
 import { nomeExportacao } from "@/lib/relatorios/exportacoes-visao-financeiro";
 import { resumirTreinos, serieTreinos } from "@/lib/relatorios/frequencia";
-import { TRACO, formatarNumero } from "@/lib/relatorios/formatar";
+import { TRACO, formatarNumero, pluralizar } from "@/lib/relatorios/formatar";
 
 export function FrequenciaTreinosMensais({ relatorio, modo }: PropsAba) {
   const serie = serieTreinos(relatorio.mensal, relatorio.hoje);
@@ -45,7 +45,7 @@ export function FrequenciaTreinosMensais({ relatorio, modo }: PropsAba) {
         <FrequenciaGraficoTreinos serie={serie} resumo={frase} />
         <GradeDados className="border-t border-white/10 pt-4">
           <Dado
-            rotulo={`Média (${resumo.mesesFechados} meses fechados)`}
+            rotulo="Média mensal"
             valor={
               resumo.frequenciaMediaFechados === null
                 ? TRACO
@@ -54,7 +54,7 @@ export function FrequenciaTreinosMensais({ relatorio, modo }: PropsAba) {
             detalhe={
               resumo.treinosMediaFechados === null
                 ? undefined
-                : `treinos por aluno · ${formatarNumero(resumo.treinosMediaFechados)} treinos por mês`
+                : `treinos por aluno · ${formatarNumero(resumo.treinosMediaFechados)} treinos por mês, em ${pluralizar(resumo.mesesFechados, "mês fechado", "meses fechados")}`
             }
           />
           <Dado

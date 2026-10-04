@@ -2,12 +2,12 @@ import { describe, expect, it } from "vitest";
 import {
   alternarOrdem,
   descreverFiltro,
+  descreverOrdem,
   filtrarAlunos,
   haFiltroAtivo,
   normalizarBusca,
   opcoesDeFiltro,
   ordenarAlunos,
-  resumirAlunos,
   SEM_FILTRO,
   temAlerta,
 } from "./alunos-lista";
@@ -53,7 +53,10 @@ describe("temAlerta", () => {
   it("inadimplente vale para qualquer situação cadastral", () => {
     expect(temAlerta(aluno("1", { parcelasEmAtraso: 1 }), "inadimplente")).toBe(true);
     expect(
-      temAlerta(aluno("2", { ativo: false, status: "Inativo", parcelasEmAtraso: 2 }), "inadimplente"),
+      temAlerta(
+        aluno("2", { ativo: false, status: "Inativo", parcelasEmAtraso: 2 }),
+        "inadimplente",
+      ),
     ).toBe(true);
     expect(temAlerta(aluno("3"), "inadimplente")).toBe(false);
   });
@@ -93,7 +96,9 @@ describe("filtrarAlunos", () => {
   });
 
   it("busca por nome sem acento nem caixa", () => {
-    expect(nomes(filtrarAlunos(lista, { ...SEM_FILTRO, busca: "joao" }))).toEqual(["João da Silva"]);
+    expect(nomes(filtrarAlunos(lista, { ...SEM_FILTRO, busca: "joao" }))).toEqual([
+      "João da Silva",
+    ]);
     expect(nomes(filtrarAlunos(lista, { ...SEM_FILTRO, busca: "SOUZA" }))).toEqual(["Maria Souza"]);
   });
 
@@ -109,11 +114,24 @@ describe("filtrarAlunos", () => {
   });
 
   it("busca pelo telefone com ou sem pontuação, a partir de 3 dígitos", () => {
-    expect(nomes(filtrarAlunos(lista, { ...SEM_FILTRO, busca: "91234" }))).toEqual(["João da Silva"]);
+    expect(nomes(filtrarAlunos(lista, { ...SEM_FILTRO, busca: "91234" }))).toEqual([
+      "João da Silva",
+    ]);
     expect(nomes(filtrarAlunos(lista, { ...SEM_FILTRO, busca: "91234-5678" }))).toEqual([
       "João da Silva",
     ]);
     expect(filtrarAlunos(lista, { ...SEM_FILTRO, busca: "12" })).toEqual([]);
+  });
+
+  it("busca pelo telefone inteiro, do jeito que aparece na tela", () => {
+    for (const busca of ["(11) 91234-5678", "11 91234 5678", "+11 9123"]) {
+      expect(nomes(filtrarAlunos(lista, { ...SEM_FILTRO, busca }))).toEqual(["João da Silva"]);
+    }
+    // Número que não está no telefone de ninguém não devolve nada.
+    expect(filtrarAlunos(lista, { ...SEM_FILTRO, busca: "(21) 99999-0000" })).toEqual([]);
+    // Número misturado com palavras ainda exige cada palavra no nome ou no plano.
+    expect(filtrarAlunos(lista, { ...SEM_FILTRO, busca: "joao 91234" })).toEqual([lista[0]]);
+    expect(filtrarAlunos(lista, { ...SEM_FILTRO, busca: "maria 91234" })).toEqual([]);
   });
 
   it("combina plano, turno, situação e alerta (E lógico)", () => {
@@ -195,10 +213,28 @@ describe("opcoesDeFiltro", () => {
 
 describe("ordenarAlunos", () => {
   const lista = [
-    aluno("1", { nome: "Carla", diasSemTreinar: 10, treinosNoMes: 3, diasTermo: 5, valorEmAtraso: 0 }),
+    aluno("1", {
+      nome: "Carla",
+      diasSemTreinar: 10,
+      treinosNoMes: 3,
+      diasTermo: 5,
+      valorEmAtraso: 0,
+    }),
     aluno("2", { nome: "Álvaro", diasSemTreinar: null, treinosNoMes: 0, diasTermo: null }),
-    aluno("3", { nome: "Bia", diasSemTreinar: 1, treinosNoMes: 9, diasTermo: -3, valorEmAtraso: 300 }),
-    aluno("4", { nome: "Dani", diasSemTreinar: 10, treinosNoMes: 3, diasTermo: 40, valorEmAtraso: 90 }),
+    aluno("3", {
+      nome: "Bia",
+      diasSemTreinar: 1,
+      treinosNoMes: 9,
+      diasTermo: -3,
+      valorEmAtraso: 300,
+    }),
+    aluno("4", {
+      nome: "Dani",
+      diasSemTreinar: 10,
+      treinosNoMes: 3,
+      diasTermo: 40,
+      valorEmAtraso: 90,
+    }),
   ];
 
   it("por nome, de A a Z e de Z a A, respeitando acentos do pt-BR", () => {
@@ -216,18 +252,18 @@ describe("ordenarAlunos", () => {
     ]);
   });
 
-  it("último treino: quem treinou há menos tempo primeiro; quem nunca treinou, por último", () => {
+  it("último treino: quem está há mais tempo sem treinar primeiro; quem nunca treinou, no topo", () => {
     expect(nomes(ordenarAlunos(lista, { coluna: "ultimo-treino", direcao: "asc" }))).toEqual([
-      "Bia",
+      "Álvaro",
       "Carla",
       "Dani",
-      "Álvaro",
+      "Bia",
     ]);
     expect(nomes(ordenarAlunos(lista, { coluna: "ultimo-treino", direcao: "desc" }))).toEqual([
-      "Álvaro",
+      "Bia",
       "Carla",
       "Dani",
-      "Bia",
+      "Álvaro",
     ]);
   });
 
@@ -254,6 +290,23 @@ describe("ordenarAlunos", () => {
       "Carla",
       "Dani",
     ]);
+    expect(nomes(ordenarAlunos(lista, { coluna: "termo", direcao: "desc" }))).toEqual([
+      "Dani",
+      "Carla",
+      "Bia",
+      "Álvaro",
+    ]);
+  });
+
+  it("termo: aluno inativo (o termo não se aplica) fica no fim nos dois sentidos", () => {
+    const comInativo = [
+      ...lista,
+      aluno("5", { nome: "Eva", ativo: false, status: "Inativo", diasTermo: -200 }),
+    ];
+    for (const direcao of ["asc", "desc"] as const) {
+      const ordenados = nomes(ordenarAlunos(comInativo, { coluna: "termo", direcao }));
+      expect(ordenados.at(-1)).toBe("Eva");
+    }
   });
 
   it("valor em atraso, do maior para o menor", () => {
@@ -293,14 +346,15 @@ describe("alternarOrdem", () => {
   });
 });
 
-describe("resumirAlunos", () => {
-  it("conta alunos, não parcelas", () => {
-    const resumo = resumirAlunos([
-      aluno("1"),
-      aluno("2", { ativo: false, status: "Inativo" }),
-      aluno("3", { emRisco: true, parcelasEmAtraso: 3 }),
-      aluno("4", { diasTermo: null, termoValidoAte: null, parcelasEmAtraso: 1 }),
-    ]);
-    expect(resumo).toEqual({ total: 4, ativos: 3, emRisco: 1, comAtraso: 2, termoPendente: 1 });
+describe("descreverOrdem", () => {
+  it("diz em palavras o que cada ordem mostra primeiro", () => {
+    expect(descreverOrdem({ coluna: "nome", direcao: "asc" })).toBe("de A a Z");
+    expect(descreverOrdem({ coluna: "nome", direcao: "desc" })).toBe("de Z a A");
+    expect(descreverOrdem({ coluna: "ultimo-treino", direcao: "asc" })).toBe(
+      "mais tempo sem treinar primeiro",
+    );
+    expect(descreverOrdem({ coluna: "atraso", direcao: "desc" })).toBe(
+      "maior valor em atraso primeiro",
+    );
   });
 });

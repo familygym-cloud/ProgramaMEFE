@@ -44,13 +44,20 @@ export function filtrarTermos<T extends AlunoTermo>(
   termos: readonly T[],
   filtro: FiltroTermos,
 ): T[] {
-  return filtro === "todos" ? [...termos] : termos.filter((t) => situacaoDoTermo(t.dias) === filtro);
+  return filtro === "todos"
+    ? [...termos]
+    : termos.filter((t) => situacaoDoTermo(t.dias) === filtro);
 }
 
 export type ContagemTermos = Record<FiltroTermos, number>;
 
 export function contarTermos(termos: readonly AlunoTermo[]): ContagemTermos {
-  const contagem: ContagemTermos = { todos: termos.length, vencido: 0, vencendo: 0, "sem-termo": 0 };
+  const contagem: ContagemTermos = {
+    todos: termos.length,
+    vencido: 0,
+    vencendo: 0,
+    "sem-termo": 0,
+  };
   for (const t of termos) contagem[situacaoDoTermo(t.dias)] += 1;
   return contagem;
 }

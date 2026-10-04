@@ -20,7 +20,10 @@ export function Frequencia({ relatorio, modo }: PropsAba) {
         <FrequenciaDiaSemana relatorio={relatorio} modo={modo} />
         <FrequenciaTurnos relatorio={relatorio} modo={modo} />
       </Entrada>
-      <Entrada atraso={200} className="grid gap-4 sm:gap-6 lg:grid-cols-2">
+      <Entrada
+        atraso={200}
+        className="grid gap-4 sm:gap-6 lg:grid-cols-2 print:grid-cols-2 print:gap-3"
+      >
         <FrequenciaModalidades relatorio={relatorio} modo={modo} />
         <FrequenciaRanking relatorio={relatorio} modo={modo} />
       </Entrada>

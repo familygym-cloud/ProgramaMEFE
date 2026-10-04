@@ -68,7 +68,10 @@ describe("classificarImcDoAluno", () => {
   });
 
   it("idoso usa os cortes de Lipschitz (22 e 27) e avisa", () => {
-    expect(classificarImcDoAluno(21.9, 60)).toMatchObject({ rotulo: "Abaixo do peso", tom: "atencao" });
+    expect(classificarImcDoAluno(21.9, 60)).toMatchObject({
+      rotulo: "Abaixo do peso",
+      tom: "atencao",
+    });
     expect(classificarImcDoAluno(22, 70)).toMatchObject({ rotulo: "Peso adequado", tom: "ok" });
     expect(classificarImcDoAluno(27, 70).rotulo).toBe("Peso adequado");
     expect(classificarImcDoAluno(27.1, 70)).toMatchObject({ rotulo: "Sobrepeso", tom: "atencao" });
@@ -172,7 +175,10 @@ describe("ehMenorDeIdade", () => {
 describe("tituloDoDocumento", () => {
   it("vira um nome de arquivo sem acentos nem símbolos", () => {
     expect(
-      tituloDoDocumento({ aluno: { nome: "  João D'Ávila Jr.  " }, geradoEm: "2026-10-04" } as never),
+      tituloDoDocumento({
+        aluno: { nome: "  João D'Ávila Jr.  " },
+        geradoEm: "2026-10-04",
+      } as never),
     ).toBe("Relatorio-Joao-D-Avila-Jr-2026-10-04");
     expect(tituloDoDocumento({ aluno: { nome: "???" }, geradoEm: "2026-10-04" } as never)).toBe(
       "Relatorio-aluno-2026-10-04",

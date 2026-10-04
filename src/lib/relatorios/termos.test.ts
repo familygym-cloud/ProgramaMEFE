@@ -105,9 +105,9 @@ describe("faixasDeTermos", () => {
 describe("coberturaDeTermos", () => {
   it("é a fatia dos ativos com termo válido hoje (vencendo ainda vale)", () => {
     // 10 ativos; 2 vencidos + 2 sem termo = 4 sem termo válido -> 60%.
-    expect(coberturaDeTermos({ alunosAtivos: 10 }, TERMOS.slice(0, 2).concat(TERMOS.slice(6)))).toBe(
-      60,
-    );
+    expect(
+      coberturaDeTermos({ alunosAtivos: 10 }, TERMOS.slice(0, 2).concat(TERMOS.slice(6))),
+    ).toBe(60);
     // Termos vencendo não tiram ninguém da cobertura.
     expect(coberturaDeTermos({ alunosAtivos: 10 }, TERMOS.slice(2, 6))).toBe(100);
   });

@@ -40,30 +40,40 @@ export function temAlerta(aluno: AlunoResumo, alerta: AlertaAluno): boolean {
 
 /** Minúsculas e sem acentos: "João" encontra "joao" e "JOÃO". */
 export function normalizarBusca(texto: string): string {
-  return texto
-    .normalize("NFD")
-    .replace(/\p{M}/gu, "")
-    .toLowerCase()
-    .replace(/\s+/g, " ")
-    .trim();
+  return texto.normalize("NFD").replace(/\p{M}/gu, "").toLowerCase().replace(/\s+/g, " ").trim();
 }
 
 function somenteDigitos(texto: string): string {
   return texto.replace(/\D/g, "");
 }
 
-/** Cada palavra digitada precisa aparecer no nome ou no plano; números também valem para o telefone. */
+/** Só números e os separadores de costume de um telefone: "(00) 90000-0021", "+55 11 9". */
+const SO_NUMEROS_DE_TELEFONE = /^[\d\s().+-]+$/;
+
+/** Menor quantidade de dígitos que vale como pedaço de telefone (menos que isso é ruído). */
+const MIN_DIGITOS_TELEFONE = 3;
+
+/**
+ * Cada palavra digitada precisa aparecer no nome ou no plano. Números também valem para o
+ * telefone: a busca inteira, se for só número e separadores ("(00) 90000-0021"), ou cada palavra
+ * numérica com 3 ou mais dígitos.
+ */
 function combinaComBusca(aluno: AlunoResumo, busca: string): boolean {
   const termo = normalizarBusca(busca);
   if (!termo) return true;
-  const palavra = normalizarBusca(`${aluno.nome} ${aluno.plano}`);
+  const texto = normalizarBusca(`${aluno.nome} ${aluno.plano}`);
   const telefone = somenteDigitos(aluno.telefone ?? "");
-  return termo.split(" ").every((parte) => {
-    if (palavra.includes(parte)) return true;
-    // Telefone: só vale se a palavra for numérica (com os separadores de costume) e tiver 3+ dígitos.
-    const digitos = somenteDigitos(parte);
-    return digitos.length >= 3 && /^[\d().+-]+$/.test(parte) && telefone.includes(digitos);
-  });
+  const temNoTelefone = (digitos: string): boolean =>
+    digitos.length >= MIN_DIGITOS_TELEFONE && telefone.includes(digitos);
+
+  if (SO_NUMEROS_DE_TELEFONE.test(termo) && temNoTelefone(somenteDigitos(termo))) return true;
+  return termo
+    .split(" ")
+    .every(
+      (parte) =>
+        texto.includes(parte) ||
+        (SO_NUMEROS_DE_TELEFONE.test(parte) && temNoTelefone(somenteDigitos(parte))),
+    );
 }
 
 // ------------------------------------------------------------------ filtros
@@ -107,10 +117,7 @@ export function descreverFiltro(filtro: FiltroAlunos): string[] {
   ].filter((frase): frase is string => frase !== null);
 }
 
-export function filtrarAlunos(
-  alunos: readonly AlunoResumo[],
-  filtro: FiltroAlunos,
-): AlunoResumo[] {
+export function filtrarAlunos(alunos: readonly AlunoResumo[], filtro: FiltroAlunos): AlunoResumo[] {
   return alunos.filter(
     (a) =>
       (filtro.plano === null || a.plano === filtro.plano) &&
@@ -142,10 +149,7 @@ function contar(alunos: readonly AlunoResumo[], campo: "plano" | "turno" | "stat
 }
 
 /** Ordem fixa para os valores conhecidos (Manhã, Tarde, Noite...) e alfabética para os demais. */
-function ordenarOpcoes(
-  contagem: Map<string, number>,
-  ordemFixa: readonly string[],
-): OpcaoFiltro[] {
+function ordenarOpcoes(contagem: Map<string, number>, ordemFixa: readonly string[]): OpcaoFiltro[] {
   const posicao = (valor: string): number => {
     const i = ordemFixa.indexOf(valor);
     return i === -1 ? ordemFixa.length : i;
@@ -168,9 +172,10 @@ export function opcoesDeFiltro(alunos: readonly AlunoResumo[]): OpcoesFiltro {
 /**
  * Colunas pelas quais a lista ordena. No sentido crescente ("asc"):
  * - nome: A a Z;
- * - ultimo-treino: quem treinou há menos tempo primeiro (quem nunca treinou fica por último);
+ * - ultimo-treino: quem está há mais tempo sem treinar primeiro (quem nunca treinou, no topo);
  * - treinos-mes: menos treinos no mês primeiro;
- * - termo: o mais urgente primeiro (sem termo, depois vencidos, depois os que vencem logo);
+ * - termo: o mais urgente primeiro (sem termo, depois vencidos, depois os que vencem logo); quem
+ *   não está ativo (termo não se aplica) fica sempre no fim, nos dois sentidos;
  * - atraso: menor valor em atraso primeiro.
  */
 export type ColunaOrdemAlunos = "nome" | "ultimo-treino" | "treinos-mes" | "termo" | "atraso";
@@ -195,13 +200,32 @@ export function ehColunaOrdem(valor: unknown): valor is ColunaOrdemAlunos {
   return typeof valor === "string" && (COLUNAS_ORDEM_ALUNOS as readonly string[]).includes(valor);
 }
 
-function valorDaColuna(aluno: AlunoResumo, coluna: ColunaOrdemAlunos): number {
+const DESCRICAO_ORDEM: Record<ColunaOrdemAlunos, Record<DirecaoOrdem, string>> = {
+  nome: { asc: "de A a Z", desc: "de Z a A" },
+  "ultimo-treino": {
+    asc: "mais tempo sem treinar primeiro",
+    desc: "treinou há menos tempo primeiro",
+  },
+  "treinos-mes": { asc: "menos treinos no mês primeiro", desc: "mais treinos no mês primeiro" },
+  termo: { asc: "termo mais urgente primeiro", desc: "termo mais distante primeiro" },
+  atraso: { asc: "menor valor em atraso primeiro", desc: "maior valor em atraso primeiro" },
+};
+
+/** A ordem em palavras ("de A a Z", "maior valor em atraso primeiro"), para a tela e leitores de tela. */
+export function descreverOrdem({ coluna, direcao }: OrdemAlunos): string {
+  return DESCRICAO_ORDEM[coluna][direcao];
+}
+
+/** Valor que a coluna compara; null = "não se aplica" (vai sempre para o fim da lista). */
+function valorDaColuna(aluno: AlunoResumo, coluna: ColunaOrdemAlunos): number | null {
   switch (coluna) {
     case "ultimo-treino":
-      return aluno.diasSemTreinar ?? Number.POSITIVE_INFINITY;
+      // Mais dias parado = valor menor; quem nunca treinou é o mais parado de todos.
+      return aluno.diasSemTreinar === null ? Number.NEGATIVE_INFINITY : -aluno.diasSemTreinar;
     case "treinos-mes":
       return aluno.treinosNoMes;
     case "termo":
+      if (!aluno.ativo) return null;
       return aluno.diasTermo ?? Number.NEGATIVE_INFINITY;
     case "atraso":
       return aluno.valorEmAtraso;
@@ -224,37 +248,21 @@ export function ordenarAlunos(
     if (coluna === "nome") return sentido * compararPorNome(a, b);
     const va = valorDaColuna(a, coluna);
     const vb = valorDaColuna(b, coluna);
+    if (va === null || vb === null) {
+      return va === vb ? compararPorNome(a, b) : va === null ? 1 : -1;
+    }
     if (va === vb) return compararPorNome(a, b);
     return sentido * (va < vb ? -1 : 1);
   });
 }
 
-/** Clicar na coluna já ativa inverte o sentido; numa coluna nova começa pelo mais útil. */
+/**
+ * Clicar na coluna já ativa inverte o sentido; numa coluna nova começa pelo mais útil: o maior
+ * número de treinos e o maior valor em atraso primeiro; nas demais, o mais urgente.
+ */
 export function alternarOrdem(atual: OrdemAlunos, coluna: ColunaOrdemAlunos): OrdemAlunos {
   if (atual.coluna === coluna) {
     return { coluna, direcao: atual.direcao === "asc" ? "desc" : "asc" };
   }
-  // Treinos e valor em atraso: o maior primeiro; a ausência de treino e o termo, o mais urgente.
   return { coluna, direcao: coluna === "treinos-mes" || coluna === "atraso" ? "desc" : "asc" };
-}
-
-// ------------------------------------------------------------------- resumo
-
-export type ResumoAlunos = {
-  total: number;
-  ativos: number;
-  emRisco: number;
-  /** Alunos (não parcelas) com algum atraso. */
-  comAtraso: number;
-  termoPendente: number;
-};
-
-export function resumirAlunos(alunos: readonly AlunoResumo[]): ResumoAlunos {
-  return {
-    total: alunos.length,
-    ativos: alunos.filter((a) => a.ativo).length,
-    emRisco: alunos.filter((a) => temAlerta(a, "em-risco")).length,
-    comAtraso: alunos.filter((a) => temAlerta(a, "inadimplente")).length,
-    termoPendente: alunos.filter((a) => temAlerta(a, "termo-pendente")).length,
-  };
 }

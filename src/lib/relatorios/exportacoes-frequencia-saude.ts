@@ -2,6 +2,7 @@
 // brasileiro, via `gerarCsv`). Dia da semana, turno, modalidade e faixa de IMC reaproveitam os
 // arquivos de `exportacoes-visao-financeiro`; o nome do arquivo sai de `nomeExportacao`.
 
+import { DIAS_SEM_AVALIACAO, JANELA_RECENTE_DIAS } from "./agregar";
 import { gerarCsv } from "./csv";
 import type { AlunoRanking, AlunoRisco, PontoMensal, RelatorioGeral } from "./types";
 
@@ -64,13 +65,13 @@ export function csvResumoSaude(relatorio: RelatorioGeral): string {
     { indicador: "IMC médio", valor: saude.imcMedio },
     { indicador: "Alunos com avaliação", valor: saude.comAvaliacao },
     {
-      indicador: "Alunos sem avaliação há mais de 90 dias",
+      indicador: `Alunos sem avaliação há mais de ${DIAS_SEM_AVALIACAO} dias`,
       valor: saude.semAvaliacaoHa90d,
     },
     { indicador: "Assinaturas de relatório (total)", valor: assinaturas.total },
     { indicador: "Alunos com assinatura", valor: assinaturas.alunos },
     {
-      indicador: "Assinaturas nos últimos 30 dias",
+      indicador: `Assinaturas nos últimos ${JANELA_RECENTE_DIAS} dias`,
       valor: assinaturas.ultimos30d,
     },
   ];

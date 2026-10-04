@@ -161,13 +161,16 @@ export function resumirModalidades(porModalidade: RelatorioGeral["porModalidade"
 // ------------------------------------------------------------------------ risco
 
 /** Dias sem treinar a partir dos quais o sumiço passa a pedir atenção (e conta em `paradosHa30Dias`). */
-const LIMITE_PARADO_DIAS = 30;
+export const LIMITE_PARADO_DIAS = 30;
+
+/** Dias sem treinar a partir dos quais o sumiço é grave (selo vermelho). */
+export const LIMITE_CRITICO_DIAS = 60;
 
 export type TomRisco = "alerta" | "atencao" | "neutro";
 
 /** Quão grave é o sumiço: nunca treinou ou 60+ dias = alerta; 30+ = atenção; o resto, neutro. */
 export function tomRisco(diasSemTreinar: number | null): TomRisco {
-  if (diasSemTreinar === null || diasSemTreinar >= 60) return "alerta";
+  if (diasSemTreinar === null || diasSemTreinar >= LIMITE_CRITICO_DIAS) return "alerta";
   if (diasSemTreinar >= LIMITE_PARADO_DIAS) return "atencao";
   return "neutro";
 }

@@ -14,6 +14,7 @@ const VS_MES_ANTERIOR = "vs. mesmo período do mês anterior";
 
 export function FrequenciaIndicadores({ relatorio }: { relatorio: RelatorioGeral }) {
   const { kpis } = relatorio;
+  const semAtivos = kpis.alunosAtivos === 0;
   const mesAtual = resumirTreinos(serieTreinos(relatorio.mensal, relatorio.hoje)).mesAtual;
 
   return (
@@ -30,16 +31,22 @@ export function FrequenciaIndicadores({ relatorio }: { relatorio: RelatorioGeral
       <KpiRelatorio
         atraso={50}
         rotulo="Engajamento"
-        valor={formatarPercentual(kpis.engajamentoPct)}
+        valor={semAtivos ? TRACO : formatarPercentual(kpis.engajamentoPct)}
         icone={<Flame />}
-        detalhe={`dos alunos ativos treinaram nos últimos ${JANELA_RECENTE_DIAS} dias`}
+        detalhe={
+          semAtivos
+            ? "nenhum aluno ativo no momento"
+            : `dos alunos ativos treinaram nos últimos ${JANELA_RECENTE_DIAS} dias`
+        }
         visual={
-          <ProgressRing
-            valor={kpis.engajamentoPct}
-            tamanho={52}
-            espessura={6}
-            rotulo={`Engajamento: ${formatarPercentual(kpis.engajamentoPct)}`}
-          />
+          semAtivos ? undefined : (
+            <ProgressRing
+              valor={kpis.engajamentoPct}
+              tamanho={52}
+              espessura={6}
+              rotulo={`Engajamento: ${formatarPercentual(kpis.engajamentoPct)}`}
+            />
+          )
         }
         dica={`Percentual dos alunos ativos que registraram ao menos um treino hoje ou nos ${JANELA_RECENTE_DIAS - 1} dias anteriores.`}
       />

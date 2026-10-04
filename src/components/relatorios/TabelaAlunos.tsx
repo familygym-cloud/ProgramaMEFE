@@ -6,15 +6,21 @@ import { LinkRelatorioAluno } from "@/components/relatorios/LinkRelatorioAluno";
 import { SeloTermo } from "@/components/relatorios/SeloTermo";
 import { Button } from "@/components/ui/button";
 import type { ModoRelatorio } from "@/lib/relatorios/abas";
-import type { ColunaOrdemAlunos, OrdemAlunos } from "@/lib/relatorios/alunos-lista";
+import { haQuantoTempo } from "@/lib/relatorios/aluno-relatorio";
+import { DIAS_TERMO_A_VENCER } from "@/lib/relatorios/agregar";
 import {
+  descreverOrdem,
+  type ColunaOrdemAlunos,
+  type OrdemAlunos,
+} from "@/lib/relatorios/alunos-lista";
+import {
+  TRACO,
   formatarData,
   formatarDiasSemTreinar,
   formatarMoeda,
   formatarNumero,
   pluralizar,
 } from "@/lib/relatorios/formatar";
-import { haQuantoTempo } from "@/lib/relatorios/aluno-relatorio";
 import type { AlunoResumo } from "@/lib/relatorios/types";
 import { cn } from "@/lib/utils";
 
@@ -25,23 +31,15 @@ function tomDaSituacao(status: string): "ok" | "atencao" | "neutro" {
   return status === "Risco" ? "atencao" : "neutro";
 }
 
-function Situacao({ aluno }: { aluno: AlunoResumo }) {
-  return <Selo tom={tomDaSituacao(aluno.status)}>{aluno.status}</Selo>;
-}
-
 function UltimoTreino({ aluno, hoje }: { aluno: AlunoResumo; hoje: string }) {
-  if (aluno.ultimoTreino === null) {
-    return (
-      <div className="space-y-1">
-        <p>{formatarDiasSemTreinar(null)}</p>
-        {aluno.emRisco ? <Selo tom="atencao">Em risco</Selo> : null}
-      </div>
-    );
-  }
-  const quando = haQuantoTempo(aluno.ultimoTreino, hoje);
+  const quando = aluno.ultimoTreino === null ? null : haQuantoTempo(aluno.ultimoTreino, hoje);
   return (
     <div className="space-y-1">
-      <p>{formatarData(aluno.ultimoTreino)}</p>
+      <p>
+        {aluno.ultimoTreino === null
+          ? formatarDiasSemTreinar(null)
+          : formatarData(aluno.ultimoTreino)}
+      </p>
       {quando ? <p className="text-xs text-muted-foreground">{quando}</p> : null}
       {aluno.emRisco ? <Selo tom="atencao">Em risco</Selo> : null}
     </div>
@@ -50,15 +48,19 @@ function UltimoTreino({ aluno, hoje }: { aluno: AlunoResumo; hoje: string }) {
 
 function Termo({ aluno }: { aluno: AlunoResumo }) {
   // Quem não está ativo não precisa de termo em dia: não vira alerta.
-  if (!aluno.ativo) return <span className="text-muted-foreground">—</span>;
-  if (aluno.diasTermo === null || aluno.diasTermo <= 30) return <SeloTermo dias={aluno.diasTermo} />;
+  if (!aluno.ativo) return <span className="text-muted-foreground">{TRACO}</span>;
+  if (aluno.diasTermo === null || aluno.diasTermo <= DIAS_TERMO_A_VENCER) {
+    return <SeloTermo dias={aluno.diasTermo} />;
+  }
   return (
-    <span className="text-muted-foreground">Válido até {formatarData(aluno.termoValidoAte)}</span>
+    <span className="whitespace-nowrap text-muted-foreground">
+      Válido até {formatarData(aluno.termoValidoAte)}
+    </span>
   );
 }
 
 function EmAtraso({ aluno }: { aluno: AlunoResumo }) {
-  if (aluno.parcelasEmAtraso === 0) return <span className="text-muted-foreground">—</span>;
+  if (aluno.parcelasEmAtraso === 0) return <span className="text-muted-foreground">{TRACO}</span>;
   return (
     <div className="space-y-0.5">
       <p className="font-semibold text-red-300">{formatarMoeda(aluno.valorEmAtraso)}</p>
@@ -71,28 +73,78 @@ function EmAtraso({ aluno }: { aluno: AlunoResumo }) {
 
 // ------------------------------------------------------------------- colunas
 
+type Contexto = { hoje: string; modo: ModoRelatorio };
+
 type Coluna = {
   id: string;
   titulo: string;
+  celula: (aluno: AlunoResumo, contexto: Contexto) => ReactNode;
   /** Presente = a coluna ordena a lista. */
   ordem?: ColunaOrdemAlunos;
   alinhar?: "direita";
   /** Fica fora do papel (ações). */
   soNaTela?: boolean;
+  /**
+   * No cartão do celular: "cabecalho" é o título do cartão e "selo" fica no canto superior direito.
+   * A ação ("Abrir relatório") vem em um botão de rodapé; sem papel, a coluna entra na grade.
+   */
+  cartao?: "cabecalho" | "selo" | "acao";
 };
 
 const COLUNAS: readonly Coluna[] = [
-  { id: "aluno", titulo: "Aluno", ordem: "nome" },
-  { id: "situacao", titulo: "Situação" },
-  { id: "ultimo-treino", titulo: "Último treino", ordem: "ultimo-treino" },
-  { id: "treinos", titulo: "Treinos no mês", ordem: "treinos-mes", alinhar: "direita" },
-  { id: "termo", titulo: "Termo", ordem: "termo" },
-  { id: "atraso", titulo: "Em atraso", ordem: "atraso" },
-  { id: "telefone", titulo: "Telefone" },
-  { id: "relatorio", titulo: "Relatório", soNaTela: true },
+  {
+    id: "aluno",
+    titulo: "Aluno",
+    ordem: "nome",
+    cartao: "cabecalho",
+    celula: (a) => (
+      <>
+        <p className="font-medium">{a.nome}</p>
+        <p className="text-xs text-muted-foreground">
+          {a.plano} · {a.turno}
+        </p>
+      </>
+    ),
+  },
+  {
+    id: "situacao",
+    titulo: "Situação",
+    cartao: "selo",
+    celula: (a) => <Selo tom={tomDaSituacao(a.status)}>{a.status}</Selo>,
+  },
+  {
+    id: "ultimo-treino",
+    titulo: "Último treino",
+    ordem: "ultimo-treino",
+    celula: (a, { hoje }) => <UltimoTreino aluno={a} hoje={hoje} />,
+  },
+  {
+    id: "treinos",
+    titulo: "Treinos no mês",
+    ordem: "treinos-mes",
+    alinhar: "direita",
+    celula: (a) => formatarNumero(a.treinosNoMes),
+  },
+  { id: "termo", titulo: "Termo", ordem: "termo", celula: (a) => <Termo aluno={a} /> },
+  { id: "atraso", titulo: "Em atraso", ordem: "atraso", celula: (a) => <EmAtraso aluno={a} /> },
+  { id: "telefone", titulo: "Telefone", celula: (a) => <CelulaTelefone telefone={a.telefone} /> },
+  {
+    id: "relatorio",
+    titulo: "Relatório",
+    soNaTela: true,
+    cartao: "acao",
+    celula: (a, { modo }) => <LinkRelatorioAluno alunoId={a.alunoId} nome={a.nome} modo={modo} />,
+  },
 ];
 
-function Cabecalho({
+const CABECALHO_DO_CARTAO = COLUNAS.find((c) => c.cartao === "cabecalho");
+const SELO_DO_CARTAO = COLUNAS.find((c) => c.cartao === "selo");
+const DADOS_DO_CARTAO = COLUNAS.filter((c) => c.cartao === undefined);
+
+/** Margens menores no papel: a tabela tem sete colunas e a folha, ~190 mm. */
+const CELULA_NO_PAPEL = "print:px-2 print:py-2";
+
+function CabecalhoColuna({
   coluna,
   ordem,
   aoOrdenar,
@@ -101,20 +153,20 @@ function Cabecalho({
   ordem: OrdemAlunos;
   aoOrdenar: (coluna: ColunaOrdemAlunos) => void;
 }) {
-  const direita = coluna.alinhar === "direita";
   const classeTh = cn(
-    "whitespace-nowrap text-xs font-semibold uppercase tracking-wider text-muted-foreground",
-    direita ? "text-right" : "text-left",
+    "whitespace-nowrap text-xs font-semibold uppercase tracking-wider text-muted-foreground print:whitespace-normal",
+    coluna.alinhar === "direita" ? "text-right" : "text-left",
     coluna.soNaTela && "print:hidden",
   );
-  if (!coluna.ordem) {
+  const colunaDeOrdem = coluna.ordem;
+  if (colunaDeOrdem === undefined) {
     return (
-      <th scope="col" className={cn(classeTh, "h-11 px-4")}>
+      <th scope="col" className={cn(classeTh, "h-11 px-4", CELULA_NO_PAPEL)}>
         {coluna.titulo}
       </th>
     );
   }
-  const ativa = ordem.coluna === coluna.ordem;
+  const ativa = ordem.coluna === colunaDeOrdem;
   const Seta = !ativa ? ArrowUpDown : ordem.direcao === "asc" ? ArrowUp : ArrowDown;
   return (
     <th
@@ -124,10 +176,10 @@ function Cabecalho({
     >
       <button
         type="button"
-        onClick={() => coluna.ordem && aoOrdenar(coluna.ordem)}
+        onClick={() => aoOrdenar(colunaDeOrdem)}
         className={cn(
-          "group flex h-11 w-full items-center gap-1.5 px-4 uppercase tracking-wider transition-colors hover:text-foreground focus-visible:outline-offset-[-2px]",
-          direita && "justify-end",
+          "group flex h-11 w-full items-center gap-1.5 px-4 uppercase tracking-wider transition-colors hover:text-foreground focus-visible:outline-offset-[-2px] print:hidden",
+          coluna.alinhar === "direita" && "justify-end",
           ativa && "text-foreground",
         )}
       >
@@ -141,32 +193,14 @@ function Cabecalho({
         />
         <span className="sr-only">
           {ativa
-            ? `, ordenado em ordem ${ordem.direcao === "asc" ? "crescente" : "decrescente"}. Ativar para inverter`
+            ? `, ordenado: ${descreverOrdem(ordem)}. Ativar para inverter`
             : ", ativar para ordenar"}
         </span>
       </button>
+      {/* No papel não há o que clicar: só o título. */}
+      <span className={cn("hidden print:inline-block", CELULA_NO_PAPEL)}>{coluna.titulo}</span>
     </th>
   );
-}
-
-function celulas(aluno: AlunoResumo, hoje: string, modo: ModoRelatorio): Record<string, ReactNode> {
-  return {
-    aluno: (
-      <>
-        <p className="font-medium">{aluno.nome}</p>
-        <p className="text-xs text-muted-foreground">
-          {aluno.plano} · {aluno.turno}
-        </p>
-      </>
-    ),
-    situacao: <Situacao aluno={aluno} />,
-    "ultimo-treino": <UltimoTreino aluno={aluno} hoje={hoje} />,
-    treinos: formatarNumero(aluno.treinosNoMes),
-    termo: <Termo aluno={aluno} />,
-    atraso: <EmAtraso aluno={aluno} />,
-    telefone: <CelulaTelefone telefone={aluno.telefone} />,
-    relatorio: <LinkRelatorioAluno alunoId={aluno.alunoId} nome={aluno.nome} modo={modo} />,
-  };
 }
 
 // -------------------------------------------------------------------- tabela
@@ -195,6 +229,7 @@ export function TabelaAlunos({
   limite: number;
   aoMostrarMais: () => void;
 }) {
+  const contexto: Contexto = { hoje, modo };
   const visiveis = alunos.slice(0, limite);
   const restantes = alunos.length - visiveis.length;
 
@@ -202,41 +237,38 @@ export function TabelaAlunos({
     <div className="space-y-3">
       {/* Celular: um cartão por aluno. */}
       <ul aria-label="Lista de alunos" className="grid gap-3 md:hidden print:hidden">
-        {visiveis.map((aluno) => {
-          const c = celulas(aluno, hoje, modo);
-          return (
-            <li
-              key={aluno.alunoId}
-              className="rounded-2xl border border-white/10 bg-white/[0.03] p-4"
-            >
-              <div className="flex items-start justify-between gap-3">
-                <div className="min-w-0">{c["aluno"]}</div>
-                <div className="shrink-0">{c["situacao"]}</div>
+        {visiveis.map((aluno) => (
+          <li
+            key={aluno.alunoId}
+            className="rounded-2xl border border-white/10 bg-white/[0.03] p-4"
+          >
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0 break-words">
+                {CABECALHO_DO_CARTAO?.celula(aluno, contexto)}
               </div>
-              <dl className="mt-3 grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
-                {COLUNAS.filter(
-                  (col) => !["aluno", "situacao", "relatorio"].includes(col.id),
-                ).map((col) => (
-                  <div key={col.id} className="min-w-0">
-                    <dt className="text-[0.68rem] font-semibold uppercase tracking-wider text-muted-foreground">
-                      {col.titulo}
-                    </dt>
-                    <dd className="mt-0.5 break-words tabular-nums">{c[col.id]}</dd>
-                  </div>
-                ))}
-              </dl>
-              <div className="mt-4">
-                <LinkRelatorioAluno
-                  alunoId={aluno.alunoId}
-                  nome={aluno.nome}
-                  modo={modo}
-                  rotulo="Abrir relatório do aluno"
-                  className="w-full"
-                />
-              </div>
-            </li>
-          );
-        })}
+              <div className="shrink-0">{SELO_DO_CARTAO?.celula(aluno, contexto)}</div>
+            </div>
+            <dl className="mt-3 grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
+              {DADOS_DO_CARTAO.map((col) => (
+                <div key={col.id} className="min-w-0">
+                  <dt className="text-[0.68rem] font-semibold uppercase tracking-wider text-muted-foreground">
+                    {col.titulo}
+                  </dt>
+                  <dd className="mt-0.5 break-words tabular-nums">{col.celula(aluno, contexto)}</dd>
+                </div>
+              ))}
+            </dl>
+            <div className="mt-4">
+              <LinkRelatorioAluno
+                alunoId={aluno.alunoId}
+                nome={aluno.nome}
+                modo={modo}
+                rotulo="Abrir relatório"
+                className="w-full"
+              />
+            </div>
+          </li>
+        ))}
       </ul>
 
       {/* Telas maiores e papel: tabela com rolagem interna. */}
@@ -253,42 +285,45 @@ export function TabelaAlunos({
           <thead>
             <tr className="border-b border-white/10 bg-white/[0.03]">
               {COLUNAS.map((coluna) => (
-                <Cabecalho key={coluna.id} coluna={coluna} ordem={ordem} aoOrdenar={aoOrdenar} />
+                <CabecalhoColuna
+                  key={coluna.id}
+                  coluna={coluna}
+                  ordem={ordem}
+                  aoOrdenar={aoOrdenar}
+                />
               ))}
             </tr>
           </thead>
           <tbody>
-            {alunos.map((aluno, indice) => {
-              const c = celulas(aluno, hoje, modo);
-              return (
-                <tr
-                  key={aluno.alunoId}
-                  className={cn(
-                    "border-b border-white/5 transition-colors last:border-b-0 hover:bg-white/[0.03] print:break-inside-avoid",
-                    indice >= limite && "hidden print:table-row",
-                  )}
-                >
-                  {COLUNAS.map((coluna) => (
-                    <td
-                      key={coluna.id}
-                      className={cn(
-                        "px-4 py-3 align-top tabular-nums",
-                        coluna.alinhar === "direita" && "text-right",
-                        coluna.soNaTela && "print:hidden",
-                      )}
-                    >
-                      {c[coluna.id]}
-                    </td>
-                  ))}
-                </tr>
-              );
-            })}
+            {alunos.map((aluno, indice) => (
+              <tr
+                key={aluno.alunoId}
+                className={cn(
+                  "border-b border-white/5 transition-colors last:border-b-0 hover:bg-white/[0.03] print:break-inside-avoid",
+                  indice >= limite && "hidden print:table-row",
+                )}
+              >
+                {COLUNAS.map((coluna) => (
+                  <td
+                    key={coluna.id}
+                    className={cn(
+                      "px-4 py-3 align-top tabular-nums",
+                      CELULA_NO_PAPEL,
+                      coluna.alinhar === "direita" && "text-right",
+                      coluna.soNaTela && "print:hidden",
+                    )}
+                  >
+                    {coluna.celula(aluno, contexto)}
+                  </td>
+                ))}
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>
 
       <div className="flex flex-wrap items-center justify-between gap-2 print:hidden">
-        <p className="text-xs text-muted-foreground">
+        <p className="text-xs text-muted-foreground" aria-live="polite">
           {restantes > 0
             ? `Mostrando ${formatarNumero(visiveis.length)} de ${pluralizar(alunos.length, "aluno")}`
             : pluralizar(alunos.length, "aluno")}

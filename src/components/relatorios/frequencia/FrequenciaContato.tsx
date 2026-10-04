@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Check, Copy } from "lucide-react";
 import { toast } from "sonner";
+import { CelulaTelefone } from "@/components/relatorios/CelulaTelefone";
 import { copiarTexto } from "@/components/relatorios/frequencia/copiarTexto";
 import { digitosDoTelefone, formatarTelefone } from "@/lib/relatorios/formatar";
 
@@ -9,8 +10,6 @@ import { digitosDoTelefone, formatarTelefone } from "@/lib/relatorios/formatar";
  * Sem telefone discável, avisa em vez de mostrar um traço solto.
  */
 export function FrequenciaContato({ nome, telefone }: { nome: string; telefone: string | null }) {
-  const digitos = digitosDoTelefone(telefone);
-  const texto = formatarTelefone(telefone);
   const [copiado, setCopiado] = useState(false);
 
   useEffect(() => {
@@ -19,10 +18,11 @@ export function FrequenciaContato({ nome, telefone }: { nome: string; telefone: 
     return () => window.clearTimeout(timer);
   }, [copiado]);
 
-  if (!digitos) return <span className="text-muted-foreground">Sem telefone</span>;
+  if (!digitosDoTelefone(telefone))
+    return <span className="text-muted-foreground">Sem telefone</span>;
 
   async function copiar() {
-    if (await copiarTexto(texto)) {
+    if (await copiarTexto(formatarTelefone(telefone))) {
       setCopiado(true);
       toast.success(`Telefone de ${nome} copiado.`);
     } else {
@@ -32,17 +32,13 @@ export function FrequenciaContato({ nome, telefone }: { nome: string; telefone: 
 
   return (
     <span className="flex items-center gap-1">
-      <a
-        href={`tel:${digitos}`}
-        className="relative underline decoration-white/30 underline-offset-4 before:absolute before:-inset-x-1 before:-inset-y-3 hover:decoration-current"
-      >
-        {texto}
-      </a>
+      <CelulaTelefone telefone={telefone} />
+      {/* Botão de 44 px que não aumenta a linha: a margem negativa o deixa sobre o respiro da célula. */}
       <button
         type="button"
         onClick={copiar}
         aria-label={copiado ? "Telefone copiado" : `Copiar telefone de ${nome}`}
-        className="-my-2 grid size-11 shrink-0 place-items-center rounded-full text-muted-foreground transition-colors hover:bg-white/10 hover:text-foreground print:hidden"
+        className="-my-3 grid size-11 shrink-0 place-items-center rounded-full text-muted-foreground transition-colors hover:bg-white/10 hover:text-foreground print:hidden"
       >
         {copiado ? (
           <Check className="size-4 text-emerald-300" aria-hidden />

@@ -12,6 +12,7 @@ import { FiltrosAlunos } from "@/components/relatorios/FiltrosAlunos";
 import { ALUNOS_POR_PAGINA, TabelaAlunos } from "@/components/relatorios/TabelaAlunos";
 import type { PropsAba } from "@/components/relatorios/tipos";
 import { Button } from "@/components/ui/button";
+import { DIAS_SEM_TREINO_RISCO } from "@/lib/relatorios/agregar";
 import {
   SEM_FILTRO,
   alternarOrdem,
@@ -26,7 +27,7 @@ import {
 } from "@/lib/relatorios/alunos-lista";
 import { csvAlunos } from "@/lib/relatorios/exportacoes-termos-alunos";
 import { nomeExportacao } from "@/lib/relatorios/exportacoes-visao-financeiro";
-import { formatarMoeda, formatarNumero, pluralizar } from "@/lib/relatorios/formatar";
+import { formatarDias, formatarMoeda, formatarNumero, pluralizar } from "@/lib/relatorios/formatar";
 
 function Indicadores({ relatorio }: { relatorio: PropsAba["relatorio"] }) {
   const { kpis } = relatorio;
@@ -55,8 +56,8 @@ function Indicadores({ relatorio }: { relatorio: PropsAba["relatorio"] }) {
         valor={formatarNumero(kpis.alunosEmRisco)}
         icone={<TriangleAlert />}
         tom={kpis.alunosEmRisco > 0 ? "atencao" : "neutro"}
-        detalhe="ativos sem treinar há 14 dias ou mais"
-        dica="Alunos ativos sem treino há 14 dias ou mais, mais os que nunca treinaram e já estão cadastrados há 14 dias ou mais. Quem acabou de chegar não entra."
+        detalhe={`ativos sem treinar há ${formatarDias(DIAS_SEM_TREINO_RISCO)} ou mais`}
+        dica={`Alunos ativos sem treino há ${formatarDias(DIAS_SEM_TREINO_RISCO)} ou mais, mais os que nunca treinaram e já estão cadastrados há esse tempo. Quem acabou de chegar não entra.`}
       />
       <KpiRelatorio
         atraso={150}

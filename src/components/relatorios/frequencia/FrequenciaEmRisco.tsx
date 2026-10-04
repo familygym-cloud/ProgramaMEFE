@@ -12,7 +12,7 @@ import type { PropsAba } from "@/components/relatorios/tipos";
 import { DIAS_SEM_TREINO_RISCO, MAX_ALUNOS_RISCO } from "@/lib/relatorios/agregar";
 import { csvAlunosEmRisco } from "@/lib/relatorios/exportacoes-frequencia-saude";
 import { nomeExportacao } from "@/lib/relatorios/exportacoes-visao-financeiro";
-import { resumirRisco, tomRisco } from "@/lib/relatorios/frequencia";
+import { LIMITE_PARADO_DIAS, resumirRisco, tomRisco } from "@/lib/relatorios/frequencia";
 import {
   TRACO,
   formatarData,
@@ -28,11 +28,16 @@ const COLUNAS: readonly ColunaTabela<AlunoRisco>[] = [
   { id: "plano", titulo: "Plano", papel: "subtitulo", celula: (a) => a.plano },
   { id: "turno", titulo: "Turno", celula: (a) => a.turno || TRACO },
   {
-    id: "sem-treinar",
-    titulo: "Sem treinar",
+    id: "situacao",
+    titulo: "Situação",
     papel: "selo",
+    // No cartão do celular o selo fica sem o título da coluna: o texto diz o que o número é.
     celula: (a) => (
-      <Selo tom={tomRisco(a.diasSemTreinar)}>{formatarDiasSemTreinar(a.diasSemTreinar)}</Selo>
+      <Selo tom={tomRisco(a.diasSemTreinar)}>
+        {a.diasSemTreinar === null
+          ? formatarDiasSemTreinar(null)
+          : `Parado há ${formatarDias(a.diasSemTreinar)}`}
+      </Selo>
     ),
     classe: "whitespace-nowrap",
   },
@@ -104,7 +109,7 @@ export function FrequenciaEmRisco({ relatorio, modo }: PropsAba) {
                 detalhe={entreListados ?? "cadastrados e sem nenhum treino"}
               />
               <Dado
-                rotulo="Parados há 30+ dias"
+                rotulo={`Parados há ${LIMITE_PARADO_DIAS}+ dias`}
                 valor={formatarNumero(resumo.paradosHa30Dias)}
                 detalhe={entreListados ?? "já treinaram, mas sumiram"}
               />
@@ -115,7 +120,7 @@ export function FrequenciaEmRisco({ relatorio, modo }: PropsAba) {
               />
             </GradeDados>
             <TabelaRelatorio
-              rotulo="Alunos em risco de abandono"
+              rotulo="Lista dos alunos em risco"
               colunas={COLUNAS}
               linhas={lista}
               chaveLinha={(a) => a.alunoId}
