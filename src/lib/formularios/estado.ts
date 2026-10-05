@@ -205,9 +205,9 @@ export function criarArmazem(
   };
 
   return {
-    obter: (chave) => valores[chave],
+    obter: (chave) => (Object.hasOwn(valores, chave) ? valores[chave] : undefined),
     definir(chave, valor) {
-      const atual = valores[chave];
+      const atual = Object.hasOwn(valores, chave) ? valores[chave] : undefined;
       // "" num campo comum equivale a "sem resposta": a chave some.
       if (valor === "" && !automaticas.has(chave)) {
         if (atual === undefined) return;
@@ -219,7 +219,7 @@ export function criarArmazem(
       trocar({ ...valores, [chave]: valor });
     },
     restaurar(chave) {
-      if (valores[chave] === undefined) return;
+      if (!Object.hasOwn(valores, chave)) return;
       const { [chave]: _removida, ...resto } = valores;
       trocar(resto);
     },

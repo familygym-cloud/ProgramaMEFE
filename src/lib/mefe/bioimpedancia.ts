@@ -79,7 +79,7 @@ function listar(itens: readonly string[]): string {
   return `${itens.slice(0, -1).join("; ")} e ${itens[itens.length - 1]}`;
 }
 
-/** Os valores com os rótulos: "Avaliação inicial: 27,8%; 1º retorno: 26,9% e 2º retorno: 27,2%". */
+/** Os valores com os rótulos: "Avaliação inicial: 27,8%; Retorno 1: 26,9% e Retorno 2: 27,2%". */
 export function descreverValores(serie: SerieDeExemplo): string {
   return listar(
     serie.valores.map(

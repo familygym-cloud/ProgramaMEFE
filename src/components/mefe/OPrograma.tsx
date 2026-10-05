@@ -18,6 +18,7 @@ import { CabecalhoSecao, Secao } from "@/components/site/SecaoSite";
 import {
   DESCRICAO_DO_PROGRAMA,
   areasDaEquipe,
+  itensDoPrograma,
   principiosDoPrograma,
   publicoDoPrograma,
   type AreaDaEquipe,
@@ -48,7 +49,7 @@ const ICONE_DO_PUBLICO: Record<string, LucideIcon> = {
 
 function TresAreas() {
   return (
-    <div className="relative overflow-hidden rounded-[2rem] border border-foreground/10 bg-card/70 p-6 sm:p-8">
+    <div className="relative self-start overflow-hidden rounded-[2rem] border border-foreground/10 bg-card/70 p-6 sm:p-8 lg:sticky lg:top-40">
       <div
         aria-hidden="true"
         className="pointer-events-none absolute -right-20 -top-20 size-64 rounded-full bg-brand-yellow/10 blur-3xl"
@@ -105,17 +106,35 @@ export function OPrograma() {
               {paragrafo}
             </p>
           ))}
+          <div className="space-y-3 pt-1">
+            <h3 className="text-sm font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+              O que o programa reúne
+            </h3>
+            <ul className="flex flex-wrap gap-2">
+              {itensDoPrograma.map((item) => (
+                <li
+                  key={item}
+                  className="rounded-full border border-brand-yellow/40 bg-brand-yellow/5 px-3.5 py-1.5 text-sm font-medium"
+                >
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </div>
           <ul className="grid gap-3 pt-2 sm:grid-cols-3 lg:grid-cols-1">
             {principiosDoPrograma.map((principio) => {
               const Icone = ICONE_DO_PRINCIPIO[principio.id] ?? Layers;
               return (
                 <li
                   key={principio.id}
-                  className="rounded-2xl border border-foreground/10 bg-card/60 p-4 lg:flex lg:items-start lg:gap-4"
+                  className="flex items-start gap-4 rounded-2xl border border-foreground/10 bg-card/60 p-4 sm:block lg:flex"
                 >
-                  <Icone aria-hidden="true" className="size-5 text-brand-yellow lg:mt-1.5" />
+                  <Icone
+                    aria-hidden="true"
+                    className="mt-1.5 size-5 shrink-0 text-brand-yellow sm:mt-0 lg:mt-1.5"
+                  />
                   <div>
-                    <h3 className="mt-3 font-display text-xl font-semibold tracking-tight lg:mt-0">
+                    <h3 className="font-display text-xl font-semibold tracking-tight sm:mt-3 lg:mt-0">
                       {principio.titulo}
                     </h3>
                     <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
@@ -146,17 +165,19 @@ export function OPrograma() {
             return (
               <li
                 key={publico.id}
-                className="group rounded-2xl border border-foreground/10 bg-card/60 p-5 transition-colors hover:border-brand-yellow/40 hover:bg-card"
+                className="group flex items-start gap-4 rounded-2xl border border-foreground/10 bg-card/60 p-5 transition-colors hover:border-brand-yellow/40 hover:bg-card min-[460px]:block"
               >
-                <span className="grid size-10 place-items-center rounded-xl bg-foreground/[0.07] text-brand-yellow transition-colors group-hover:bg-brand-yellow group-hover:text-brand-black">
+                <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-foreground/[0.07] text-brand-yellow transition-colors group-hover:bg-brand-yellow group-hover:text-brand-black">
                   <Icone aria-hidden="true" className="size-5" />
                 </span>
-                <h4 className="mt-4 font-display text-lg font-semibold leading-tight tracking-tight">
-                  {publico.titulo}
-                </h4>
-                <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
-                  {publico.texto}
-                </p>
+                <div className="min-[460px]:mt-4">
+                  <h4 className="font-display text-lg font-semibold leading-tight tracking-tight">
+                    {publico.titulo}
+                  </h4>
+                  <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
+                    {publico.texto}
+                  </p>
+                </div>
               </li>
             );
           })}

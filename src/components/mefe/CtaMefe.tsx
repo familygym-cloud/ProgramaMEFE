@@ -40,12 +40,12 @@ export function CtaMefe() {
           <p className="text-xs leading-relaxed text-muted-foreground sm:text-sm">{AVISO_LEGAL}</p>
           <p className="text-xs text-muted-foreground">
             Equipe da Family Gym?{" "}
-            <a
-              href="/formularios-mefe"
+            <Link
+              to="/formularios-mefe"
               className="inline-flex min-h-11 items-center font-medium text-foreground/80 underline underline-offset-4 hover:text-foreground"
             >
               Equipe: abrir formulários
-            </a>
+            </Link>
           </p>
         </div>
       </div>

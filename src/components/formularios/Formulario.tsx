@@ -36,7 +36,13 @@ const Documento = memo(function Documento({ definicao }: { definicao: DefinicaoF
   return (
     <div className="fm-documento">
       {definicao.paginas.map((pagina, i) => (
-        <PaginaFolha key={i} definicao={definicao} numero={i + 1} total={total}>
+        <PaginaFolha
+          key={i}
+          definicao={definicao}
+          numero={i + 1}
+          total={total}
+          densa={pagina.densa === true}
+        >
           {pagina.blocos.map((bloco, j) => (
             <BlocoView
               key={j}

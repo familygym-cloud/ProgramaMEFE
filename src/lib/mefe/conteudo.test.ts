@@ -9,9 +9,11 @@ import {
   avaliacoesDoPrograma,
   checklistDePreparo,
   cuidadosDaBioimpedancia,
+  deParaDaAvaliacao,
   etapasDaJornada,
   glossarioDosTestes,
   indicadoresDaBioimpedancia,
+  itensDoPrograma,
   IDS_DE_PILARES,
   limitesDaBioimpedancia,
   motivosDaAvaliacao,
@@ -114,6 +116,7 @@ describe("os quatro pilares", () => {
       "VO2 máx. estimado",
       "FC ao final do teste",
       "Esforço percebido (Borg)",
+      "Tempo / distância",
       "Zona de treinamento predominante",
     ]);
     expect(nomesDosTestes(pilar, 2)).toEqual([
@@ -139,6 +142,14 @@ describe("os quatro pilares", () => {
       "Coluna lombar – Extensão",
     ]);
     expect(pilar.grupos[1]?.titulo).toBe("Protocolo e condições da avaliação");
+    expect(nomesDosTestes(pilar, 1)).toEqual([
+      "Protocolo adotado",
+      "Temperatura ambiente",
+      "Horário da avaliação",
+      "Aquecimento prévio",
+      "Duração do aquecimento",
+      "Instrumento",
+    ]);
   });
 
   it("Elasticidade traz os sete testes e os dois índices calculados do formulário", () => {
@@ -292,6 +303,15 @@ describe("avaliação física e jornada", () => {
     ]);
   });
 
+  it("o antes e depois da avaliação tem três pares, todos com texto dos dois lados", () => {
+    expect(deParaDaAvaliacao).toHaveLength(3);
+    for (const linha of deParaDaAvaliacao) {
+      expect(linha.de.length).toBeGreaterThan(5);
+      expect(linha.para.length).toBeGreaterThan(5);
+      expect(linha.de).not.toBe(linha.para);
+    }
+  });
+
   it("o acompanhamento ilustrativo parte da avaliação inicial e as notas são de 0 a 10", () => {
     expect(acompanhamentoIlustrativo[0]?.id).toBe("inicial");
     expect(conteudo.notasDoAcompanhamento).toHaveLength(acompanhamentoIlustrativo.length);
@@ -324,6 +344,10 @@ describe("avaliação física e jornada", () => {
     const ids = publicoDoPrograma.map((p) => p.id);
     expect(ids).toEqual(expect.arrayContaining(["kids", "melhor-idade", "familias", "atletas"]));
     expect(principiosDoPrograma).toHaveLength(3);
+    expect(itensDoPrograma).toEqual(
+      expect.arrayContaining(["Avaliação física MEFE", "Bioimpedância", "Avaliação nutricional"]),
+    );
+    expect(new Set(itensDoPrograma).size).toBe(itensDoPrograma.length);
   });
 });
 

@@ -117,6 +117,17 @@ export const multipla = (
   porLinha: number = lista.length,
 ) => escolha("multipla", chave, rotulo, colunas, lista, porLinha);
 
+/** Marca como "letra menor no papel" as opções cujos rótulos o PDF original reduz para caber numa linha. */
+export function reduzir(lista: readonly Opcao[], ...rotulos: readonly string[]): Opcao[] {
+  return lista.map((o) => (rotulos.includes(o.rotulo) ? { ...o, reduzido: true } : o));
+}
+
+/** Opções em colunas de mesma largura, como o PDF original desenha em alguns quadros. */
+export const emColunas = (item: ItemEscolha): ItemEscolha => ({ ...item, colunasIguais: true });
+
+/** Marca uma caixa de opções que o PDF original desenha mais alta e com mais espaço em volta. */
+export const comFolga = (item: ItemEscolha): ItemEscolha => ({ ...item, folga: true });
+
 export const SIM_NAO: readonly Opcao[] = opcoes(["sim", "Sim"], ["nao", "Não"]);
 
 export function longo(
@@ -138,6 +149,16 @@ export function longo(
 /** Caixa de texto sem linhas de escrita (uma ou duas linhas de altura). */
 export const caixa = (chave: string, rotulo: string, colunas: Colunas = 12, linhas = 1) =>
   longo(chave, rotulo, linhas, { colunas, pautado: false });
+
+/** Caixa de uma linha que o PDF original não traz: só vai para o papel se for preenchida. */
+export const caixaOpcional = (
+  chave: string,
+  rotulo: string,
+  colunas: Colunas = 12,
+): ItemTextoLongo => ({
+  ...caixa(chave, rotulo, colunas, 1),
+  opcional: true,
+});
 
 export function linhasMatriz(
   prefixo: string,

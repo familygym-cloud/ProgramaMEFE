@@ -7,6 +7,7 @@ import {
   CHAMADA_DO_PROGRAMA,
   MENSAGEM_FALE_CONOSCO_MEFE,
   SIGNIFICADO_DA_SIGLA,
+  areasDaEquipe,
   pilares,
 } from "@/lib/mefe/conteudo";
 import { cn } from "@/lib/utils";
@@ -82,9 +83,23 @@ export function HeroMefe() {
           >
             {CHAMADA_DO_PROGRAMA}
           </p>
+          <ul
+            aria-label="Áreas do programa"
+            className="fg-entrada flex flex-wrap gap-2"
+            style={{ animationDelay: "230ms" }}
+          >
+            {areasDaEquipe.map((area) => (
+              <li
+                key={area.id}
+                className="rounded-full border border-foreground/15 bg-card/60 px-3.5 py-1.5 text-sm font-medium text-foreground/90"
+              >
+                {area.nome}
+              </li>
+            ))}
+          </ul>
           <div
             className="fg-entrada flex flex-col gap-3 sm:flex-row sm:flex-wrap"
-            style={{ animationDelay: "260ms" }}
+            style={{ animationDelay: "290ms" }}
           >
             <FaleConosco variante="primario" tamanho="lg" mensagem={MENSAGEM_FALE_CONOSCO_MEFE} />
             <a href="#avaliacao" className={botaoMarca("secundario", "lg")}>

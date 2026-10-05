@@ -5,17 +5,20 @@
  */
 import {
   caixa,
+  caixaOpcional,
   celulaArea,
   celulaData,
   celulaNumero,
   celulaTexto,
   dataCampo,
   email,
+  emColunas,
   linhasMatriz,
   longo,
   multipla,
   numero,
   opcoes,
+  reduzir,
   SIM_NAO,
   telefone,
   texto,
@@ -426,7 +429,8 @@ export const FORMULARIO_NUTRICIONAL: DefinicaoFormulario = {
               3,
             ),
             // Acrescentado: o PDF manda "descrever abaixo" mas não traz onde descrever.
-            caixa("alergiaOutra", "Outra alergia ou intolerância (descrever)"),
+            // Só vai para o papel se for preenchido (o papel fica igual ao original).
+            caixaOpcional("alergiaOutra", "Outra alergia ou intolerância (descrever)"),
           ],
         },
         { tipo: "subtitulo", texto: "Sinais, sintomas e funcionamento intestinal" },
@@ -456,18 +460,20 @@ export const FORMULARIO_NUTRICIONAL: DefinicaoFormulario = {
             numero("evacuacoes", "Evacuações", 3, "x / semana"),
             numero("agua", "Ingestão de água", 3, "L / dia"),
             unica("urina", "Cor da urina", 6, opcoes("Clara", "Amarela", "Escura")),
-            unica(
-              "bristol",
-              "Consistência das fezes (Escala de Bristol)",
-              12,
-              opcoes(
-                ["1", "Tipo 1"],
-                ["2", "Tipo 2"],
-                ["3", "Tipo 3"],
-                ["4", "Tipo 4"],
-                ["5", "Tipo 5"],
-                ["6", "Tipo 6"],
-                ["7", "Tipo 7"],
+            emColunas(
+              unica(
+                "bristol",
+                "Consistência das fezes (Escala de Bristol)",
+                12,
+                opcoes(
+                  ["1", "Tipo 1"],
+                  ["2", "Tipo 2"],
+                  ["3", "Tipo 3"],
+                  ["4", "Tipo 4"],
+                  ["5", "Tipo 5"],
+                  ["6", "Tipo 6"],
+                  ["7", "Tipo 7"],
+                ),
               ),
             ),
           ],
@@ -782,15 +788,20 @@ export const FORMULARIO_NUTRICIONAL: DefinicaoFormulario = {
         {
           tipo: "grade",
           itens: [
-            unica(
-              "autorizo",
-              "Autorizo compartilhar informações pertinentes com",
-              12,
-              opcoes(
-                "Toda a equipe Family Gym",
-                "Apenas a Psicologia",
-                "Apenas o(a) instrutor(a)",
-                "Não autorizo",
+            emColunas(
+              unica(
+                "autorizo",
+                "Autorizo compartilhar informações pertinentes com",
+                12,
+                reduzir(
+                  opcoes(
+                    "Toda a equipe Family Gym",
+                    "Apenas a Psicologia",
+                    "Apenas o(a) instrutor(a)",
+                    "Não autorizo",
+                  ),
+                  "Toda a equipe Family Gym",
+                ),
               ),
             ),
           ],

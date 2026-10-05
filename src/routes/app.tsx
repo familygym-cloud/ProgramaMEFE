@@ -2,6 +2,7 @@ import { createFileRoute, Link, Outlet, redirect } from "@tanstack/react-router"
 import type { ReactNode } from "react";
 import { AppShell } from "@/components/app/AppShell";
 import { EstadoVazio } from "@/components/app/ui";
+import { AcoesSemVinculo } from "@/components/auth/AcoesSemVinculo";
 import { BrandLogo } from "@/components/BrandLogo";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -113,7 +114,9 @@ function AppReal() {
                 <Button asChild>
                   <Link to="/dashboard">Ir para o painel da equipe</Link>
                 </Button>
-              ) : undefined
+              ) : (
+                <AcoesSemVinculo />
+              )
             }
           />
         </div>

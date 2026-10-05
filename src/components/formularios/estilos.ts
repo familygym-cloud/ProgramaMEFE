@@ -32,6 +32,7 @@ html {
   margin-inline: auto;
   color: var(--fm-tinta);
   font-family: var(--font-sans);
+  font-weight: 500;
 }
 
 .fm-documento *,
@@ -47,6 +48,11 @@ html {
 .fm-documento :focus-visible {
   outline: 2px solid var(--fm-onix);
   outline-offset: 2px;
+}
+
+.fm-ord {
+  font-size: 0.68em;
+  line-height: 0;
 }
 
 .fm-sr {
@@ -354,7 +360,8 @@ html {
   white-space: nowrap;
 }
 
-.fm-espelho-data {
+.fm-espelho-data,
+.fm-espelho-texto {
   display: none;
 }
 
@@ -459,9 +466,6 @@ html {
 }
 
 @container fm (min-width: 34rem) {
-  .fm-opcoes[data-dist="espalhar"] {
-    justify-content: space-between;
-  }
   .fm-opcoes[data-dist="grade"] {
     grid-template-columns: repeat(var(--fm-n, 1), minmax(0, 1fr));
   }
@@ -546,7 +550,12 @@ html {
   outline-offset: 2px;
 }
 
-/* nota de 1 a 5: círculo com o número */
+/* nota de 1 a 5: círculo com o número, em alvo de toque de 44 px */
+.fm-opt[data-forma="nota"] {
+  justify-content: center;
+  min-inline-size: 2.75rem;
+}
+
 .fm-opt[data-forma="nota"] .fm-box {
   inline-size: 2rem;
   block-size: 2rem;
@@ -738,7 +747,7 @@ html {
   color: var(--fm-suave);
 }
 
-@container fm (min-width: 40rem) {
+@container fm (min-width: 44rem) {
   .fm-tab-cab-narrow {
     display: none;
   }
@@ -821,7 +830,7 @@ html {
   grid-column: 1 / -1;
 }
 
-@container fm (min-width: 40rem) {
+@container fm (min-width: 44rem) {
   .fm-cel[data-unico] {
     grid-column: span 2;
   }
@@ -882,7 +891,7 @@ html {
   font-weight: 700;
 }
 
-@container fm (min-width: 40rem) {
+@container fm (min-width: 44rem) {
   .fm-mx-cab {
     display: grid;
     grid-template-columns: minmax(0, 1fr) calc(var(--fm-n) * var(--fm-w));
@@ -895,6 +904,7 @@ html {
   .fm-mx-cab-opcoes {
     display: grid;
     grid-template-columns: repeat(var(--fm-n), var(--fm-w));
+    font-weight: 700;
     font-size: 0.7rem;
     line-height: 1.15;
     text-align: center;
@@ -1152,6 +1162,11 @@ html {
 
 /* ------------------------------------------------------------------ impressão (A4) */
 
+/*
+ * Medidas do papel (mm) tiradas dos PDFs originais: faixa de 22,2 mm, margens laterais de 16 mm, caixas de
+ * 11,1 mm, linhas de escrita de 5,5 mm, tabelas com cabeçalho de 6,3 mm. A folha tem 296 mm de altura útil;
+ * quando o conteúdo digitado cresce além disso, a folha continua na seguinte (nada é cortado).
+ */
 @media print {
   @page {
     size: A4;
@@ -1202,7 +1217,7 @@ html {
 
   .fm-pagina {
     inline-size: 210mm;
-    min-block-size: 296mm;
+    min-block-size: 296.7mm;
     border-radius: 0;
     box-shadow: none;
     overflow: visible;
@@ -1215,67 +1230,148 @@ html {
     page-break-after: auto;
   }
 
+  /* faixa, filete e rodapé */
+
   .fm-faixa {
-    padding: 5.2mm 16mm 4.8mm;
+    padding: 3.7mm 16mm;
   }
 
   .fm-faixa-logo {
-    height: 12.6mm;
+    height: 14.8mm;
   }
 
   .fm-faixa-titulo {
-    font-size: 18pt;
+    font-size: 16.5pt;
   }
 
   .fm-faixa-sub {
-    font-size: 8pt;
+    margin-top: 0.8mm;
+    font-size: 8.6pt;
   }
 
   .fm-filete {
-    height: 1.7mm;
+    height: 1.2mm;
   }
 
   .fm-corpo {
-    padding: 3.2mm 16mm 0;
+    padding: 2.2mm 16mm 0;
+  }
+
+  .fm-pagina[data-form="nutricional"] .fm-corpo > .fm-sub:first-child,
+  .fm-pagina[data-form="psicologica"] .fm-corpo > .fm-sub:first-child {
+    margin-top: 3.8mm;
+  }
+
+  .fm-pagina[data-form="nutricional"] .fm-corpo > .fm-tab:first-child,
+  .fm-pagina[data-form="psicologica"] .fm-corpo > .fm-tab:first-child {
+    margin-top: 3.9mm;
   }
 
   .fm-rodape {
     margin: 0 16mm;
-    padding: 2.2mm 0 5mm;
+    padding: 2.1mm 0 5.6mm;
+    border-top-width: 0.25mm;
     font-size: 8pt;
   }
 
+  /* seções e subtítulos */
+
   .fm-secao {
-    margin: 2.2mm 0 2mm;
+    min-block-size: 12.4mm;
+    margin: 5.5mm 0 var(--fm-secao-mb, 6.6mm);
     border-radius: 2.4mm;
   }
 
+  .fm-corpo > .fm-secao:first-child,
+  .fm-corpo > .fm-grade:first-child {
+    margin-top: 3.9mm;
+  }
+
+  .fm-secao + .fm-sub {
+    margin-top: -3.4mm;
+  }
+
   .fm-selo {
-    inline-size: 11.5mm;
-    font-size: 17pt;
+    inline-size: 12.5mm;
+    font-size: 24pt;
   }
 
   .fm-secao-texto {
-    padding: 1.8mm 3.2mm;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 1.2mm 3.4mm;
   }
 
   .fm-secao-titulo {
-    font-size: 12.6pt;
+    font-size: 13.2pt;
   }
 
   .fm-secao-sub {
-    font-size: 8.4pt;
-    margin-top: 0;
+    margin-top: 0.3mm;
+    font-size: 9pt;
   }
 
   .fm-sub {
-    margin: 3mm 0 1.8mm;
-    font-size: 11pt;
+    margin: 0 0 var(--fm-sub-mb, 3.4mm);
+    font-size: 12pt;
   }
 
+  /* Nutrição e Psicologia: o título fica mais perto do que vem logo abaixo */
+  .fm-pagina[data-form="nutricional"],
+  .fm-pagina[data-form="psicologica"] {
+    --fm-sub-mb: 1.1mm;
+    --fm-tab-mt: 1.1mm;
+    --fm-tab-mb: 3.2mm;
+    --fm-secao-mb: 5.5mm;
+  }
+
+  .fm-pagina[data-form="nutricional"] .fm-sub,
+  .fm-pagina[data-form="psicologica"] .fm-sub {
+    margin-top: 3.1mm;
+  }
+
+  .fm-pagina[data-form="nutricional"] .fm-secao + .fm-sub,
+  .fm-pagina[data-form="psicologica"] .fm-secao + .fm-sub {
+    margin-top: -1.6mm;
+  }
+
+  .fm-pagina[data-form="nutricional"] .fm-nota,
+  .fm-pagina[data-form="psicologica"] .fm-nota {
+    margin: 0 0 3.8mm;
+  }
+
+  /* caixas de largura total (opções e linhas de escrita) têm mais respiro em volta */
+  .fm-pagina[data-form="nutricional"] .fm-item:not([data-g]) + .fm-item[data-g="escolha"][data-c="12"],
+  .fm-pagina[data-form="psicologica"] .fm-item:not([data-g]) + .fm-item[data-g="escolha"][data-c="12"] {
+    margin-top: 1.6mm;
+  }
+
+  .fm-pagina[data-form="nutricional"] .fm-item[data-g][data-c="12"],
+  .fm-pagina[data-form="psicologica"] .fm-item[data-g][data-c="12"] {
+    margin-bottom: 1.6mm;
+  }
+
+  .fm-pagina[data-form="nutricional"] .fm-item[data-g="escolha"][data-c="12"] .fm-escolha,
+  .fm-pagina[data-form="psicologica"] .fm-item[data-g="escolha"][data-c="12"] .fm-escolha {
+    padding-bottom: 1.4mm;
+  }
+
+  .fm-pagina[data-form="nutricional"] .fm-item[data-g="escolha"][data-c="12"] .fm-opcoes,
+  .fm-pagina[data-form="psicologica"] .fm-item[data-g="escolha"][data-c="12"] .fm-opcoes {
+    margin-top: 1.6mm;
+  }
+
+  .fm-pagina[data-form="nutricional"] .fm-pautado,
+  .fm-pagina[data-form="psicologica"] .fm-pautado {
+    padding-bottom: 1.5mm;
+  }
+
+  /* campos em caixa */
+
   .fm-grade {
-    gap: 1.5mm;
-    margin: 1.4mm 0;
+    gap: 1.9mm;
+    margin: 0 0 1.9mm;
   }
 
   .fm-item {
@@ -1283,42 +1379,82 @@ html {
   }
 
   .fm-caixa {
-    min-block-size: 8.6mm;
-    padding: 0.9mm 2mm 1mm;
+    min-block-size: 11.1mm;
+    padding: 1.1mm 2.4mm 0.6mm;
     border-radius: 1.8mm;
   }
 
   .fm-rotulo {
-    font-size: 7.8pt;
+    font-size: 8.2pt;
+    line-height: 1.2;
   }
 
   .fm-entrada {
-    font-size: 10.2pt;
+    font-size: 10.5pt;
     line-height: 4.6mm;
     padding-top: 0.2mm;
   }
 
   .fm-un {
-    font-size: 7.8pt;
+    font-size: 8.6pt;
+    color: color-mix(in srgb, var(--fg-onix) 45%, Canvas);
   }
 
   .fm-marca-auto,
   .fm-legenda,
   .fm-ajuda,
-  .fm-restaurar {
+  .fm-restaurar,
+  .fm-sr {
     display: none !important;
   }
 
-  .fm-entrada[type="date"] {
+  /* campo opcional que o PDF não traz: só vai para o papel se for preenchido */
+  .fm-item[data-opcional][data-vazio] {
     display: none;
+  }
+
+  .fm-entrada[type="date"],
+  .fm-entrada[data-espelhado] {
+    display: none;
+  }
+
+  .fm-espelho-texto {
+    display: block;
+    flex: 1;
+    min-inline-size: 0;
+    min-block-size: 4.6mm;
+    padding-top: 0.2mm;
+    font-size: 10.5pt;
+    line-height: 4.6mm;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+
+  .fm-extra .fm-espelho-texto {
+    min-inline-size: 38mm;
+    padding-inline: 0.3mm;
+    border-bottom: 0.25mm solid var(--fm-controle);
+    font-size: 9.4pt;
+  }
+
+  .fm-obs .fm-espelho-texto {
+    min-block-size: 4mm;
+    padding-top: 0;
+    line-height: 4.2mm;
+  }
+
+  .fm-cel-c .fm-espelho-texto {
+    padding-top: 0.3mm;
   }
 
   .fm-espelho-data {
     display: block;
-    min-block-size: 4.6mm;
-    font-size: 10.2pt;
-    line-height: 4.6mm;
+    min-block-size: 5mm;
+    font-size: 10.5pt;
+    line-height: 5mm;
   }
+
+  /* texto longo: linhas de escrita de 5,5 mm, como no papel */
 
   .fm-longo-area {
     display: none;
@@ -1326,32 +1462,36 @@ html {
 
   .fm-espelho {
     display: block;
-    min-block-size: calc(var(--fm-linhas, 1) * 5.2mm);
-    font-size: 10.2pt;
-    line-height: 5.2mm;
+    min-block-size: calc(var(--fm-linhas, 1) * 5.5mm);
+    font-size: 10.5pt;
+    line-height: 5.5mm;
+  }
+
+  .fm-pautado {
+    padding-bottom: 2.5mm;
   }
 
   .fm-pautado .fm-espelho {
+    margin-top: -0.9mm;
     background-image: repeating-linear-gradient(
       to bottom,
       transparent 0,
-      transparent calc(5.2mm - 0.2mm),
-      var(--fm-linha) calc(5.2mm - 0.2mm),
-      var(--fm-linha) 5.2mm
+      transparent calc(5.5mm - 0.2mm),
+      var(--fm-linha) calc(5.5mm - 0.2mm),
+      var(--fm-linha) 5.5mm
     );
   }
 
+  /* grupos de opções */
+
   .fm-escolha {
-    padding: 0.9mm 2mm 0.4mm;
+    min-block-size: 11.1mm;
+    padding: 1.1mm 2.4mm 0.4mm;
     border-radius: 1.8mm;
   }
 
   .fm-opcoes {
-    column-gap: 3.4mm;
-  }
-
-  .fm-opcoes[data-dist="espalhar"] {
-    justify-content: space-between;
+    column-gap: 3.6mm;
   }
 
   .fm-opcoes[data-dist="grade"] {
@@ -1360,17 +1500,37 @@ html {
   }
 
   .fm-opt {
-    min-block-size: 4.7mm;
-    gap: 1.6mm;
-    font-size: 9.8pt;
+    min-block-size: 5.1mm;
+    gap: 1.5mm;
+    padding-inline-end: 0;
+    font-size: 9.3pt;
   }
 
   .fm-box {
-    inline-size: 3.2mm;
-    block-size: 3.2mm;
-    border-radius: 0.8mm;
+    inline-size: 3.4mm;
+    block-size: 3.4mm;
+    border-radius: 0.9mm;
     border-width: 0.3mm;
     border-color: color-mix(in srgb, var(--fg-onix) 62%, transparent);
+  }
+
+  .fm-opt[data-reduzido] {
+    font-size: 7.8pt;
+  }
+
+  /* quadros de classificação com cinco faixas numa só linha */
+  .fm-item[data-c="9"] .fm-opcoes:has(.fm-opt:nth-child(5)) {
+    flex-wrap: nowrap;
+    column-gap: 2.6mm;
+  }
+
+  .fm-item[data-c="9"] .fm-opcoes:has(.fm-opt:nth-child(5)) .fm-opt {
+    gap: 1.2mm;
+    font-size: 7.6pt;
+  }
+
+  .fm-opt[data-forma="nota"] {
+    min-inline-size: 0;
   }
 
   .fm-opt[data-forma="nota"] .fm-box {
@@ -1379,67 +1539,98 @@ html {
     font-size: 7pt;
   }
 
+  /* No papel, como nos PDFs: quadrado para marcar (círculo só nas notas de 1 a 5). */
+  .fm-opt[data-forma="unica"] .fm-box {
+    border-radius: 0.9mm;
+  }
+
+  .fm-opt[data-forma="unica"] .fm-box::after {
+    inline-size: 0.9mm;
+    block-size: 1.7mm;
+    margin-top: -0.3mm;
+    border: solid var(--fm-alabastro);
+    border-width: 0 0.5mm 0.5mm 0;
+    border-radius: 0;
+    background: transparent;
+    transform: rotate(45deg);
+  }
+
+  /* tabelas */
+
   .fm-tab {
-    margin: 1.4mm 0 1.8mm;
+    margin: var(--fm-tab-mt, 3.4mm) 0 var(--fm-tab-mb, 1.6mm);
+  }
+
+  .fm-tab-cab,
+  .fm-mx-cab {
+    min-block-size: var(--fm-cab-h, 6.3mm);
+    padding: 0.8mm 2.4mm;
+    border-radius: 1.6mm;
+    font-size: 8.4pt;
   }
 
   .fm-tab-cab {
-    padding: 1.5mm 2mm;
-    border-radius: 1.6mm;
-    font-size: 8.2pt;
+    grid-template-columns: var(--fm-cols-print, var(--fm-cols));
+    gap: 1.6mm;
   }
 
   .fm-lin {
-    padding: 0.3mm 2mm;
+    grid-template-columns: var(--fm-cols-print, var(--fm-cols));
+    min-block-size: var(--fm-lin-h, 7.8mm);
+    padding: 0.4mm 2.4mm;
     gap: 0.4mm 1.6mm;
   }
 
+  .fm-lin .fm-cel-c {
+    background: Canvas;
+  }
+
   .fm-nome {
-    font-size: 10.2pt;
-    line-height: 1.15;
+    font-size: 10.5pt;
+    line-height: 1.2;
   }
 
   .fm-detalhe {
     margin-top: 0;
-    font-size: 8pt;
-    line-height: 1.15;
+    font-size: 8.2pt;
+    line-height: 1.2;
   }
 
   .fm-extra {
     margin-top: 0.3mm;
-    font-size: 8pt;
+    font-size: 8.2pt;
   }
 
   .fm-extra .fm-entrada {
     min-inline-size: 38mm;
-    font-size: 9pt;
+    font-size: 9.4pt;
   }
 
   .fm-cel-c {
-    min-block-size: 6.3mm;
-    padding: 0.3mm 1.6mm;
+    min-block-size: var(--fm-cel-h, 6.4mm);
+    padding: 0.3mm 1.8mm;
     border-radius: 1.6mm;
   }
 
   .fm-cel-c .fm-entrada {
-    padding-top: 0.3mm;
+    padding-top: 0.2mm;
   }
 
   .fm-cel-c[data-area] .fm-longo-area,
   .fm-cel-c[data-area] .fm-espelho {
     min-block-size: 9.8mm;
-    line-height: 4.6mm;
+    line-height: 4.8mm;
     padding-top: 0.2mm;
   }
 
   .fm-sn,
   .fm-notas {
     justify-content: flex-start;
-    gap: 0 2.4mm;
+    gap: 0 3mm;
   }
 
   .fm-notas {
-    gap: 0 1mm;
+    gap: 0 1.2mm;
   }
 
   .fm-obs {
@@ -1447,46 +1638,55 @@ html {
   }
 
   .fm-obs-t {
-    font-size: 8.2pt;
+    font-size: 8.4pt;
   }
 
   .fm-obs .fm-cel-c {
-    min-block-size: 4mm;
+    min-block-size: 4.4mm;
     padding-block: 0;
   }
 
   .fm-obs .fm-cel-c .fm-entrada {
     padding-top: 0;
-    line-height: 3.9mm;
+    line-height: 4.2mm;
   }
 
+  /* matrizes */
+
   .fm-mx-cab {
-    padding: 1.5mm 2mm;
-    border-radius: 1.6mm;
-    font-size: 8.2pt;
+    grid-template-columns: minmax(0, 1fr) calc(var(--fm-n) * var(--fm-w-print, var(--fm-w)));
   }
 
   .fm-mx-cab-opcoes {
-    font-size: 7pt;
+    grid-template-columns: repeat(var(--fm-n), var(--fm-w-print, var(--fm-w)));
+    font-size: 7.4pt;
   }
 
   .fm-mx-lin {
-    padding: 0.4mm 2mm;
+    grid-template-columns: minmax(0, 1fr) calc(var(--fm-n) * var(--fm-w-print, var(--fm-w)));
+    min-block-size: var(--fm-lin-h, 7.8mm);
+    padding: 1mm 2.4mm;
+  }
+
+  .fm-mx-opcoes {
+    grid-template-columns: repeat(var(--fm-n), var(--fm-w-print, var(--fm-w)));
   }
 
   .fm-mx-texto {
-    font-size: 10.2pt;
+    font-size: 10pt;
     line-height: 1.22;
   }
 
   .fm-mx-opcoes .fm-opt {
-    min-block-size: 6.2mm;
+    min-block-size: 5.6mm;
   }
 
+  /* notas, alertas, pontuação, assinaturas */
+
   .fm-nota {
-    margin: 2mm 0;
-    padding: 1.8mm 2.6mm;
-    font-size: 8.8pt;
+    margin: 2.2mm 0;
+    padding: 2mm 3mm;
+    font-size: 9pt;
   }
 
   .fm-alerta {
@@ -1494,36 +1694,37 @@ html {
   }
 
   .fm-alerta-titulo {
-    font-size: 9.4pt;
+    font-size: 9.6pt;
   }
 
   .fm-alerta p,
   .fm-alerta ul {
-    font-size: 8.4pt;
+    font-size: 8.6pt;
   }
 
   .fm-pontos {
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 1.6mm;
-    margin: 1.6mm 0;
+    gap: 1.3mm;
+    margin: 3.2mm 0 1.6mm;
   }
 
   .fm-ponto {
-    padding: 1.6mm 2.2mm;
+    min-block-size: 15mm;
+    padding: 1.6mm 2.4mm;
     border-radius: 2mm;
   }
 
   .fm-ponto-letra {
-    font-size: 17pt;
+    font-size: 22pt;
   }
 
   .fm-ponto-nome {
-    font-size: 8pt;
+    font-size: 8.6pt;
   }
 
   .fm-nota-in {
-    min-block-size: 6mm;
-    padding: 0.3mm 1.6mm;
+    min-block-size: 6.2mm;
+    padding: 0.3mm 1.8mm;
   }
 
   .fm-ponto .fm-nota-in .fm-entrada,
@@ -1531,29 +1732,145 @@ html {
     padding-top: 0.3mm;
   }
 
+  .fm-geral .fm-nota-in {
+    border-color: transparent;
+    background: Canvas;
+  }
+
   .fm-geral {
-    margin: 1.8mm 0 1.4mm;
-    padding: 1.6mm 3mm;
+    min-block-size: 9.9mm;
+    margin: 1.6mm 0 1.6mm;
+    padding: 1.2mm 3mm;
     border-radius: 2mm;
   }
 
   .fm-geral-titulo {
-    font-size: 10.8pt;
+    font-size: 11pt;
   }
 
   .fm-geral-formula {
-    font-size: 8.4pt;
+    font-size: 8.6pt;
   }
 
   .fm-assinaturas {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 8mm;
-    margin-top: 11mm;
+    gap: 12mm;
+    margin-top: 8.6mm;
   }
 
   .fm-assinatura {
-    padding-top: 1.2mm;
-    font-size: 8pt;
+    padding-top: 1.4mm;
+    font-size: 8.4pt;
+  }
+
+  .fm-pagina[data-form="nutricional"] .fm-assinaturas,
+  .fm-pagina[data-form="psicologica"] .fm-assinaturas {
+    margin-top: 18.5mm;
+  }
+
+  /* folhas que o PDF original diagramou com os blocos quase encostados */
+
+  .fm-pagina[data-densa] .fm-grade {
+    margin-bottom: 0;
+  }
+
+  .fm-pagina[data-densa] .fm-tab {
+    margin-bottom: 0.4mm;
+  }
+
+  /* medidas por bloco (as dos PDFs originais) */
+
+  .fm-tab[data-bloco="mob"],
+  .fm-tab[data-bloco="flex"] {
+    --fm-lin-h: 10.8mm;
+    --fm-cel-h: 7.6mm;
+    --fm-cols-print: minmax(0, 1fr) 23.8mm 23.8mm 47mm;
+  }
+
+  .fm-tab[data-bloco="ela"] {
+    --fm-lin-h: 10.2mm;
+    --fm-cel-h: 7.2mm;
+    --fm-cols-print: minmax(0, 1fr) 23.8mm 23.8mm 47mm;
+  }
+
+  .fm-tab[data-bloco="forca"] {
+    --fm-lin-h: 9.7mm;
+    --fm-cel-h: 7.2mm;
+    --fm-cols-print: minmax(0, 1fr) 23.8mm 23.8mm 47mm;
+  }
+
+  .fm-tab[data-bloco="pad"] {
+    --fm-lin-h: 15.2mm;
+    --fm-cols-print: minmax(0, 1fr) 32mm 33mm 38mm;
+  }
+
+  .fm-tab[data-bloco="circ"] .fm-lin:has(.fm-detalhe) {
+    min-block-size: 10.3mm;
+  }
+
+  .fm-tab[data-bloco="circ"] {
+    --fm-lin-h: 7.8mm;
+    --fm-cols-print: minmax(0, 1fr) repeat(4, 27mm);
+  }
+
+  .fm-tab[data-bloco="dobras"] {
+    --fm-lin-h: 7.8mm;
+    --fm-cols-print: minmax(0, 1fr) repeat(4, 27mm);
+  }
+
+  .fm-tab[data-bloco="exames"] {
+    --fm-lin-h: 7.8mm;
+    --fm-cols-print: minmax(0, 1fr) 27mm 36.5mm 36.5mm;
+  }
+
+  .fm-tab[data-bloco="medicamentos"],
+  .fm-tab[data-bloco="suplementos"] {
+    --fm-lin-h: 8.1mm;
+    --fm-cols-print: 58mm 25.7mm 26mm minmax(0, 1fr);
+  }
+
+  .fm-tab[data-bloco="recordatorio"] .fm-cel-c {
+    align-items: flex-end;
+  }
+
+  .fm-tab[data-bloco="recordatorio"] {
+    --fm-lin-h: 12.5mm;
+    --fm-cel-h: 9.6mm;
+    --fm-cols-print: 36.5mm 16.8mm 24mm minmax(0, 1fr);
+  }
+
+  .fm-tab[data-bloco="macros"] {
+    --fm-lin-h: 7.8mm;
+    --fm-cols-print: minmax(0, 1fr) repeat(4, 30mm);
+  }
+
+  .fm-tab[data-bloco^="frequencia"] {
+    --fm-w-print: 21.3mm;
+  }
+
+  .fm-tab[data-bloco="scoff"],
+  .fm-tab[data-bloco="risco"] {
+    --fm-w-print: 24mm;
+  }
+
+  .fm-tab[data-bloco="phq9"],
+  .fm-tab[data-bloco^="gad7"] {
+    --fm-w-print: 22.2mm;
+    --fm-cab-h: 12mm;
+  }
+
+  .fm-tab[data-bloco="substancias"],
+  .fm-tab[data-bloco^="corpo"] {
+    --fm-w-print: 17.8mm;
+  }
+
+  .fm-tab[data-bloco="autoavaliacao"] {
+    --fm-w-print: 9.7mm;
+  }
+
+  .fm-tab[data-bloco="motivacao"],
+  .fm-tab[data-bloco="autoeficacia"] {
+    --fm-w-print: 14.3mm;
   }
 }
 `;

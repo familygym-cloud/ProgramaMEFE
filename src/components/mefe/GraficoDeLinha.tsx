@@ -12,9 +12,9 @@ import {
   type SerieDeExemplo,
 } from "@/lib/mefe/bioimpedancia";
 
-const LARGURA = 360;
+const LARGURA = 340;
 const ALTURA = 252;
-const AREA: AreaDoGrafico = { esquerda: 56, topo: 44, largura: 288, altura: 144 };
+const AREA: AreaDoGrafico = { esquerda: 48, topo: 44, largura: 278, altura: 144 };
 
 const HALO = "[paint-order:stroke] stroke-card stroke-[3px] [stroke-linejoin:round]";
 
@@ -54,7 +54,7 @@ export function GraficoDeLinha({ serie }: { serie: SerieDeExemplo }) {
           x={AREA.esquerda - 10}
           y={22}
           textAnchor="end"
-          className="fill-muted-foreground text-[12px]"
+          className="fill-muted-foreground text-[13px]"
         >
           {serie.unidade}
         </text>
@@ -77,7 +77,7 @@ export function GraficoDeLinha({ serie }: { serie: SerieDeExemplo }) {
               x={AREA.esquerda - 10}
               y={y + 4}
               textAnchor="end"
-              className="fill-muted-foreground text-[12px] tabular-nums"
+              className="fill-muted-foreground text-[13px] tabular-nums"
             >
               {formatarNumero(marca, casasDoEixo)}
             </text>
@@ -137,7 +137,7 @@ export function GraficoDeLinha({ serie }: { serie: SerieDeExemplo }) {
                 x={ponto.x}
                 y={abaixo ? ponto.y + (ehUltimo ? 29 : 25) : ponto.y - (ehUltimo ? 20 : 15)}
                 textAnchor="middle"
-                className={`fill-foreground text-[13px] font-semibold tabular-nums ${HALO}`}
+                className={`fill-foreground text-[14px] font-semibold tabular-nums ${HALO}`}
               >
                 {formatarComUnidade(ponto.valor, serie.casas, serie.unidade)}
               </text>
@@ -156,7 +156,7 @@ export function GraficoDeLinha({ serie }: { serie: SerieDeExemplo }) {
             x={ponto.x}
             y={base + 22}
             textAnchor="middle"
-            className="fill-muted-foreground text-[12px]"
+            className="fill-muted-foreground text-[13px]"
           >
             <tspan x={ponto.x}>{linha1}</tspan>
             {linha2 ? (

@@ -1,7 +1,8 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { Link } from "@tanstack/react-router";
-import { Loader2, Mail, MailCheck, PlayCircle } from "lucide-react";
+import { Loader2, Mail, PlayCircle } from "lucide-react";
 import { CampoAuth, CampoSenha } from "@/components/auth/CampoAuth";
+import { ConfiraSeuEmail } from "@/components/auth/ConfiraSeuEmail";
 import { ForcaSenha } from "@/components/auth/ForcaSenha";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -46,7 +47,8 @@ export function FormularioAcesso({
   const [carregando, setCarregando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
   const [aviso, setAviso] = useState<string | null>(null);
-  const [pendente, setPendente] = useState<string | null>(null);
+  // E-mail aguardando confirmação; `jaEnviado` diz se o e-mail acabou de sair (cadastro).
+  const [pendente, setPendente] = useState<{ email: string; jaEnviado: boolean } | null>(null);
 
   const textos = TEXTOS[modo];
 
@@ -58,21 +60,6 @@ export function FormularioAcesso({
     setModo(novo);
     setErro(null);
     setAviso(null);
-  }
-
-  async function reenviar() {
-    if (!pendente) return;
-    setErro(null);
-    setAviso(null);
-    setCarregando(true);
-    const { error } = await supabase.auth.resend({
-      type: "signup",
-      email: pendente,
-      options: { emailRedirectTo: `${window.location.origin}/auth` },
-    });
-    setCarregando(false);
-    if (error) return setErro(traduzErroAuth(error));
-    setAviso("Novo e-mail de confirmação enviado.");
   }
 
   async function esqueciSenha() {
@@ -102,7 +89,8 @@ export function FormularioAcesso({
         const { error } = await supabase.auth.signInWithPassword({ email: em, password: senha });
         if (error) {
           if (error.message.toLowerCase().includes("email not confirmed")) {
-            setPendente(em);
+            setSenha("");
+            setPendente({ email: em, jaEnviado: false });
             return;
           }
           throw error;
@@ -123,14 +111,34 @@ export function FormularioAcesso({
           await aoAutenticar();
           return;
         }
-        setPendente(em);
-        setModo("login");
+        setSenha("");
+        setPendente({ email: em, jaEnviado: true });
       }
     } catch (err) {
       setErro(traduzErroAuth(err));
     } finally {
       setCarregando(false);
     }
+  }
+
+  if (pendente) {
+    return (
+      <ConfiraSeuEmail
+        email={pendente.email}
+        jaEnviado={pendente.jaEnviado}
+        aoUsarOutroEmail={() => {
+          setPendente(null);
+          setEmail("");
+          setSenha("");
+          trocarModo("signup");
+        }}
+        aoJaConfirmei={() => {
+          setEmail(pendente.email);
+          setPendente(null);
+          trocarModo("login");
+        }}
+      />
+    );
   }
 
   return (
@@ -209,32 +217,6 @@ export function FormularioAcesso({
             </div>
           )}
         </div>
-
-        {pendente ? (
-          <div
-            role="status"
-            className="space-y-3 rounded-2xl border border-brand-yellow/40 bg-brand-yellow/10 p-4"
-          >
-            <div className="flex items-center gap-2">
-              <MailCheck aria-hidden className="size-5 text-brand-yellow" />
-              <p className="text-sm font-semibold text-brand-yellow">Aguardando validação</p>
-            </div>
-            <p className="text-sm leading-relaxed text-foreground/80">
-              Enviamos um link de confirmação para{" "}
-              <strong className="font-semibold text-foreground">{pendente}</strong>. Abra o e-mail
-              (verifique também o spam) e clique no link. Só depois disso o acesso será liberado.
-            </p>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={reenviar}
-              disabled={carregando}
-              className="h-11 w-full rounded-2xl border-brand-yellow/40 bg-transparent text-brand-yellow hover:bg-brand-yellow hover:text-brand-black"
-            >
-              Reenviar e-mail de confirmação
-            </Button>
-          </div>
-        ) : null}
 
         {erro ? (
           <p

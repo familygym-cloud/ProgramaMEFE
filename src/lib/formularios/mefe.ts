@@ -5,7 +5,6 @@
  * de várias respostas ficam quadrados.
  */
 import {
-  caixa,
   dataCampo,
   email,
   longo,
@@ -122,6 +121,7 @@ export const FORMULARIO_MEFE: DefinicaoFormulario = {
     },
     // ------------------------------------------------------------------ página 2
     {
+      densa: true,
       blocos: [
         {
           tipo: "secao",
@@ -194,7 +194,7 @@ export const FORMULARIO_MEFE: DefinicaoFormulario = {
             teste("salto", "Salto vertical", "Altura alcançada", "cm", "um"),
           ],
         },
-        { tipo: "grade", itens: [caixa("forca.obs", "Observações – Eficiência", 12, 2)] },
+        { tipo: "grade", itens: [longo("forca.obs", "Observações – Eficiência", 1)] },
       ],
     },
     // ------------------------------------------------------------------ página 3
@@ -295,7 +295,7 @@ export const FORMULARIO_MEFE: DefinicaoFormulario = {
             unica("flex.aquecimento", "Aquecimento prévio", 6, SIM_NAO),
             numero("flex.duracao", "Duração do aquecimento", 3, "min"),
             texto("flex.instrumento", "Instrumento", 3),
-            longo("flex.obs", "Observações – Flexibilidade", 11),
+            longo("flex.obs", "Observações – Flexibilidade", 12),
           ],
         },
       ],

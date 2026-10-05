@@ -103,7 +103,10 @@ export function BarraAcoes({ definicao }: { definicao: DefinicaoFormulario }) {
 
   return (
     <>
-      <div className="fm-nao-imprimir sticky top-0 z-30 border-b border-foreground/10 bg-background/95 backdrop-blur">
+      <section
+        aria-label="Ações do formulário"
+        className="fm-nao-imprimir sticky top-0 z-30 border-b border-foreground/10 bg-background/95 backdrop-blur"
+      >
         <div className="mx-auto flex max-w-5xl flex-wrap items-center gap-x-4 gap-y-1 px-4 py-2">
           <p className="flex items-center gap-1.5 text-[0.7rem] leading-tight text-muted-foreground sm:min-h-9 sm:text-xs">
             <ShieldCheck className="size-4 shrink-0 text-brand-yellow" aria-hidden />
@@ -164,7 +167,7 @@ export function BarraAcoes({ definicao }: { definicao: DefinicaoFormulario }) {
             onChange={(e) => void aoEscolherArquivo(e)}
           />
         </div>
-      </div>
+      </section>
 
       <ConfirmarAcao
         aberto={limpando}

@@ -7,6 +7,8 @@
 import {
   caixa,
   celulaTexto,
+  comFolga,
+  emColunas,
   dataCampo,
   email,
   linhasMatriz,
@@ -14,6 +16,7 @@ import {
   multipla,
   numero,
   opcoes,
+  reduzir,
   SIM_NAO,
   telefone,
   texto,
@@ -166,16 +169,20 @@ export const FORMULARIO_PSICOLOGICA: DefinicaoFormulario = {
             texto("emergencia", "Contato de emergência (nome, vínculo e telefone)", 12),
             texto("psicologo", "Psicólogo(a) responsável", 9),
             texto("crp", "CRP", 3),
-            multipla(
-              "encaminhadoPor",
-              "Encaminhado por",
-              12,
-              opcoes(
-                "Iniciativa própria",
-                "Instrutor(a)",
-                "Nutricionista",
-                "Médico(a)",
-                "Outro profissional",
+            comFolga(
+              emColunas(
+                multipla(
+                  "encaminhadoPor",
+                  "Encaminhado por",
+                  12,
+                  opcoes(
+                    "Iniciativa própria",
+                    "Instrutor(a)",
+                    "Nutricionista",
+                    "Médico(a)",
+                    "Outro profissional",
+                  ),
+                ),
               ),
             ),
             longo("queixa", "Motivo da procura / queixa principal (nas palavras do cliente)", 3),
@@ -258,16 +265,19 @@ export const FORMULARIO_PSICOLOGICA: DefinicaoFormulario = {
               "eventos",
               "Eventos estressantes nos últimos 12 meses",
               12,
-              opcoes(
-                "Luto / perda importante",
-                "Separação ou divórcio",
-                "Mudança de casa ou cidade",
+              reduzir(
+                opcoes(
+                  "Luto / perda importante",
+                  "Separação ou divórcio",
+                  "Mudança de casa ou cidade",
+                  "Desemprego / dificuldade financeira",
+                  "Doença própria ou de familiar",
+                  "Conflitos familiares",
+                  "Sobrecarga no trabalho",
+                  "Nascimento de filho(a)",
+                  "Violência ou trauma",
+                ),
                 "Desemprego / dificuldade financeira",
-                "Doença própria ou de familiar",
-                "Conflitos familiares",
-                "Sobrecarga no trabalho",
-                "Nascimento de filho(a)",
-                "Violência ou trauma",
               ),
               3,
             ),
@@ -389,11 +399,13 @@ export const FORMULARIO_PSICOLOGICA: DefinicaoFormulario = {
         {
           tipo: "grade",
           itens: [
-            unica(
-              "risco.nivel",
-              "Nível de risco estimado",
-              12,
-              opcoes("Ausente", "Baixo", "Moderado", "Alto"),
+            emColunas(
+              unica(
+                "risco.nivel",
+                "Nível de risco estimado",
+                12,
+                opcoes("Ausente", "Baixo", "Moderado", "Alto"),
+              ),
             ),
             multipla(
               "risco.conduta",
@@ -435,7 +447,7 @@ export const FORMULARIO_PSICOLOGICA: DefinicaoFormulario = {
           id: "autoavaliacao",
           cabecalho: "Como você avalia…",
           opcoes: OPCOES_ESCALA_11,
-          larguraOpcao: "1.95rem",
+          larguraOpcao: "2.75rem",
           linhas: linhasMatriz("auto.", [
             "Nível de estresse no dia a dia",
             "Ansiedade ou preocupação",
@@ -564,24 +576,29 @@ export const FORMULARIO_PSICOLOGICA: DefinicaoFormulario = {
               "barreiras",
               "Barreiras percebidas",
               12,
-              opcoes(
-                "Falta de tempo",
-                "Cansaço",
-                "Falta de motivação",
+              reduzir(
+                opcoes(
+                  "Falta de tempo",
+                  "Cansaço",
+                  "Falta de motivação",
+                  "Vergonha / desconforto no ambiente",
+                  "Dor ou lesão",
+                  "Custo",
+                  "Cuidado com filhos / família",
+                  "Transporte / distância",
+                  "Não ver resultados",
+                ),
                 "Vergonha / desconforto no ambiente",
-                "Dor ou lesão",
-                "Custo",
-                "Cuidado com filhos / família",
-                "Transporte / distância",
-                "Não ver resultados",
               ),
               3,
             ),
-            unica(
-              "prontidao",
-              "Estágio de prontidão para mudança",
-              12,
-              opcoes("Pré-contemplação", "Contemplação", "Preparação", "Ação", "Manutenção"),
+            emColunas(
+              unica(
+                "prontidao",
+                "Estágio de prontidão para mudança",
+                12,
+                opcoes("Pré-contemplação", "Contemplação", "Preparação", "Ação", "Manutenção"),
+              ),
             ),
           ],
         },
@@ -653,15 +670,20 @@ export const FORMULARIO_PSICOLOGICA: DefinicaoFormulario = {
         {
           tipo: "grade",
           itens: [
-            unica(
-              "autorizo",
-              "Autorizo compartilhar informações pertinentes com",
-              12,
-              opcoes(
-                "Toda a equipe Family Gym",
-                "Apenas a Nutrição",
-                "Apenas o(a) instrutor(a)",
-                "Não autorizo",
+            emColunas(
+              unica(
+                "autorizo",
+                "Autorizo compartilhar informações pertinentes com",
+                12,
+                reduzir(
+                  opcoes(
+                    "Toda a equipe Family Gym",
+                    "Apenas a Nutrição",
+                    "Apenas o(a) instrutor(a)",
+                    "Não autorizo",
+                  ),
+                  "Toda a equipe Family Gym",
+                ),
               ),
             ),
           ],

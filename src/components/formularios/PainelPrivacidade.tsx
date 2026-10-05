@@ -22,17 +22,14 @@ export function PainelPrivacidade({ definicao }: { definicao: DefinicaoFormulari
         <li>
           Para continuar depois, use{" "}
           <strong className="font-semibold text-foreground">Salvar arquivo</strong> e, mais tarde,{" "}
-          <strong className="font-semibold text-foreground">Abrir arquivo</strong>. Para entregar,
-          use Imprimir / Salvar PDF.
-        </li>
-        <li>
-          O arquivo salvo e o PDF têm dados sensíveis de saúde (LGPD), sem criptografia: guarde em
-          local protegido e apague quando não precisar mais.
+          <strong className="font-semibold text-foreground">Abrir arquivo</strong>; para entregar,
+          use Imprimir / Salvar PDF. Os dois têm dados sensíveis de saúde (LGPD), sem criptografia:
+          guarde em local protegido e apague quando não precisar mais.
         </li>
         <li>
           Campos <span className="font-semibold text-foreground">automáticos</span> mostram a
           fórmula e aceitam outro valor por cima. Os cálculos apoiam o profissional; a conduta é
-          sempre dele.
+          sempre dele. Para desmarcar uma opção, toque nela de novo (ou use Delete no teclado).
         </li>
       </ul>
     </section>

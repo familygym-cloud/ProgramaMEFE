@@ -379,7 +379,7 @@ function calculosPsicologica(ctx: Contexto): void {
     Array.from({ length: itens }, (_, i) => lerNumero(ctx.bruto(`${prefixo}${i + 1}`)));
 
   const total =
-    (prefixo: string, itens: number, maximo: number): Calculo =>
+    (prefixo: string, itens: number): Calculo =>
     () => {
       const soma = somarItens(respostas(prefixo, itens), itens);
       if (soma.respondidos === 0) return undefined;
@@ -389,11 +389,11 @@ function calculosPsicologica(ctx: Contexto): void {
           nota: `${soma.respondidos} de ${itens} itens respondidos: o escore aparece quando todos estiverem preenchidos.`,
         };
       }
-      return { valor: String(soma.total), nota: `Soma dos ${itens} itens (0 a ${maximo}).` };
+      return { valor: String(soma.total) };
     };
 
-  ctx.definir("phq.total", total("phq.", PHQ9_ITENS, 27));
-  ctx.definir("gad.total", total("gad.", GAD7_ITENS, 21));
+  ctx.definir("phq.total", total("phq.", PHQ9_ITENS));
+  ctx.definir("gad.total", total("gad.", GAD7_ITENS));
 
   ctx.definir("phq.classe", () => {
     const faixa = classificarPhq9(ctx.numero("phq.total"));

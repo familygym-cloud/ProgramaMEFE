@@ -106,15 +106,19 @@ function CartaoDaDimensao({
       aria-pressed={ativo}
       onClick={() => aoEscolher(dimensao)}
       className={cn(
-        "flex min-h-[4.75rem] items-center gap-3.5 rounded-2xl border bg-background/50 p-3.5 text-left transition-colors",
+        "flex min-h-[4.75rem] flex-col items-start gap-2 rounded-2xl border bg-background/50 p-3.5 text-left transition-colors min-[460px]:flex-row min-[460px]:items-center min-[460px]:gap-3.5",
         ativo
           ? "border-brand-yellow bg-brand-yellow/10 ring-2 ring-brand-yellow/60"
           : "border-foreground/15 hover:border-foreground/35",
       )}
     >
-      <SeloLetra letra={dimensao} tamanho="md" />
+      <SeloLetra
+        letra={dimensao}
+        tamanho="md"
+        className="size-11 rounded-xl text-2xl min-[460px]:size-14 min-[460px]:rounded-2xl min-[460px]:text-3xl"
+      />
       <span className="min-w-0">
-        <span className="block truncate font-medium leading-tight">{NOMES[dimensao]}</span>
+        <span className="block font-medium leading-tight">{NOMES[dimensao]}</span>
         <span className="block text-sm text-muted-foreground">
           <strong className="font-display text-xl font-semibold text-foreground">
             {formatarNota(valor, "auto")}
@@ -267,7 +271,7 @@ export function PainelPontuacao() {
   const mostrarReferencia = momento.id !== INICIAL.id;
 
   return (
-    <div className="rounded-[2rem] border border-foreground/10 bg-card/70 p-5 sm:p-8 lg:p-10">
+    <div className="rounded-[2rem] border border-foreground/10 bg-card/70 p-4 sm:p-8 lg:p-10">
       <header className="flex flex-wrap items-start justify-between gap-4">
         <div className="max-w-2xl space-y-2">
           <h3 className="font-display text-3xl font-semibold leading-tight tracking-tight text-balance sm:text-4xl">
@@ -309,7 +313,7 @@ export function PainelPontuacao() {
         </figure>
 
         <div className="space-y-4">
-          <div className="grid grid-cols-1 gap-3 min-[460px]:grid-cols-2">
+          <div className="grid grid-cols-2 gap-3">
             {DIMENSOES.map((d) => (
               <CartaoDaDimensao
                 key={d}

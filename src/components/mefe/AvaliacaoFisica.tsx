@@ -1,4 +1,5 @@
 import {
+  ArrowRight,
   Flag,
   GitCompare,
   HeartPulse,
@@ -12,6 +13,7 @@ import {
 import { CabecalhoSecao, Secao } from "@/components/site/SecaoSite";
 import {
   AVISO_AVALIACAO_NAO_SUBSTITUI_MEDICO,
+  deParaDaAvaliacao,
   motivosDaAvaliacao,
   type MotivoDaAvaliacao,
 } from "@/lib/mefe/conteudo";
@@ -34,6 +36,25 @@ function classeDoCartao(indice: number): string {
   if (indice === 0) return "sm:col-span-2 lg:row-span-2";
   if (indice >= 5) return "lg:col-span-2";
   return "";
+}
+
+/** Antes e depois da avaliação: ocupa o espaço do cartão em destaque nas telas largas. */
+function DeParaDaAvaliacao() {
+  return (
+    <ul aria-label="Antes e depois de ter uma avaliação" className="relative hidden gap-3 lg:grid">
+      {deParaDaAvaliacao.map((linha) => (
+        <li
+          key={linha.de}
+          className="grid grid-cols-[1fr_auto_1fr] items-center gap-3 rounded-2xl border border-foreground/10 bg-background/50 px-4 py-3 text-sm leading-snug"
+        >
+          <span className="text-muted-foreground">{linha.de}</span>
+          <ArrowRight aria-hidden="true" className="size-4 shrink-0 text-brand-yellow" />
+          <span className="sr-only">, passa a ser: </span>
+          <span className="font-medium">{linha.para}</span>
+        </li>
+      ))}
+    </ul>
+  );
 }
 
 function CartaoDoMotivo({ motivo, indice }: { motivo: MotivoDaAvaliacao; indice: number }) {
@@ -59,6 +80,7 @@ function CartaoDoMotivo({ motivo, indice }: { motivo: MotivoDaAvaliacao; indice:
       >
         <Icone aria-hidden="true" className={destaque ? "size-8" : "size-6"} />
       </span>
+      {destaque ? <DeParaDaAvaliacao /> : null}
       <div className={cn("relative space-y-2", destaque ? "" : "mt-5")}>
         <h3
           className={cn(

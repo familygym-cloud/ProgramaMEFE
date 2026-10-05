@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState, useSyncExternalStore } from "react";
 import {
   DIMENSOES,
   anguloDoEixo,
@@ -12,10 +12,68 @@ import {
 } from "@/lib/mefe/pontuacao";
 import { cn } from "@/lib/utils";
 
-const LARGURA = 380;
-const ALTURA = 350;
-const GEOMETRIA: GeometriaDoRadar = { centroX: 190, centroY: 172, raio: 92 };
 const NIVEIS = [2, 4, 6, 8, 10];
+
+type RotuloDoEixo = {
+  anchor: "start" | "middle" | "end";
+  /** Deslocamento da letra em relação à ponta do eixo. */
+  letra: { dx: number; dy: number };
+  nome: { dx: number; dy: number };
+};
+
+type Desenho = {
+  largura: number;
+  altura: number;
+  geometria: GeometriaDoRadar;
+  /** Telas largas mostram o nome de cada dimensão no gráfico; no celular os nomes ficam nos cartões ao lado. */
+  comNomes: boolean;
+  rotulos: Record<Dimensao, RotuloDoEixo>;
+};
+
+// M em cima, E à direita, F embaixo e El à esquerda. A letra fica sempre acima do nome.
+const DESENHO_COMPLETO: Desenho = {
+  largura: 380,
+  altura: 350,
+  geometria: { centroX: 190, centroY: 172, raio: 92 },
+  comNomes: true,
+  rotulos: {
+    M: { anchor: "middle", letra: { dx: 0, dy: -38 }, nome: { dx: 0, dy: -18 } },
+    E: { anchor: "start", letra: { dx: 16, dy: -2 }, nome: { dx: 16, dy: 16 } },
+    F: { anchor: "middle", letra: { dx: 0, dy: 40 }, nome: { dx: 0, dy: 59 } },
+    El: { anchor: "end", letra: { dx: -16, dy: -2 }, nome: { dx: -16, dy: 16 } },
+  },
+};
+
+// No celular o gráfico ganha o espaço que os nomes ocupavam: o raio cresce e só as letras ficam na ponta.
+const DESENHO_COMPACTO: Desenho = {
+  largura: 340,
+  altura: 322,
+  geometria: { centroX: 170, centroY: 161, raio: 112 },
+  comNomes: false,
+  rotulos: {
+    M: { anchor: "middle", letra: { dx: 0, dy: -16 }, nome: { dx: 0, dy: 0 } },
+    E: { anchor: "start", letra: { dx: 16, dy: 9 }, nome: { dx: 0, dy: 0 } },
+    F: { anchor: "middle", letra: { dx: 0, dy: 36 }, nome: { dx: 0, dy: 0 } },
+    El: { anchor: "end", letra: { dx: -16, dy: 9 }, nome: { dx: 0, dy: 0 } },
+  },
+};
+
+const CONSULTA_TELA_LARGA = "(min-width: 640px)";
+
+function assinarTela(aoMudar: () => void): () => void {
+  const consulta = window.matchMedia(CONSULTA_TELA_LARGA);
+  consulta.addEventListener("change", aoMudar);
+  return () => consulta.removeEventListener("change", aoMudar);
+}
+
+/** Verdadeiro em telas a partir de 640px; no servidor e na primeira pintura vale o desenho completo. */
+function useTelaLarga(): boolean {
+  return useSyncExternalStore(
+    assinarTela,
+    () => window.matchMedia(CONSULTA_TELA_LARGA).matches,
+    () => true,
+  );
+}
 
 /** Leva o perfil exibido até o perfil alvo, em meio segundo (sem movimento se o sistema pedir menos). */
 function usePerfilSuave(alvo: PerfilMefe, duracaoMs = 520): PerfilMefe {
@@ -52,21 +110,6 @@ function usePerfilSuave(alvo: PerfilMefe, duracaoMs = 520): PerfilMefe {
   return exibido;
 }
 
-type RotuloDoEixo = {
-  anchor: "start" | "middle" | "end";
-  /** Deslocamento da letra em relação à ponta do eixo. */
-  letra: { dx: number; dy: number };
-  nome: { dx: number; dy: number };
-};
-
-// M em cima, E à direita, F embaixo e El à esquerda. A letra fica sempre acima do nome.
-const ROTULOS: Record<Dimensao, RotuloDoEixo> = {
-  M: { anchor: "middle", letra: { dx: 0, dy: -38 }, nome: { dx: 0, dy: -18 } },
-  E: { anchor: "start", letra: { dx: 16, dy: -2 }, nome: { dx: 16, dy: 16 } },
-  F: { anchor: "middle", letra: { dx: 0, dy: 40 }, nome: { dx: 0, dy: 59 } },
-  El: { anchor: "end", letra: { dx: -16, dy: -2 }, nome: { dx: -16, dy: 16 } },
-};
-
 const HALO = "[paint-order:stroke] stroke-background stroke-[3px] [stroke-linejoin:round]";
 
 /**
@@ -89,12 +132,16 @@ export function RadarMefe({
 }) {
   const id = useId();
   const suave = usePerfilSuave(perfil);
-  const { centroX, centroY, raio } = GEOMETRIA;
-  const aneis = aneisDoRadar(GEOMETRIA, NIVEIS);
+  const larga = useTelaLarga();
+  const { largura, altura, geometria, comNomes, rotulos } = larga
+    ? DESENHO_COMPLETO
+    : DESENHO_COMPACTO;
+  const { centroX, centroY, raio } = geometria;
+  const aneis = aneisDoRadar(geometria, NIVEIS);
 
   return (
     <svg
-      viewBox={`0 0 ${LARGURA} ${ALTURA}`}
+      viewBox={`0 0 ${largura} ${altura}`}
       role="img"
       aria-labelledby={`${id}-t ${id}-d`}
       className="mx-auto block h-auto w-full max-w-[34rem]"
@@ -117,7 +164,7 @@ export function RadarMefe({
       ))}
 
       {DIMENSOES.map((dimensao, indice) => {
-        const ponta = pontoDoRadar(GEOMETRIA, indice, 10);
+        const ponta = pontoDoRadar(geometria, indice, 10);
         const ativo = dimensao === destaque;
         return (
           <line
@@ -149,7 +196,7 @@ export function RadarMefe({
 
       {referencia ? (
         <polygon
-          points={poligonoDoPerfil(GEOMETRIA, referencia)}
+          points={poligonoDoPerfil(geometria, referencia)}
           className="fill-none stroke-foreground/80"
           strokeWidth={2}
           strokeDasharray="7 6"
@@ -158,14 +205,14 @@ export function RadarMefe({
       ) : null}
 
       <polygon
-        points={poligonoDoPerfil(GEOMETRIA, suave)}
+        points={poligonoDoPerfil(geometria, suave)}
         className="fill-brand-yellow/25 stroke-brand-yellow"
         strokeWidth={2.5}
         strokeLinejoin="round"
       />
 
       {DIMENSOES.map((dimensao, indice) => {
-        const vertice = pontoDoRadar(GEOMETRIA, indice, suave[dimensao]);
+        const vertice = pontoDoRadar(geometria, indice, suave[dimensao]);
         const angulo = anguloDoEixo(indice);
         const ativo = dimensao === destaque;
         return (
@@ -199,8 +246,8 @@ export function RadarMefe({
       })}
 
       {DIMENSOES.map((dimensao, indice) => {
-        const ponta = pontoDoRadar(GEOMETRIA, indice, 10);
-        const rotulo = ROTULOS[dimensao];
+        const ponta = pontoDoRadar(geometria, indice, 10);
+        const rotulo = rotulos[dimensao];
         const ativo = dimensao === destaque;
         return (
           <g key={dimensao} textAnchor={rotulo.anchor}>
@@ -214,16 +261,18 @@ export function RadarMefe({
             >
               {dimensao}
             </text>
-            <text
-              x={ponta.x + rotulo.nome.dx}
-              y={ponta.y + rotulo.nome.dy}
-              className={cn(
-                "text-[13px]",
-                ativo ? "fill-foreground font-semibold" : "fill-muted-foreground",
-              )}
-            >
-              {nomes[dimensao]}
-            </text>
+            {comNomes ? (
+              <text
+                x={ponta.x + rotulo.nome.dx}
+                y={ponta.y + rotulo.nome.dy}
+                className={cn(
+                  "text-[13px]",
+                  ativo ? "fill-foreground font-semibold" : "fill-muted-foreground",
+                )}
+              >
+                {nomes[dimensao]}
+              </text>
+            ) : null}
           </g>
         );
       })}

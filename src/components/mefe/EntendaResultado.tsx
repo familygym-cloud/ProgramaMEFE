@@ -139,7 +139,7 @@ function PainelDoIndicador({ indicador }: { indicador: IndicadorDaBioimpedancia 
 
       {serie ? (
         <>
-          <figure className="space-y-3 rounded-2xl border border-foreground/10 bg-background/50 p-4 sm:p-5">
+          <figure className="space-y-3 rounded-2xl border border-foreground/10 bg-background/50 p-3 sm:p-5">
             <GraficoDeLinha serie={serie} />
             <figcaption className="flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-between">
               <SeloIlustrativo />
@@ -207,7 +207,7 @@ export function EntendaResultado() {
   if (!indicador) return null;
 
   return (
-    <div className="rounded-[2rem] border border-foreground/10 bg-card/70 p-5 sm:p-8 lg:p-10">
+    <div className="rounded-[2rem] border border-foreground/10 bg-card/70 p-4 sm:p-8 lg:p-10">
       <header className="flex flex-wrap items-start justify-between gap-4">
         <div className="max-w-2xl space-y-2">
           <h3 className="font-display text-3xl font-semibold leading-tight tracking-tight text-balance sm:text-4xl">

@@ -7,17 +7,22 @@ export function PaginaFolha({
   definicao,
   numero,
   total,
+  densa = false,
   children,
 }: {
   definicao: DefinicaoFormulario;
   numero: number;
   total: number;
+  /** Folha diagramada com pouco espaço entre os blocos (só no papel). */
+  densa?: boolean;
   children: ReactNode;
 }) {
   const primeira = numero === 1;
   return (
     <section
       className="fm-pagina"
+      data-form={definicao.id}
+      data-densa={densa ? "" : undefined}
       data-primeira={primeira ? "" : undefined}
       aria-label={`Página ${numero} de ${total}`}
     >

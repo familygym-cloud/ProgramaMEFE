@@ -27,6 +27,8 @@ import { SEM_AUTOPREENCHER, selecionarSeAutomatico } from "./atributos";
 import {
   AreaDeTexto,
   CampoGrade,
+  EspelhoTexto,
+  TextoOrdinal,
   EscolhaGrade,
   OpcaoRadio,
   TextoLongoGrade,
@@ -126,7 +128,7 @@ function Celula({
   return (
     <div className="fm-cel" data-largo={largo ? "" : undefined} data-unico={unico ? "" : undefined}>
       <label htmlFor={id} className="fm-cel-t">
-        {titulo}
+        <TextoOrdinal texto={titulo} />
         {sufixo}
       </label>
       <div className="fm-cel-c" data-area={area ? "" : undefined}>
@@ -147,6 +149,7 @@ function Celula({
               type={data ? "date" : "text"}
               inputMode={numerico ? "decimal" : undefined}
               data-num={numerico ? "" : undefined}
+              data-espelhado={!data && !numerico ? "" : undefined}
               min={data ? "1900-01-01" : undefined}
               max={data ? "2100-12-31" : undefined}
               maxLength={data ? undefined : MAXIMO_CHARS_CAMPO}
@@ -158,6 +161,7 @@ function Celula({
             {data ? (
               <span className="fm-espelho-data">{dataParaExibir(estado.exibido)}</span>
             ) : null}
+            {!data && !numerico ? <EspelhoTexto valor={estado.exibido} /> : null}
           </>
         )}
         {celula.unidade ? <Unidade unidade={celula.unidade} /> : null}
@@ -200,11 +204,13 @@ function CampoExtra({
         {...SEM_AUTOPREENCHER}
         className="fm-entrada"
         type="text"
+        data-espelhado=""
         maxLength={MAXIMO_CHARS_CAMPO}
         aria-label={leitura}
         value={estado.exibido}
         onChange={(e) => estado.mudar(e.target.value)}
       />
+      <EspelhoTexto valor={estado.exibido} />
     </label>
   );
 }
@@ -212,7 +218,7 @@ function CampoExtra({
 function TestesView({ bloco }: { bloco: BlocoTestes }) {
   const estilo = { "--fm-cols": COLUNAS_TESTES } as CSSProperties;
   return (
-    <div className="fm-tab" style={estilo}>
+    <div className="fm-tab" data-bloco={bloco.id} style={estilo}>
       <div className="fm-tab-cab-narrow" aria-hidden="true">
         Teste e protocolo
       </div>
@@ -286,7 +292,7 @@ function TestesView({ bloco }: { bloco: BlocoTestes }) {
 
 /* ------------------------------------------------------------------ padrões de movimento */
 
-const COLUNAS_PADROES = "minmax(0, 1fr) 8.4rem 8.4rem 11.5rem";
+const COLUNAS_PADROES = "minmax(0, 1fr) 7.4rem 7.4rem 14rem";
 
 function Observacao({ chave, leitura }: { chave: string; leitura: string }) {
   const estado = useCampo(chave, false);
@@ -302,11 +308,13 @@ function Observacao({ chave, leitura }: { chave: string; leitura: string }) {
           id={id}
           className="fm-entrada"
           type="text"
+          data-espelhado=""
           maxLength={MAXIMO_CHARS_CAMPO}
           aria-label={leitura}
           value={estado.exibido}
           onChange={(e) => estado.mudar(e.target.value)}
         />
+        <EspelhoTexto valor={estado.exibido} />
       </div>
     </div>
   );
@@ -315,7 +323,7 @@ function Observacao({ chave, leitura }: { chave: string; leitura: string }) {
 function PadroesView({ bloco }: { bloco: BlocoPadroes }) {
   const estilo = { "--fm-cols": COLUNAS_PADROES } as CSSProperties;
   return (
-    <div className="fm-tab" style={estilo}>
+    <div className="fm-tab" data-bloco={bloco.id} style={estilo}>
       <div className="fm-tab-cab-narrow" aria-hidden="true">
         Padrão e critério
       </div>
@@ -380,14 +388,16 @@ function TabelaView({ bloco }: { bloco: BlocoTabela }) {
   const primeiraColuna = bloco.colunaRotulo?.titulo ?? bloco.colunas[0]?.titulo ?? "";
 
   return (
-    <div className="fm-tab" style={estilo}>
+    <div className="fm-tab" data-bloco={bloco.id} style={estilo}>
       <div className="fm-tab-cab-narrow" aria-hidden="true">
         {primeiraColuna}
       </div>
       <CabecalhoTabela colunas={colunas}>
         {bloco.colunaRotulo ? <span>{bloco.colunaRotulo.titulo}</span> : null}
         {bloco.colunas.map((c) => (
-          <span key={c.id}>{c.titulo}</span>
+          <span key={c.id}>
+            <TextoOrdinal texto={c.titulo} />
+          </span>
         ))}
       </CabecalhoTabela>
       {bloco.linhas.map((l, i) => {
@@ -477,7 +487,7 @@ function LinhaDaMatriz({
 function MatrizView({ bloco }: { bloco: BlocoMatriz }) {
   const estilo = { "--fm-n": bloco.opcoes.length, "--fm-w": bloco.larguraOpcao } as CSSProperties;
   return (
-    <div className="fm-tab" style={estilo}>
+    <div className="fm-tab" data-bloco={bloco.id} style={estilo}>
       <div className="fm-mx-cab" aria-hidden="true">
         <span>{bloco.cabecalho}</span>
         <div className="fm-mx-cab-opcoes">

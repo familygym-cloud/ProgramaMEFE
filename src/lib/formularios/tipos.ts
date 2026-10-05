@@ -28,6 +28,8 @@ export interface Opcao {
   /** Valor gravado no arquivo (sem espaços nem pontos). */
   readonly valor: string;
   readonly rotulo: string;
+  /** O PDF original imprime este rótulo em letra menor, para caber numa só linha (só muda o papel). */
+  readonly reduzido?: boolean;
 }
 
 /** Campo de uma linha (nome, peso, data...). */
@@ -56,6 +58,10 @@ export interface ItemEscolha {
   /** Quantas opções por linha na folha (a tela estreita sempre usa uma coluna). */
   readonly porLinha: number;
   readonly calculo?: Calculo;
+  /** No PDF original esta caixa é mais alta e tem mais espaço em volta (só muda o papel). */
+  readonly folga?: boolean;
+  /** As opções ocupam colunas de mesma largura (como no PDF), em vez de seguirem o tamanho do texto. */
+  readonly colunasIguais?: boolean;
 }
 
 /** Texto longo; `pautado` desenha as linhas de escrita, como no papel. */
@@ -66,6 +72,11 @@ export interface ItemTextoLongo {
   readonly colunas: Colunas;
   readonly linhas: number;
   readonly pautado: boolean;
+  /**
+   * Campo que o PDF original não traz (acrescentado para não perder informação): fica na tela, mas só vai
+   * para o papel se for preenchido, e assim o papel continua idêntico ao original.
+   */
+  readonly opcional?: boolean;
 }
 
 export type ItemGrade = ItemCampo | ItemEscolha | ItemTextoLongo;
@@ -214,6 +225,11 @@ export type Bloco =
 
 export interface Pagina {
   readonly blocos: readonly Bloco[];
+  /**
+   * Página do PDF original que foi diagramada com pouco espaço entre os blocos para caber em uma folha A4.
+   * Só muda o espaçamento do papel; a tela não é afetada.
+   */
+  readonly densa?: boolean;
 }
 
 export interface DefinicaoFormulario {

@@ -28,6 +28,29 @@ function atributosDaEntrada(entrada: TipoEntrada) {
   }
 }
 
+/**
+ * A fonte do tema não desenha os indicadores ordinais (ª e º) elevados: sairia "1a medida" e "No de filhos".
+ * Aqui eles viram letra pequena e elevada; leitores de tela continuam lendo o texto original.
+ */
+export function TextoOrdinal({ texto }: { texto: string }) {
+  return (
+    <>
+      {texto.split(/([ªº])/).map((parte, i) =>
+        parte === "ª" || parte === "º" ? (
+          <span key={i}>
+            <sup className="fm-ord" aria-hidden="true">
+              {parte === "ª" ? "a" : "o"}
+            </sup>
+            <span className="fm-sr">{parte}</span>
+          </span>
+        ) : (
+          parte
+        ),
+      )}
+    </>
+  );
+}
+
 export function Unidade({ unidade }: { unidade: string }) {
   return (
     <>
@@ -36,6 +59,18 @@ export function Unidade({ unidade }: { unidade: string }) {
       </span>
       <span className="fm-sr">{unidadeFalada(unidade)}</span>
     </>
+  );
+}
+
+/**
+ * Cópia do texto de um campo de uma linha que só aparece no papel: o campo da tela corta o que não cabe na
+ * largura, a cópia quebra a linha e mostra tudo.
+ */
+export function EspelhoTexto({ valor }: { valor: string }) {
+  return (
+    <span className="fm-espelho-texto" aria-hidden="true">
+      {valor}
+    </span>
   );
 }
 
@@ -81,12 +116,16 @@ export function CampoGrade({ item }: { item: ItemCampo }) {
   const atributos = atributosDaEntrada(item.entrada);
   const numerico = item.entrada === "numero";
   const data = item.entrada === "data";
+  const espelhado =
+    item.entrada === "texto" || item.entrada === "email" || item.entrada === "telefone";
 
   return (
     <div className="fm-item" data-c={item.colunas}>
       <label className="fm-caixa">
         <span className="fm-rotulo">
-          <span>{item.rotulo}</span>
+          <span>
+            <TextoOrdinal texto={item.rotulo} />
+          </span>
           <MarcaAuto estado={estado} />
         </span>
         <span className="fm-linha-entrada">
@@ -95,6 +134,7 @@ export function CampoGrade({ item }: { item: ItemCampo }) {
             {...SEM_AUTOPREENCHER}
             className="fm-entrada"
             data-num={numerico ? "" : undefined}
+            data-espelhado={espelhado ? "" : undefined}
             value={estado.exibido}
             maxLength={data ? undefined : MAXIMO_CHARS_CAMPO}
             aria-describedby={item.calculo !== undefined ? idLegenda : undefined}
@@ -102,6 +142,7 @@ export function CampoGrade({ item }: { item: ItemCampo }) {
             onFocus={selecionarSeAutomatico(estado)}
           />
           {data ? <span className="fm-espelho-data">{dataParaExibir(estado.exibido)}</span> : null}
+          {espelhado ? <EspelhoTexto valor={estado.exibido} /> : null}
           {item.unidade ? <Unidade unidade={item.unidade} /> : null}
         </span>
       </label>
@@ -116,7 +157,13 @@ export function CampoGrade({ item }: { item: ItemCampo }) {
 export function TextoLongoGrade({ item }: { item: ItemTextoLongo }) {
   const estado = useCampo(item.chave, false);
   return (
-    <div className="fm-item" data-c={item.colunas}>
+    <div
+      className="fm-item"
+      data-c={item.colunas}
+      data-g={item.pautado ? "pautado" : undefined}
+      data-opcional={item.opcional === true ? "" : undefined}
+      data-vazio={item.opcional === true && estado.exibido === "" ? "" : undefined}
+    >
       <label className={item.pautado ? "fm-caixa fm-pautado" : "fm-caixa"}>
         <span className="fm-rotulo">{item.rotulo}</span>
         <AreaDeTexto
@@ -184,7 +231,7 @@ export function OpcaoRadio({
   forma?: Extract<Forma, "unica" | "nota">;
 }) {
   return (
-    <label className="fm-opt" data-forma={forma}>
+    <label className="fm-opt" data-forma={forma} data-reduzido={opcao.reduzido ? "" : undefined}>
       <input
         type="radio"
         className="fm-in"
@@ -194,6 +241,13 @@ export function OpcaoRadio({
         onChange={() => aoEscolher(opcao.valor)}
         onClick={() => {
           if (marcada) aoEscolher("");
+        }}
+        onKeyDown={(e) => {
+          // Pelo teclado, Delete ou Backspace desmarcam a opção escolhida (como apagar a marca no papel).
+          if (marcada && (e.key === "Delete" || e.key === "Backspace")) {
+            e.preventDefault();
+            aoEscolher("");
+          }
         }}
       />
       <span className="fm-box" aria-hidden={forma === "nota" ? undefined : true}>
@@ -207,14 +261,16 @@ export function OpcaoRadio({
 export function OpcaoCaixa({
   marcada,
   rotulo,
+  reduzido = false,
   aoAlternar,
 }: {
   marcada: boolean;
   rotulo: ReactNode;
+  reduzido?: boolean;
   aoAlternar: (marcada: boolean) => void;
 }) {
   return (
-    <label className="fm-opt" data-forma="multipla">
+    <label className="fm-opt" data-forma="multipla" data-reduzido={reduzido ? "" : undefined}>
       <input
         type="checkbox"
         className="fm-in"
@@ -235,14 +291,14 @@ function OpcaoMultipla({ chave, opcao }: { chave: string; opcao: Opcao }) {
     <OpcaoCaixa
       marcada={marcada}
       rotulo={opcao.rotulo}
+      reduzido={opcao.reduzido === true}
       aoAlternar={(m) => armazem.definir(k, m ? VALOR_MARCADO : "")}
     />
   );
 }
 
-function distribuicao(item: ItemEscolha): "grade" | "espalhar" | "inicio" {
-  if (item.opcoes.length > item.porLinha) return "grade";
-  return item.colunas === 12 ? "espalhar" : "inicio";
+function distribuicao(item: ItemEscolha): "grade" | "inicio" {
+  return item.colunasIguais === true || item.opcoes.length > item.porLinha ? "grade" : "inicio";
 }
 
 /** Grupo de opções numa caixa com título (fieldset + legend). */
@@ -255,7 +311,15 @@ export function EscolhaGrade({ item }: { item: ItemEscolha }) {
   const estilo = { "--fm-n": item.porLinha } as CSSProperties;
 
   return (
-    <div className="fm-item" data-c={item.colunas}>
+    <div
+      className="fm-item"
+      data-c={item.colunas}
+      data-g={
+        item.folga === true || Math.ceil(item.opcoes.length / item.porLinha) >= 2
+          ? "escolha"
+          : undefined
+      }
+    >
       <fieldset
         className="fm-escolha"
         aria-describedby={item.calculo !== undefined ? idLegenda : undefined}

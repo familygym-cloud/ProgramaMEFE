@@ -156,12 +156,13 @@ const eficiencia: Pilar = {
     {
       titulo: "Capacidade cardiorrespiratória",
       testes: [
-        { nome: "Teste aplicado", protocolo: "Tempo / distância" },
+        { nome: "Teste aplicado" },
         { nome: "FC de repouso", protocolo: "bpm" },
         { nome: "FC máxima estimada", protocolo: "bpm" },
         { nome: "VO2 máx. estimado", protocolo: "ml/kg/min" },
         { nome: "FC ao final do teste", protocolo: "bpm" },
         { nome: "Esforço percebido (Borg)", protocolo: "Escala de 0 a 10" },
+        { nome: "Tempo / distância" },
         {
           nome: "Zona de treinamento predominante",
           protocolo:
@@ -243,10 +244,11 @@ const flexibilidade: Pilar = {
       titulo: "Protocolo e condições da avaliação",
       testes: [
         { nome: "Protocolo adotado" },
-        { nome: "Temperatura ambiente" },
+        { nome: "Temperatura ambiente", protocolo: "°C" },
         { nome: "Horário da avaliação" },
-        { nome: "Aquecimento prévio", protocolo: "Sim ou não, e a duração" },
-        { nome: "Instrumento utilizado" },
+        { nome: "Aquecimento prévio", protocolo: "Sim ou não" },
+        { nome: "Duração do aquecimento", protocolo: "min" },
+        { nome: "Instrumento" },
       ],
     },
   ],
@@ -366,6 +368,18 @@ export const glossarioDosTestes: readonly TermoDoGlossario[] = [
 // ---------------------------------------------------------------------------------------------
 // O programa e para quem ele é
 // ---------------------------------------------------------------------------------------------
+
+/** O que o programa reúne, em itens curtos (a bioimpedância depende do equipamento disponível). */
+export const itensDoPrograma: readonly string[] = [
+  "Avaliação física MEFE",
+  "Bioimpedância",
+  "Avaliação nutricional",
+  "Avaliação psicológica",
+  "Plano individual",
+  "Prática orientada",
+  "Reavaliações",
+  "Evolução na área do aluno",
+];
 
 export type Principio = { readonly id: string; readonly titulo: string; readonly texto: string };
 
@@ -521,6 +535,15 @@ export const motivosDaAvaliacao: readonly MotivoDaAvaliacao[] = [
   },
 ];
 
+export type DePara = { readonly de: string; readonly para: string };
+
+/** Antes e depois de ter uma avaliação: ilustra o primeiro motivo, "um ponto de partida objetivo". */
+export const deParaDaAvaliacao: readonly DePara[] = [
+  { de: "Sensações e palpites", para: "Registros que podem ser comparados" },
+  { de: "Treino igual para todos", para: "Plano pensado para você" },
+  { de: "Compensações que passam despercebidas", para: "Compensações notadas cedo" },
+];
+
 export type MomentoDoAcompanhamento = {
   readonly id: string;
   readonly rotulo: string;
@@ -647,7 +670,7 @@ export const indicadoresDaBioimpedancia: readonly IndicadorDaBioimpedancia[] = [
     oQueE:
       "Estimativa da energia que o corpo gasta em repouso para manter funções como respirar e fazer o sangue circular.",
     oQueInfluencia:
-      "É calculada por fórmula, a partir da composição corporal. Outras fórmulas podem dar números diferentes.",
+      "Em geral, é calculada por fórmula, a partir da composição corporal. Outras fórmulas podem dar números diferentes.",
     comoUsamos:
       "É o ponto de partida para a nutricionista estimar o gasto total de energia, somando o seu nível de atividade.",
     exemplo: { valores: [1452, 1460, 1471], casas: 0 },
@@ -705,7 +728,7 @@ export const comoFunciona: readonly PassoDaBioimpedancia[] = [
 
 export const vantagensDaBioimpedancia: readonly string[] = [
   "Rápida: costuma ser uma medição breve.",
-  "Indolor e não invasiva: sem agulhas, sem radiação e sem desconforto.",
+  "Indolor e não invasiva: sem agulhas e sem radiação.",
   "Repetível: pode ser refeita nas reavaliações para acompanhar a tendência.",
   "Complementar: soma-se às medidas, às dobras cutâneas e à conversa com a nutricionista.",
 ];
@@ -935,7 +958,8 @@ export const sigilo = {
     "Apenas o(a) instrutor(a)",
     "Não autorizo",
   ],
-  paginaNaoColeta: "Esta página apresenta o programa e não coleta nem guarda nenhum dado seu.",
+  paginaNaoColeta:
+    "Esta página apresenta o programa e não coleta nem guarda nenhum dado seu. Os formulários das avaliações são preenchidos pela equipe, e nada fica público.",
 } as const;
 
 // ---------------------------------------------------------------------------------------------
