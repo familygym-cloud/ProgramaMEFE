@@ -8,6 +8,7 @@ bun.lock
 routeTree.gen.ts
 .tanstack
 .wrangler
-# Gerados pelo Lovable/Supabase e sobrescritos a cada sincronização: formatar só geraria diferenças.
+# Gerados pelo Supabase e sobrescritos a cada sincronização: formatar só geraria diferenças.
 src/integrations/supabase/*.ts
 !src/integrations/supabase/*.test.ts
+supabase/email-templates/

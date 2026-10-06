@@ -1,8 +1,8 @@
 # Configuração do Supabase CLI deste projeto.
 #
-# project_id é a referência do projeto Supabase (Lovable Cloud) usado por `supabase link` e
-# `supabase db push`. Ao migrar para um projeto próprio, troque pelo "Project ref" do novo projeto.
-project_id = "yjmabkypfzftxyqetgva"
+# project_id é a referência do projeto Supabase usado por `supabase link` e `supabase db push`.
+# Troque pelo "Project ref" do SEU projeto (painel do Supabase > Project Settings > General).
+project_id = "troque-pelo-project-ref"
 
 # Autenticação. O app envia `emailRedirectTo = <origem>/auth` no cadastro e no reenvio da
 # confirmação, e `redirectTo = <origem>/reset-password` na recuperação de senha. Uma URL que não
@@ -10,13 +10,13 @@ project_id = "yjmabkypfzftxyqetgva"
 #
 # ATENÇÃO: `supabase config push` grava estas configurações no projeto REMOTO, e chaves de [auth] que
 # não estão aqui podem voltar ao padrão da CLI. Revise o diff que o comando mostra antes de confirmar.
-# Se o app tiver outro domínio (domínio próprio, outro projeto no Lovable), troque o endereço
-# abaixo e inclua as URLs /auth e /reset-password dele antes de rodar o comando.
+# Troque o endereço abaixo (exemplo) pelo do site publicado (Cloudflare Workers ou domínio próprio) e inclua as
+# URLs /auth e /reset-password dele antes de rodar o comando.
 [auth]
-site_url = "https://familygym-healthhub.lovable.app"
+site_url = "https://familygym.exemplo.workers.dev"
 additional_redirect_urls = [
-  "https://familygym-healthhub.lovable.app/auth",
-  "https://familygym-healthhub.lovable.app/reset-password",
+  "https://familygym.exemplo.workers.dev/auth",
+  "https://familygym.exemplo.workers.dev/reset-password",
   # Desenvolvimento local: `bun run dev` sobe na porta 8080 (padrão do projeto); 5173 é a porta
   # padrão do Vite, para quem sobe com `--port 5173`.
   "http://localhost:8080/auth",

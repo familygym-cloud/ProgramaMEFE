@@ -13,7 +13,6 @@ import { Toaster } from "@/components/ui/sonner";
 import appCss from "../styles.css?url";
 import urbanistLatim from "@fontsource-variable/urbanist/files/urbanist-latin-wght-normal.woff2?url";
 import { reagirAoEventoDeAuth } from "../lib/auth-sessao";
-import { reportLovableError } from "../lib/lovable-error-reporting";
 import { urlAbsoluta } from "../lib/site";
 
 const NOME_DO_SITE = "Academia Family Gym";
@@ -48,7 +47,7 @@ function ErrorComponent({ error, reset }: { error: unknown; reset: () => void })
   console.error(error);
   const router = useRouter();
   useEffect(() => {
-    reportLovableError(error, { boundary: "tanstack_root_error_component" });
+    // O erro já foi enviado ao console acima; aqui entraria um serviço de monitoramento, se houver.
   }, [error]);
 
   return (
