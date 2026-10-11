@@ -210,6 +210,10 @@ Passo a passo, na primeira vez:
 5. **Deploy**: `bun run deploy` (faz `vite build && wrangler deploy`). Para testar localmente no runtime do Worker: `bun run build && bun run preview`.
 6. **Domínio próprio** (opcional): Cloudflare > Workers > `familygym` > Settings > Domains & Routes; depois ajuste Site URL e Redirect URLs no Supabase.
 
+### Integrações por API
+
+Catraca, Tecnofit e outros sistemas usam a API em `/api/v1` (chaves criadas em `/integracoes`). Guia: `docs/api-integracao.md`; descrição OpenAPI em `/api/v1/openapi.json`.
+
 ### Valores reais dos planos
 
 Os valores **não estão no código** (só dentro da área do aluno, com plano ativo). Depois das migrations, rode o SQL de carga dos valores reais, entregue à parte, no **SQL Editor** do Supabase. Não o versione.

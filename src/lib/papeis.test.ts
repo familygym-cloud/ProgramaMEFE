@@ -44,6 +44,13 @@ describe("podeAcessar", () => {
     expect(podeAcessar(["recepcao", "professor"], "financeiro")).toBe(true);
   });
 
+  it("as chaves de API são só da gestão; a tela de integrações abre para gestão e recepção", () => {
+    expect(podeAcessar(["recepcao"], "integracoes")).toBe(false);
+    expect(podeAcessar(["professor"], "integracoes")).toBe(false);
+    expect(areaDaRota("/integracoes")).toBe("vinculos");
+    expect(podeAcessar(["recepcao"], "vinculos")).toBe(true);
+  });
+
   it("toda área tem a gestão entre os papéis", () => {
     for (const area of AREAS) expect(PAPEIS_POR_AREA[area]).toContain("staff");
   });

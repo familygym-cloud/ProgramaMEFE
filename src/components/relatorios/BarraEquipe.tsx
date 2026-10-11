@@ -7,6 +7,7 @@ import {
   Link2,
   LogIn,
   LogOut,
+  Plug,
   Ruler,
   ShieldCheck,
   Tags,
@@ -30,6 +31,7 @@ const FERRAMENTAS = [
   { to: "/planos", rotulo: "Planos", Icone: Tags, area: "planos" },
   { to: "/termos", rotulo: "Termos", Icone: ShieldCheck, area: "termos" },
   { to: "/vinculos", rotulo: "Vínculos", Icone: Link2, area: "vinculos" },
+  { to: "/integracoes", rotulo: "Integrações", Icone: Plug, area: "vinculos" },
   { to: "/prescricao-treinos", rotulo: "Treinos", Icone: Dumbbell, area: "treinos" },
   { to: "/registrar-avaliacao", rotulo: "Avaliação", Icone: Ruler, area: "avaliacoes" },
   {

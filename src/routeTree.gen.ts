@@ -22,6 +22,7 @@ import { Route as ValoresRouteImport } from './routes/valores'
 import { Route as AuthenticatedAulasRouteImport } from './routes/_authenticated/aulas'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedFinanceiroRouteImport } from './routes/_authenticated/financeiro'
+import { Route as AuthenticatedIntegracoesRouteImport } from './routes/_authenticated/integracoes'
 import { Route as AuthenticatedPlanosRouteImport } from './routes/_authenticated/planos'
 import { Route as AuthenticatedPrescricaoTreinosRouteImport } from './routes/_authenticated/prescricao-treinos'
 import { Route as AuthenticatedRegistrarAvaliacaoRouteImport } from './routes/_authenticated/registrar-avaliacao'
@@ -39,9 +40,17 @@ import { Route as AppValoresRouteImport } from './routes/app/valores'
 import { Route as AuthenticatedFormulariosMefeIndexRouteImport } from './routes/_authenticated/formularios-mefe.index'
 import { Route as AuthenticatedFormulariosMefeTipoRouteImport } from './routes/_authenticated/formularios-mefe.$tipo'
 import { Route as AuthenticatedRelatorioAlunoAlunoIdRouteImport } from './routes/_authenticated/relatorio-aluno.$alunoId'
+import { Route as ApiV1AcessosRouteImport } from './routes/api.v1.acessos'
+import { Route as ApiV1AlunosRouteImport } from './routes/api.v1.alunos'
+import { Route as ApiV1AulasRouteImport } from './routes/api.v1.aulas'
+import { Route as ApiV1OpenapiDotjsonRouteImport } from './routes/api.v1.openapi[.]json'
+import { Route as ApiV1SaudeRouteImport } from './routes/api.v1.saude'
 import { Route as AppTreinosIndexRouteImport } from './routes/app/treinos/index'
 import { Route as AppTreinosTreinoIdRouteImport } from './routes/app/treinos/$treinoId'
 import { Route as EquipeDemoAlunoAlunoIdRouteImport } from './routes/equipe-demo_.aluno.$alunoId'
+import { Route as ApiV1AcessosVerificarRouteImport } from './routes/api.v1.acessos.verificar'
+import { Route as ApiV1AlunosIdsExternosRouteImport } from './routes/api.v1.alunos.ids-externos'
+import { Route as ApiV1PagamentosBaixaRouteImport } from './routes/api.v1.pagamentos.baixa'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -107,6 +116,12 @@ const AuthenticatedFinanceiroRoute = AuthenticatedFinanceiroRouteImport.update({
   path: '/financeiro',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedIntegracoesRoute =
+  AuthenticatedIntegracoesRouteImport.update({
+    id: '/integracoes',
+    path: '/integracoes',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedPlanosRoute = AuthenticatedPlanosRouteImport.update({
   id: '/planos',
   path: '/planos',
@@ -197,6 +212,31 @@ const AuthenticatedRelatorioAlunoAlunoIdRoute =
     path: '/relatorio-aluno/$alunoId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const ApiV1AcessosRoute = ApiV1AcessosRouteImport.update({
+  id: '/api/v1/acessos',
+  path: '/api/v1/acessos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1AlunosRoute = ApiV1AlunosRouteImport.update({
+  id: '/api/v1/alunos',
+  path: '/api/v1/alunos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1AulasRoute = ApiV1AulasRouteImport.update({
+  id: '/api/v1/aulas',
+  path: '/api/v1/aulas',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1OpenapiDotjsonRoute = ApiV1OpenapiDotjsonRouteImport.update({
+  id: '/api/v1/openapi.json',
+  path: '/api/v1/openapi.json',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1SaudeRoute = ApiV1SaudeRouteImport.update({
+  id: '/api/v1/saude',
+  path: '/api/v1/saude',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AppTreinosIndexRoute = AppTreinosIndexRouteImport.update({
   id: '/treinos/',
   path: '/treinos/',
@@ -210,6 +250,21 @@ const AppTreinosTreinoIdRoute = AppTreinosTreinoIdRouteImport.update({
 const EquipeDemoAlunoAlunoIdRoute = EquipeDemoAlunoAlunoIdRouteImport.update({
   id: '/equipe-demo_/aluno/$alunoId',
   path: '/equipe-demo/aluno/$alunoId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1AcessosVerificarRoute = ApiV1AcessosVerificarRouteImport.update({
+  id: '/verificar',
+  path: '/verificar',
+  getParentRoute: () => ApiV1AcessosRoute,
+} as any)
+const ApiV1AlunosIdsExternosRoute = ApiV1AlunosIdsExternosRouteImport.update({
+  id: '/ids-externos',
+  path: '/ids-externos',
+  getParentRoute: () => ApiV1AlunosRoute,
+} as any)
+const ApiV1PagamentosBaixaRoute = ApiV1PagamentosBaixaRouteImport.update({
+  id: '/api/v1/pagamentos/baixa',
+  path: '/api/v1/pagamentos/baixa',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -226,6 +281,7 @@ export interface FileRoutesByFullPath {
   '/aulas': typeof AuthenticatedAulasRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/financeiro': typeof AuthenticatedFinanceiroRoute
+  '/integracoes': typeof AuthenticatedIntegracoesRoute
   '/planos': typeof AuthenticatedPlanosRoute
   '/prescricao-treinos': typeof AuthenticatedPrescricaoTreinosRoute
   '/registrar-avaliacao': typeof AuthenticatedRegistrarAvaliacaoRoute
@@ -242,10 +298,18 @@ export interface FileRoutesByFullPath {
   '/app/': typeof AppIndexRoute
   '/formularios-mefe/$tipo': typeof AuthenticatedFormulariosMefeTipoRoute
   '/relatorio-aluno/$alunoId': typeof AuthenticatedRelatorioAlunoAlunoIdRoute
+  '/api/v1/acessos': typeof ApiV1AcessosRouteWithChildren
+  '/api/v1/alunos': typeof ApiV1AlunosRouteWithChildren
+  '/api/v1/aulas': typeof ApiV1AulasRoute
+  '/api/v1/openapi.json': typeof ApiV1OpenapiDotjsonRoute
+  '/api/v1/saude': typeof ApiV1SaudeRoute
   '/app/treinos/$treinoId': typeof AppTreinosTreinoIdRoute
   '/equipe-demo/aluno/$alunoId': typeof EquipeDemoAlunoAlunoIdRoute
   '/formularios-mefe/': typeof AuthenticatedFormulariosMefeIndexRoute
   '/app/treinos/': typeof AppTreinosIndexRoute
+  '/api/v1/acessos/verificar': typeof ApiV1AcessosVerificarRoute
+  '/api/v1/alunos/ids-externos': typeof ApiV1AlunosIdsExternosRoute
+  '/api/v1/pagamentos/baixa': typeof ApiV1PagamentosBaixaRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -259,6 +323,7 @@ export interface FileRoutesByTo {
   '/aulas': typeof AuthenticatedAulasRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/financeiro': typeof AuthenticatedFinanceiroRoute
+  '/integracoes': typeof AuthenticatedIntegracoesRoute
   '/planos': typeof AuthenticatedPlanosRoute
   '/prescricao-treinos': typeof AuthenticatedPrescricaoTreinosRoute
   '/registrar-avaliacao': typeof AuthenticatedRegistrarAvaliacaoRoute
@@ -275,10 +340,18 @@ export interface FileRoutesByTo {
   '/app': typeof AppIndexRoute
   '/formularios-mefe/$tipo': typeof AuthenticatedFormulariosMefeTipoRoute
   '/relatorio-aluno/$alunoId': typeof AuthenticatedRelatorioAlunoAlunoIdRoute
+  '/api/v1/acessos': typeof ApiV1AcessosRouteWithChildren
+  '/api/v1/alunos': typeof ApiV1AlunosRouteWithChildren
+  '/api/v1/aulas': typeof ApiV1AulasRoute
+  '/api/v1/openapi.json': typeof ApiV1OpenapiDotjsonRoute
+  '/api/v1/saude': typeof ApiV1SaudeRoute
   '/app/treinos/$treinoId': typeof AppTreinosTreinoIdRoute
   '/equipe-demo/aluno/$alunoId': typeof EquipeDemoAlunoAlunoIdRoute
   '/formularios-mefe': typeof AuthenticatedFormulariosMefeIndexRoute
   '/app/treinos': typeof AppTreinosIndexRoute
+  '/api/v1/acessos/verificar': typeof ApiV1AcessosVerificarRoute
+  '/api/v1/alunos/ids-externos': typeof ApiV1AlunosIdsExternosRoute
+  '/api/v1/pagamentos/baixa': typeof ApiV1PagamentosBaixaRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -295,6 +368,7 @@ export interface FileRoutesById {
   '/_authenticated/aulas': typeof AuthenticatedAulasRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/financeiro': typeof AuthenticatedFinanceiroRoute
+  '/_authenticated/integracoes': typeof AuthenticatedIntegracoesRoute
   '/_authenticated/planos': typeof AuthenticatedPlanosRoute
   '/_authenticated/prescricao-treinos': typeof AuthenticatedPrescricaoTreinosRoute
   '/_authenticated/registrar-avaliacao': typeof AuthenticatedRegistrarAvaliacaoRoute
@@ -311,10 +385,18 @@ export interface FileRoutesById {
   '/app/': typeof AppIndexRoute
   '/_authenticated/formularios-mefe/$tipo': typeof AuthenticatedFormulariosMefeTipoRoute
   '/_authenticated/relatorio-aluno/$alunoId': typeof AuthenticatedRelatorioAlunoAlunoIdRoute
+  '/api/v1/acessos': typeof ApiV1AcessosRouteWithChildren
+  '/api/v1/alunos': typeof ApiV1AlunosRouteWithChildren
+  '/api/v1/aulas': typeof ApiV1AulasRoute
+  '/api/v1/openapi.json': typeof ApiV1OpenapiDotjsonRoute
+  '/api/v1/saude': typeof ApiV1SaudeRoute
   '/app/treinos/$treinoId': typeof AppTreinosTreinoIdRoute
   '/equipe-demo_/aluno/$alunoId': typeof EquipeDemoAlunoAlunoIdRoute
   '/_authenticated/formularios-mefe/': typeof AuthenticatedFormulariosMefeIndexRoute
   '/app/treinos/': typeof AppTreinosIndexRoute
+  '/api/v1/acessos/verificar': typeof ApiV1AcessosVerificarRoute
+  '/api/v1/alunos/ids-externos': typeof ApiV1AlunosIdsExternosRoute
+  '/api/v1/pagamentos/baixa': typeof ApiV1PagamentosBaixaRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -331,6 +413,7 @@ export interface FileRouteTypes {
     | '/aulas'
     | '/dashboard'
     | '/financeiro'
+    | '/integracoes'
     | '/planos'
     | '/prescricao-treinos'
     | '/registrar-avaliacao'
@@ -347,10 +430,18 @@ export interface FileRouteTypes {
     | '/app/'
     | '/formularios-mefe/$tipo'
     | '/relatorio-aluno/$alunoId'
+    | '/api/v1/acessos'
+    | '/api/v1/alunos'
+    | '/api/v1/aulas'
+    | '/api/v1/openapi.json'
+    | '/api/v1/saude'
     | '/app/treinos/$treinoId'
     | '/equipe-demo/aluno/$alunoId'
     | '/formularios-mefe/'
     | '/app/treinos/'
+    | '/api/v1/acessos/verificar'
+    | '/api/v1/alunos/ids-externos'
+    | '/api/v1/pagamentos/baixa'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -364,6 +455,7 @@ export interface FileRouteTypes {
     | '/aulas'
     | '/dashboard'
     | '/financeiro'
+    | '/integracoes'
     | '/planos'
     | '/prescricao-treinos'
     | '/registrar-avaliacao'
@@ -380,10 +472,18 @@ export interface FileRouteTypes {
     | '/app'
     | '/formularios-mefe/$tipo'
     | '/relatorio-aluno/$alunoId'
+    | '/api/v1/acessos'
+    | '/api/v1/alunos'
+    | '/api/v1/aulas'
+    | '/api/v1/openapi.json'
+    | '/api/v1/saude'
     | '/app/treinos/$treinoId'
     | '/equipe-demo/aluno/$alunoId'
     | '/formularios-mefe'
     | '/app/treinos'
+    | '/api/v1/acessos/verificar'
+    | '/api/v1/alunos/ids-externos'
+    | '/api/v1/pagamentos/baixa'
   id:
     | '__root__'
     | '/'
@@ -399,6 +499,7 @@ export interface FileRouteTypes {
     | '/_authenticated/aulas'
     | '/_authenticated/dashboard'
     | '/_authenticated/financeiro'
+    | '/_authenticated/integracoes'
     | '/_authenticated/planos'
     | '/_authenticated/prescricao-treinos'
     | '/_authenticated/registrar-avaliacao'
@@ -415,10 +516,18 @@ export interface FileRouteTypes {
     | '/app/'
     | '/_authenticated/formularios-mefe/$tipo'
     | '/_authenticated/relatorio-aluno/$alunoId'
+    | '/api/v1/acessos'
+    | '/api/v1/alunos'
+    | '/api/v1/aulas'
+    | '/api/v1/openapi.json'
+    | '/api/v1/saude'
     | '/app/treinos/$treinoId'
     | '/equipe-demo_/aluno/$alunoId'
     | '/_authenticated/formularios-mefe/'
     | '/app/treinos/'
+    | '/api/v1/acessos/verificar'
+    | '/api/v1/alunos/ids-externos'
+    | '/api/v1/pagamentos/baixa'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -432,7 +541,13 @@ export interface RootRouteChildren {
   ModalidadesRoute: typeof ModalidadesRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   ValoresRoute: typeof ValoresRoute
+  ApiV1AcessosRoute: typeof ApiV1AcessosRouteWithChildren
+  ApiV1AlunosRoute: typeof ApiV1AlunosRouteWithChildren
+  ApiV1AulasRoute: typeof ApiV1AulasRoute
+  ApiV1OpenapiDotjsonRoute: typeof ApiV1OpenapiDotjsonRoute
+  ApiV1SaudeRoute: typeof ApiV1SaudeRoute
   EquipeDemoAlunoAlunoIdRoute: typeof EquipeDemoAlunoAlunoIdRoute
+  ApiV1PagamentosBaixaRoute: typeof ApiV1PagamentosBaixaRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -526,6 +641,13 @@ declare module '@tanstack/react-router' {
       path: '/financeiro'
       fullPath: '/financeiro'
       preLoaderRoute: typeof AuthenticatedFinanceiroRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/integracoes': {
+      id: '/_authenticated/integracoes'
+      path: '/integracoes'
+      fullPath: '/integracoes'
+      preLoaderRoute: typeof AuthenticatedIntegracoesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/planos': {
@@ -647,6 +769,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRelatorioAlunoAlunoIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/v1/acessos': {
+      id: '/api/v1/acessos'
+      path: '/api/v1/acessos'
+      fullPath: '/api/v1/acessos'
+      preLoaderRoute: typeof ApiV1AcessosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/alunos': {
+      id: '/api/v1/alunos'
+      path: '/api/v1/alunos'
+      fullPath: '/api/v1/alunos'
+      preLoaderRoute: typeof ApiV1AlunosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/aulas': {
+      id: '/api/v1/aulas'
+      path: '/api/v1/aulas'
+      fullPath: '/api/v1/aulas'
+      preLoaderRoute: typeof ApiV1AulasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/openapi.json': {
+      id: '/api/v1/openapi.json'
+      path: '/api/v1/openapi.json'
+      fullPath: '/api/v1/openapi.json'
+      preLoaderRoute: typeof ApiV1OpenapiDotjsonRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/saude': {
+      id: '/api/v1/saude'
+      path: '/api/v1/saude'
+      fullPath: '/api/v1/saude'
+      preLoaderRoute: typeof ApiV1SaudeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/app/treinos/': {
       id: '/app/treinos/'
       path: '/treinos'
@@ -668,6 +825,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EquipeDemoAlunoAlunoIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/v1/acessos/verificar': {
+      id: '/api/v1/acessos/verificar'
+      path: '/verificar'
+      fullPath: '/api/v1/acessos/verificar'
+      preLoaderRoute: typeof ApiV1AcessosVerificarRouteImport
+      parentRoute: typeof ApiV1AcessosRoute
+    }
+    '/api/v1/alunos/ids-externos': {
+      id: '/api/v1/alunos/ids-externos'
+      path: '/ids-externos'
+      fullPath: '/api/v1/alunos/ids-externos'
+      preLoaderRoute: typeof ApiV1AlunosIdsExternosRouteImport
+      parentRoute: typeof ApiV1AlunosRoute
+    }
+    '/api/v1/pagamentos/baixa': {
+      id: '/api/v1/pagamentos/baixa'
+      path: '/api/v1/pagamentos/baixa'
+      fullPath: '/api/v1/pagamentos/baixa'
+      preLoaderRoute: typeof ApiV1PagamentosBaixaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -675,6 +853,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAulasRoute: typeof AuthenticatedAulasRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedFinanceiroRoute: typeof AuthenticatedFinanceiroRoute
+  AuthenticatedIntegracoesRoute: typeof AuthenticatedIntegracoesRoute
   AuthenticatedPlanosRoute: typeof AuthenticatedPlanosRoute
   AuthenticatedPrescricaoTreinosRoute: typeof AuthenticatedPrescricaoTreinosRoute
   AuthenticatedRegistrarAvaliacaoRoute: typeof AuthenticatedRegistrarAvaliacaoRoute
@@ -689,6 +868,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAulasRoute: AuthenticatedAulasRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedFinanceiroRoute: AuthenticatedFinanceiroRoute,
+  AuthenticatedIntegracoesRoute: AuthenticatedIntegracoesRoute,
   AuthenticatedPlanosRoute: AuthenticatedPlanosRoute,
   AuthenticatedPrescricaoTreinosRoute: AuthenticatedPrescricaoTreinosRoute,
   AuthenticatedRegistrarAvaliacaoRoute: AuthenticatedRegistrarAvaliacaoRoute,
@@ -734,6 +914,30 @@ const AppRouteChildren: AppRouteChildren = {
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 
+interface ApiV1AcessosRouteChildren {
+  ApiV1AcessosVerificarRoute: typeof ApiV1AcessosVerificarRoute
+}
+
+const ApiV1AcessosRouteChildren: ApiV1AcessosRouteChildren = {
+  ApiV1AcessosVerificarRoute: ApiV1AcessosVerificarRoute,
+}
+
+const ApiV1AcessosRouteWithChildren = ApiV1AcessosRoute._addFileChildren(
+  ApiV1AcessosRouteChildren,
+)
+
+interface ApiV1AlunosRouteChildren {
+  ApiV1AlunosIdsExternosRoute: typeof ApiV1AlunosIdsExternosRoute
+}
+
+const ApiV1AlunosRouteChildren: ApiV1AlunosRouteChildren = {
+  ApiV1AlunosIdsExternosRoute: ApiV1AlunosIdsExternosRoute,
+}
+
+const ApiV1AlunosRouteWithChildren = ApiV1AlunosRoute._addFileChildren(
+  ApiV1AlunosRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
@@ -745,7 +949,13 @@ const rootRouteChildren: RootRouteChildren = {
   ModalidadesRoute: ModalidadesRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   ValoresRoute: ValoresRoute,
+  ApiV1AcessosRoute: ApiV1AcessosRouteWithChildren,
+  ApiV1AlunosRoute: ApiV1AlunosRouteWithChildren,
+  ApiV1AulasRoute: ApiV1AulasRoute,
+  ApiV1OpenapiDotjsonRoute: ApiV1OpenapiDotjsonRoute,
+  ApiV1SaudeRoute: ApiV1SaudeRoute,
   EquipeDemoAlunoAlunoIdRoute: EquipeDemoAlunoAlunoIdRoute,
+  ApiV1PagamentosBaixaRoute: ApiV1PagamentosBaixaRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

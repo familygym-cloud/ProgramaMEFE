@@ -14,6 +14,160 @@ export type Database = {
   }
   public: {
     Tables: {
+      acessos: {
+        Row: {
+          aluno_id: string
+          chave_id: string | null
+          criado_em: string
+          dia: string
+          dispositivo: string | null
+          id: string
+          momento: string
+          origem: string
+        }
+        Insert: {
+          aluno_id: string
+          chave_id?: string | null
+          criado_em?: string
+          dia: string
+          dispositivo?: string | null
+          id?: string
+          momento: string
+          origem?: string
+        }
+        Update: {
+          aluno_id?: string
+          chave_id?: string | null
+          criado_em?: string
+          dia?: string
+          dispositivo?: string | null
+          id?: string
+          momento?: string
+          origem?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "acessos_aluno_id_fkey"
+            columns: ["aluno_id"]
+            isOneToOne: false
+            referencedRelation: "alunos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "acessos_chave_id_fkey"
+            columns: ["chave_id"]
+            isOneToOne: false
+            referencedRelation: "integracao_chaves"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      integracao_chamadas: {
+        Row: {
+          chave_id: string | null
+          criada_em: string
+          detalhe: string | null
+          id: number
+          rota: string
+          status: number
+        }
+        Insert: {
+          chave_id?: string | null
+          criada_em?: string
+          detalhe?: string | null
+          id?: number
+          rota: string
+          status: number
+        }
+        Update: {
+          chave_id?: string | null
+          criada_em?: string
+          detalhe?: string | null
+          id?: number
+          rota?: string
+          status?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "integracao_chamadas_chave_id_fkey"
+            columns: ["chave_id"]
+            isOneToOne: false
+            referencedRelation: "integracao_chaves"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      integracao_chaves: {
+        Row: {
+          ativa: boolean
+          criada_em: string
+          criada_por: string | null
+          escopos: string[]
+          hash: string
+          id: string
+          nome: string
+          prefixo: string
+          revogada_em: string | null
+          ultimo_uso_em: string | null
+        }
+        Insert: {
+          ativa?: boolean
+          criada_em?: string
+          criada_por?: string | null
+          escopos: string[]
+          hash: string
+          id?: string
+          nome: string
+          prefixo: string
+          revogada_em?: string | null
+          ultimo_uso_em?: string | null
+        }
+        Update: {
+          ativa?: boolean
+          criada_em?: string
+          criada_por?: string | null
+          escopos?: string[]
+          hash?: string
+          id?: string
+          nome?: string
+          prefixo?: string
+          revogada_em?: string | null
+          ultimo_uso_em?: string | null
+        }
+        Relationships: []
+      }
+      integracao_ids_externos: {
+        Row: {
+          aluno_id: string
+          criado_em: string
+          id: string
+          id_externo: string
+          provedor: string
+        }
+        Insert: {
+          aluno_id: string
+          criado_em?: string
+          id?: string
+          id_externo: string
+          provedor: string
+        }
+        Update: {
+          aluno_id?: string
+          criado_em?: string
+          id?: string
+          id_externo?: string
+          provedor?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "integracao_ids_externos_aluno_id_fkey"
+            columns: ["aluno_id"]
+            isOneToOne: false
+            referencedRelation: "alunos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       alunos: {
         Row: {
           altura: number
@@ -596,6 +750,39 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      api_baixar_pagamento: {
+        Args: {
+          _aluno: string
+          _metodo: string
+          _pago_em: string
+          _pagamento: string
+          _referencia: string
+        }
+        Returns: string
+      }
+      api_fatos_acesso: {
+        Args: { _aluno: string }
+        Returns: Json
+      }
+      api_registrar_acesso: {
+        Args: {
+          _aluno: string
+          _chave: string
+          _dispositivo: string
+          _momento: string
+          _origem: string
+        }
+        Returns: string
+      }
+      api_resolver_aluno: {
+        Args: {
+          _aluno_id: string
+          _email: string
+          _id_externo: string
+          _provedor: string
+        }
+        Returns: string
+      }
       atualizar_meu_contato: {
         Args: { _email: string; _telefone: string }
         Returns: undefined

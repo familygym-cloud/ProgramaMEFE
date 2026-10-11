@@ -21,6 +21,7 @@ export const AREAS = [
   "treinos",
   "avaliacoes",
   "formularios",
+  "integracoes",
 ] as const;
 export type Area = (typeof AREAS)[number];
 
@@ -39,6 +40,7 @@ export const PAPEIS_POR_AREA: Record<Area, readonly PapelEquipe[]> = {
   treinos: ["staff", "professor"],
   avaliacoes: ["staff", "professor"],
   formularios: ["staff", "recepcao", "professor"],
+  integracoes: ["staff"],
 };
 
 export function ehPapelDaEquipe(papel: string): papel is PapelEquipe {
@@ -64,6 +66,8 @@ const AREA_DA_ROTA: readonly (readonly [string, Area])[] = [
   ["/prescricao-treinos", "treinos"],
   ["/registrar-avaliacao", "avaliacoes"],
   ["/formularios-mefe", "formularios"],
+  // A tela é de gestão e recepção; as chaves de API dentro dela só aparecem (e só funcionam) para a gestão.
+  ["/integracoes", "vinculos"],
 ];
 
 export function areaDaRota(pathname: string): Area | null {
