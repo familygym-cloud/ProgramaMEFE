@@ -31,6 +31,7 @@ export function CartaoAula({
         className={cn(
           "flex h-full flex-col gap-4",
           aula.reservada && "border-brand-yellow/50 bg-brand-yellow/[0.07]",
+          aula.naFila && "border-brand-yellow/30",
         )}
       >
         <div className="flex items-start justify-between gap-3">
@@ -44,6 +45,10 @@ export function CartaoAula({
           </p>
           {aula.reservada ? (
             <Selo tom="ok">Reservada</Selo>
+          ) : aula.naFila ? (
+            <Selo tom="realce">
+              {aula.posicaoFila ? `Na fila · ${aula.posicaoFila}º` : "Na lista de espera"}
+            </Selo>
           ) : emAndamento ? (
             <Selo>
               <Radio className="size-3" aria-hidden />

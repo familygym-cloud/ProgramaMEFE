@@ -173,8 +173,12 @@ export function criarDadosDemo(agora: Date = new Date()): AreaAlunoDados {
         professor: cfg.p,
         observacoes: k === 0 ? "Traga uma toalha e garrafa de água." : "",
         vagas: cfg.v,
-        ocupadas,
+        // Uma turma lotada para mostrar a lista de espera na demonstração.
+        ocupadas: d === 3 && k === 1 ? cfg.v : ocupadas,
         reservada: d === 1 && k === 1,
+        naFila: false,
+        posicaoFila: null,
+        promovidaEm: null,
       });
     }
   }

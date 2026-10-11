@@ -32,6 +32,9 @@ function aula(em: Date, reservada = true): AulaAgenda {
     vagas: 10,
     ocupadas: 3,
     reservada,
+    naFila: false,
+    posicaoFila: null,
+    promovidaEm: null,
   };
 }
 
@@ -90,5 +93,33 @@ describe("montarAvisos", () => {
     const lista = montarAvisos(dados({ ultimaAvaliacao: iso(addDays(new Date(), -150)) }));
     expect(lista.map((a) => a.id)).toEqual(["avaliacao-atrasada"]);
     expect(hoje).toBeTruthy();
+  });
+
+  it("avisa quando uma vaga da lista de espera abriu para o aluno", () => {
+    const agora = new Date();
+    const futura = aula(new Date(agora.getTime() + 50 * 3600_000));
+    const lista = montarAvisos(
+      dados({
+        agenda: [{ ...futura, promovidaEm: new Date(agora.getTime() - 3600_000).toISOString() }],
+      }),
+      agora,
+    );
+    expect(lista.map((a) => a.id)).toContain("vaga-au1");
+  });
+
+  it("não avisa de promoção antiga ou de aula que já passou", () => {
+    const agora = new Date();
+    const velha = {
+      ...aula(new Date(agora.getTime() + 50 * 3600_000)),
+      promovidaEm: new Date(agora.getTime() - 5 * 24 * 3600_000).toISOString(),
+    };
+    expect(montarAvisos(dados({ agenda: [velha] }), agora).map((a) => a.id)).not.toContain(
+      "vaga-au1",
+    );
+    const passada = {
+      ...aula(new Date(agora.getTime() - 3 * 3600_000)),
+      promovidaEm: new Date(agora.getTime() - 3600_000).toISOString(),
+    };
+    expect(montarAvisos(dados({ agenda: [passada] }), agora)).toEqual([]);
   });
 });

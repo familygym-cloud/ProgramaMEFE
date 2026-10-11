@@ -63,7 +63,7 @@ function Pagina() {
   const visiveis = useMemo(() => filtrarPorModalidade(futuras, modalidade), [futuras, modalidade]);
   const dias = useMemo(() => diasDaFaixa(futuras, visiveis, hoje), [futuras, visiveis, hoje]);
   const reservas = useMemo(
-    () => (podeReservar ? futuras.filter((a) => a.reservada) : []),
+    () => (podeReservar ? futuras.filter((a) => a.reservada || a.naFila) : []),
     [futuras, podeReservar],
   );
 

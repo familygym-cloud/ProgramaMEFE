@@ -52,6 +52,22 @@ export function montarAvisos(
     });
   }
 
+  // Vaga aberta na lista de espera: avisa por alguns dias, enquanto a aula ainda não aconteceu.
+  const DIAS_AVISO_VAGA = 3;
+  for (const a of dados.agenda) {
+    if (!a.reservada || !a.promovidaEm) continue;
+    const idade = agora.getTime() - new Date(a.promovidaEm).getTime();
+    if (idade < 0 || idade > DIAS_AVISO_VAGA * 24 * MS_HORA) continue;
+    if (dataHoraAula(a).getTime() < agora.getTime()) continue;
+    avisos.push({
+      id: `vaga-${a.id}`,
+      tom: "atencao",
+      titulo: `Abriu uma vaga! Você entrou em ${a.modalidade}`,
+      texto: `${quando(a, hoje) === "hoje" ? "Hoje" : a.data.split("-").reverse().join("/")} às ${a.horario}. Você estava na lista de espera e a vaga já é sua. Se não puder ir, cancele para liberar.`,
+      acao: { rotulo: "Ver minhas aulas", para: "/app/aulas" },
+    });
+  }
+
   const proxima = dados.agenda
     .filter((a) => a.reservada)
     .map((a) => ({ a, t: dataHoraAula(a).getTime() }))

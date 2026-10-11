@@ -437,6 +437,7 @@ export type Database = {
           aula_id: string
           created_at: string
           id: string
+          promovida_em: string | null
           status: string
         }
         Insert: {
@@ -444,6 +445,7 @@ export type Database = {
           aula_id: string
           created_at?: string
           id?: string
+          promovida_em?: string | null
           status?: string
         }
         Update: {
@@ -451,6 +453,7 @@ export type Database = {
           aula_id?: string
           created_at?: string
           id?: string
+          promovida_em?: string | null
           status?: string
         }
         Relationships: [
@@ -625,6 +628,10 @@ export type Database = {
           _vagas?: number
         }
         Returns: string
+      }
+      minha_posicao_na_fila: {
+        Args: { _aula_ids: string[] }
+        Returns: { aula_id: string; posicao: number }[]
       }
       vagas_ocupadas: {
         Args: { _aula_ids: string[] }

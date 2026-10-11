@@ -69,3 +69,14 @@ liga a pessoa errada.
 
 A migration `20261011000200` apaga as 8 fichas de demonstração (nome e e-mail `@email.com` exatamente
 iguais aos da primeira migration, e só se nunca foram ligadas a uma conta).
+
+## 7. Recursos do aluno que dependem de configuração
+
+- **Pix copia e cola da mensalidade**: defina `VITE_PIX_CHAVE` (chave Pix da academia), e se quiser
+  `VITE_PIX_NOME` e `VITE_PIX_CIDADE`, antes do build. Sem a chave o botão não aparece. A baixa da
+  parcela continua sendo feita pela recepção (o app não confirma pagamento sozinho).
+- **Lista de espera nas aulas**: vem da migration `20261011000300_lista_de_espera.sql`. Quando uma vaga
+  abre (cancelamento, remoção da reserva ou aumento de vagas), o primeiro da fila entra sozinho. O aluno
+  vê o aviso na tela inicial; não há e-mail nem WhatsApp automático.
+- **App instalável e treino offline**: o service worker (`public/sw.js`) só é registrado no site
+  publicado. O treino salvo no aparelho é apagado ao sair da conta.

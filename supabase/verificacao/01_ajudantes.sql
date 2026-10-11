@@ -11,7 +11,12 @@ BEGIN
   EXECUTE format('SET LOCAL ROLE %I', papel);
 END $$;
 
-CREATE FUNCTION t.logout() RETURNS void LANGUAGE plpgsql AS $$ BEGIN RESET ROLE; END $$;
+CREATE FUNCTION t.logout() RETURNS void LANGUAGE plpgsql AS $$
+BEGIN
+  RESET ROLE;
+  PERFORM set_config('request.jwt.claim.sub', '', true);
+  PERFORM set_config('request.jwt.claims', '', true);
+END $$;
 
 CREATE FUNCTION t.ok(cond boolean, msg text) RETURNS void LANGUAGE plpgsql AS $$
 BEGIN
