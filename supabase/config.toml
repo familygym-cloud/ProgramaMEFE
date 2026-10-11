@@ -34,6 +34,19 @@ enable_confirmations = true
 # Verificação em duas etapas (aplicativo autenticador). A tela Segurança do app cadastra
 # (mfa.enroll) e confirma (mfa.challengeAndVerify) fatores TOTP; no padrão da CLI as duas etapas
 # vêm desligadas.
+# SMTP próprio. O e-mail padrão do Supabase só entrega a membros da equipe do projeto e limita a cerca
+# de 2 por hora: sem isto, clientes não recebem a confirmação de cadastro. Descomente, defina
+# SMTP_HOST/SMTP_USER/SMTP_PASS/SMTP_FROM no ambiente de quem roda `supabase config push` e veja
+# docs/configuracao-de-producao.md. No painel: Authentication > Emails > SMTP Settings.
+# [auth.email.smtp]
+# enabled = true
+# host = "env(SMTP_HOST)"
+# port = 587
+# user = "env(SMTP_USER)"
+# pass = "env(SMTP_PASS)"
+# admin_email = "env(SMTP_FROM)"
+# sender_name = "Academia Family Gym"
+
 [auth.mfa.totp]
 enroll_enabled = true
 verify_enabled = true

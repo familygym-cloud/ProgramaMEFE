@@ -1,3 +1,4 @@
+import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import {
   CalendarCheck,
@@ -14,6 +15,9 @@ import {
 } from "lucide-react";
 import type { ComponentType, ReactNode } from "react";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
+import { podeAcessar, ROTULO_PAPEL, type Area } from "@/lib/papeis";
+import { papeisDoUsuario } from "@/lib/staff";
 import type { PerfilAcesso } from "@/lib/relatorios/perfil";
 import { cn } from "@/lib/utils";
 
@@ -21,18 +25,24 @@ const CLASSE_CHIP =
   "min-h-11 shrink-0 gap-2 rounded-full border-brand-yellow/40 bg-transparent px-3 text-xs uppercase tracking-wider text-brand-onblack hover:bg-brand-yellow hover:text-brand-black sm:px-4 sm:tracking-widest";
 
 const FERRAMENTAS = [
-  { to: "/aulas", rotulo: "Aulas", Icone: CalendarCheck },
-  { to: "/financeiro", rotulo: "Financeiro", Icone: Wallet },
-  { to: "/planos", rotulo: "Planos", Icone: Tags },
-  { to: "/termos", rotulo: "Termos", Icone: ShieldCheck },
-  { to: "/vinculos", rotulo: "Vínculos", Icone: Link2 },
-  { to: "/prescricao-treinos", rotulo: "Treinos", Icone: Dumbbell },
-  { to: "/registrar-avaliacao", rotulo: "Avaliação", Icone: Ruler },
-  { to: "/formularios-mefe", rotulo: "Formulários MEFE", Icone: ClipboardList },
+  { to: "/aulas", rotulo: "Aulas", Icone: CalendarCheck, area: "aulas" },
+  { to: "/financeiro", rotulo: "Financeiro", Icone: Wallet, area: "financeiro" },
+  { to: "/planos", rotulo: "Planos", Icone: Tags, area: "planos" },
+  { to: "/termos", rotulo: "Termos", Icone: ShieldCheck, area: "termos" },
+  { to: "/vinculos", rotulo: "Vínculos", Icone: Link2, area: "vinculos" },
+  { to: "/prescricao-treinos", rotulo: "Treinos", Icone: Dumbbell, area: "treinos" },
+  { to: "/registrar-avaliacao", rotulo: "Avaliação", Icone: Ruler, area: "avaliacoes" },
+  {
+    to: "/formularios-mefe",
+    rotulo: "Formulários MEFE",
+    Icone: ClipboardList,
+    area: "formularios",
+  },
 ] as const satisfies readonly {
   to: string;
   rotulo: string;
   Icone: ComponentType<{ className?: string }>;
+  area: Area;
 }[];
 
 const ROTULO_PERFIL: Record<PerfilAcesso, string> = {
@@ -80,20 +90,39 @@ export function BarraEquipe({
   perfil: PerfilAcesso | undefined;
   aoSair: () => void;
 }) {
+  // Só as ferramentas que o perfil da pessoa pode usar (o banco recusa o resto de qualquer forma).
+  const { data: papeis } = useQuery({
+    queryKey: ["meus-papeis"],
+    queryFn: async (): Promise<string[]> => {
+      const { data } = await supabase.auth.getUser();
+      return data.user ? papeisDoUsuario(supabase, data.user.id) : [];
+    },
+    staleTime: 5 * 60_000,
+  });
+  const papelDaEquipe = (["staff", "recepcao", "professor"] as const).find((p) =>
+    papeis?.includes(p),
+  );
+  const rotuloDaBarra = papelDaEquipe
+    ? `Equipe · ${ROTULO_PAPEL[papelDaEquipe]}`
+    : perfil
+      ? ROTULO_PERFIL[perfil]
+      : "Painel da equipe";
   return (
-    <Moldura rotulo={perfil ? ROTULO_PERFIL[perfil] : "Painel da equipe"}>
+    <Moldura rotulo={rotuloDaBarra}>
       {perfil === "staff" ? (
         <nav
           aria-label="Ferramentas da equipe"
           className="sem-barra-rolagem order-3 -mx-4 flex w-[calc(100%+2rem)] gap-2 overflow-x-auto px-4 pb-0.5 sm:order-none sm:mx-0 sm:w-auto sm:flex-1 sm:px-0"
         >
-          {FERRAMENTAS.map(({ to, rotulo, Icone }) => (
-            <Button key={to} asChild variant="outline" size="sm" className={CLASSE_CHIP}>
-              <Link to={to}>
-                <Icone className="size-3.5" aria-hidden /> {rotulo}
-              </Link>
-            </Button>
-          ))}
+          {FERRAMENTAS.filter((f) => papeis === undefined || podeAcessar(papeis, f.area)).map(
+            ({ to, rotulo, Icone }) => (
+              <Button key={to} asChild variant="outline" size="sm" className={CLASSE_CHIP}>
+                <Link to={to}>
+                  <Icone className="size-3.5" aria-hidden /> {rotulo}
+                </Link>
+              </Button>
+            ),
+          )}
         </nav>
       ) : null}
       <Button

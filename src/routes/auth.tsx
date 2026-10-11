@@ -58,8 +58,7 @@ function AuthPage() {
   const seguirParaArea = useCallback(async () => {
     const { data } = await supabase.auth.getUser();
     const destino = data.user ? await destinoPosLogin(data.user.id) : "/app";
-    if (destino === "/dashboard") await navigate({ to: "/dashboard", replace: true });
-    else await navigate({ to: "/app", replace: true });
+    await navigate({ to: destino, replace: true });
   }, [navigate]);
 
   useEffect(() => {

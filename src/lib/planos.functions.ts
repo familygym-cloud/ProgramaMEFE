@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { podeAcessar } from "@/lib/papeis";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import {
   decidirAcessoAosPrecos,
@@ -31,7 +32,10 @@ export const carregarPrecosPlanos = createServerFn({ method: "GET" })
     if (alunoRes.error) throw alunoRes.error;
 
     const acesso = decidirAcessoAosPrecos({
-      equipe: (papeisRes.data ?? []).some((p) => p.role === "staff"),
+      equipe: podeAcessar(
+        (papeisRes.data ?? []).map((p) => p.role),
+        "planos",
+      ),
       statusAluno: alunoRes.data?.status ?? null,
     });
     if (!acesso.liberado) return { estado: "bloqueado", motivo: acesso.motivo };

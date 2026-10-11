@@ -45,3 +45,17 @@ EXCEPTION WHEN OTHERS THEN
   RAISE EXCEPTION 'FALHOU: deveria passar [%]: % (%)', q, SQLERRM, SQLSTATE;
 END $$;
 GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA t TO anon, authenticated, service_role;
+
+-- Os testes entram só com o claim sub (sem aal2). A exigência de duas etapas é ligada de novo, e
+-- testada, em 06_papeis_equipe.sql.
+UPDATE private.configuracoes SET valor = 'false' WHERE chave = 'exigir_mfa_equipe';
+
+-- Login com nível de garantia (aal) no JWT, como o PostgREST entrega com TOTP concluído.
+CREATE FUNCTION t.login_aal(uid uuid, aal text) RETURNS void LANGUAGE plpgsql AS $$
+BEGIN
+  RESET ROLE;
+  PERFORM set_config('request.jwt.claim.sub', COALESCE(uid::text, ''), true);
+  PERFORM set_config('request.jwt.claims', jsonb_build_object('sub', uid, 'aal', aal)::text, true);
+  EXECUTE 'SET LOCAL ROLE authenticated';
+END $$;
+GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA t TO anon, authenticated, service_role;

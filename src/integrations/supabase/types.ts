@@ -601,6 +601,14 @@ export type Database = {
         Args: { _email_autorizado: string; _user_id: string }
         Returns: boolean
       }
+      definir_papel_equipe: {
+        Args: { _user_id: string; _papel: string }
+        Returns: undefined
+      }
+      vincular_automatico: {
+        Args: { _user_id: string }
+        Returns: string
+      }
       definir_vinculos: {
         Args: { _itens: Json }
         Returns: number
@@ -624,7 +632,7 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "staff" | "aluno"
+      app_role: "staff" | "aluno" | "recepcao" | "professor"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -752,7 +760,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["staff", "aluno"],
+      app_role: ["staff", "aluno", "recepcao", "professor"],
     },
   },
 } as const

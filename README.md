@@ -115,30 +115,7 @@ Três migrations de `supabase/migrations/` (`0000` a `0002` originais) vieram de
 
 ### Dados de demonstração da primeira migration
 
-`20260805160135_…` insere 8 alunos fictícios (e-mails `@email.com`), com avaliações e check-ins de julho de 2026. Todo banco novo nasce com eles. Antes de operar com alunos reais, apague-os (remove também avaliações, check-ins, pagamentos e reservas ligados, por `ON DELETE CASCADE`):
-
-```sql
--- Confira antes: deve listar só os 8 alunos fictícios.
-select nome, email from public.alunos where email in (
-  'ana.ribeiro@email.com', 'carlos.menezes@email.com', 'duarte.familia@email.com', 'bia.lima@email.com',
-  'joaquim.alves@email.com', 'marina.souza@email.com', 'pedro.nogueira@email.com', 'luisa.campos@email.com');
-
-delete from public.alunos where email in (
-  'ana.ribeiro@email.com', 'carlos.menezes@email.com', 'duarte.familia@email.com', 'bia.lima@email.com',
-  'joaquim.alves@email.com', 'marina.souza@email.com', 'pedro.nogueira@email.com', 'luisa.campos@email.com');
-```
-
-### Verificação do banco
-
-`supabase/verificacao/` tem testes SQL de RLS, permissões e regras (reserva com lotação, validações, chaves estrangeiras, `updated_at`), um teste de duas sessões reservando a última vaga e a conferência de tabelas e colunas com o `types.ts`. Rode só em um banco **descartável**:
-
-```sh
-createdb teste
-CONFIRMO_BANCO_DESCARTAVEL=sim DATABASE_URL=postgresql://postgres@localhost:5432/teste \
-  supabase/verificacao/executar.sh --stubs --migrar --concorrencia --tipos
-```
-
-`--stubs` cria os papéis e o `auth.uid()` em um Postgres puro; em um Supabase local (depois de `supabase db reset`) omita `--stubs` e `--migrar`.
+`20260805160135_…` insere 8 alunos fictícios (e-mails `@email.com`). A migration `20261011000200_…` apaga exatamente essas fichas (se nunca foram ligadas a uma conta), então um banco novo termina sem dados de demonstração. Os testes de `supabase/verificacao/` recriam essas fichas por conta própria (`01b_fixture_alunos.sql`).
 
 ## Autenticação (Supabase Auth)
 
@@ -218,7 +195,7 @@ O build gera o Worker em `.output/` (preset `cloudflare-module` do Nitro, com `n
 
 Passo a passo, na primeira vez:
 
-1. **Supabase**: crie o projeto, aplique as migrations (`supabase db push`), configure **Authentication > URL Configuration** (seção abaixo) e um **SMTP próprio** (o padrão do Supabase só entrega a membros da equipe e limita a cerca de 2 e-mails por hora). Modelos de e-mail em português: `supabase/email-templates/`, quando existirem.
+1. **Supabase**: crie o projeto (guia completo de SMTP, duas etapas e perfis da equipe em `docs/configuracao-de-producao.md`), aplique as migrations (`supabase db push`), configure **Authentication > URL Configuration** (seção abaixo) e um **SMTP próprio** (o padrão do Supabase só entrega a membros da equipe e limita a cerca de 2 e-mails por hora). Modelos de e-mail em português: `supabase/email-templates/`, quando existirem.
 2. **Login na Cloudflare**: `npx wrangler login` (ou exporte `CLOUDFLARE_API_TOKEN` e `CLOUDFLARE_ACCOUNT_ID` em CI).
 3. **Variáveis públicas do build** (valores públicos, embutidos no JavaScript do navegador). Copie `.env.example` para `.env.local` e preencha `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY` e `VITE_SITE_URL`. Opcionalmente `VITE_CONTATO_*` para trocar WhatsApp e endereço (há padrões no código).
 4. **Segredos do Worker** (valem para os deploys seguintes):

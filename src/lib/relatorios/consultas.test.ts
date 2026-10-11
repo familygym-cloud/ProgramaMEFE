@@ -157,18 +157,18 @@ describe("garantirStaff", () => {
     const { cliente } = criarClienteFalso({
       user_roles: [STAFF, { user_id: "aluno-9", role: "aluno" }],
     });
-    await expect(garantirStaff(cliente, "aluno-9")).rejects.toThrow(/Apenas a equipe/);
+    await expect(garantirStaff(cliente, "aluno-9")).rejects.toThrow(/Apenas a equipe de gestão/);
   });
 
   it("recusa quem não tem papel nenhum", async () => {
     const { cliente } = criarClienteFalso({ user_roles: [STAFF] });
-    await expect(garantirStaff(cliente, "fantasma")).rejects.toThrow(/Apenas a equipe/);
+    await expect(garantirStaff(cliente, "fantasma")).rejects.toThrow(/Apenas a equipe de gestão/);
   });
 
-  it("filtra a consulta pelo usuário E pelo papel (e não só pelo papel)", async () => {
+  it("filtra a consulta pelo usuário (o papel é conferido depois, contra a matriz de áreas)", async () => {
     const { cliente, consultas } = criarClienteFalso({ user_roles: [STAFF] });
     await garantirStaff(cliente, "staff-1");
-    expect(consultas[0]?.filtros).toEqual(["eq user_id=staff-1", "eq role=staff"]);
+    expect(consultas[0]?.filtros).toEqual(["eq user_id=staff-1"]);
   });
 
   it("erro do banco sobe como erro (não vira 'sem permissão' nem libera)", async () => {
@@ -188,7 +188,9 @@ describe("os relatórios só leem dados depois de confirmar que é staff", () =>
       user_roles: [{ user_id: "aluno-9", role: "aluno" }],
       alunos: [alunoLinha(A1)],
     });
-    await expect(gerarRelatorioGeral(cliente, "aluno-9", HOJE)).rejects.toThrow(/Apenas a equipe/);
+    await expect(gerarRelatorioGeral(cliente, "aluno-9", HOJE)).rejects.toThrow(
+      /Apenas a equipe de gestão/,
+    );
     expect(tabelasLidas()).toEqual(["user_roles"]);
   });
 
@@ -198,7 +200,7 @@ describe("os relatórios só leem dados depois de confirmar que é staff", () =>
       alunos: [alunoLinha(A1)],
     });
     await expect(gerarRelatorioAluno(cliente, "aluno-9", HOJE, A1, 3)).rejects.toThrow(
-      /Apenas a equipe/,
+      /Apenas a equipe de gestão/,
     );
     expect(tabelasLidas()).toEqual(["user_roles"]);
   });

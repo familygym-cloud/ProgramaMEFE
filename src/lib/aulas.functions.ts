@@ -11,16 +11,16 @@ import {
   type EntradaAula,
 } from "@/lib/aulas";
 import { buscarTudo, idDaLinha, MAX_LOTES } from "@/lib/relatorios/carga";
-import { exigirStaff } from "@/lib/staff";
+import { exigirArea } from "@/lib/staff";
 
 export type { AlunoOpcao, Aula, AulaPresente } from "@/lib/aulas";
 
-const APENAS_EQUIPE = "Apenas a equipe (staff) pode gerenciar as aulas.";
+const APENAS_EQUIPE = "Apenas a equipe pode gerenciar as aulas.";
 
 export const listarAulas = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }): Promise<{ aulas: Aula[]; alunos: AlunoOpcao[] }> => {
-    await exigirStaff(context.supabase, context.userId, APENAS_EQUIPE);
+    await exigirArea(context.supabase, context.userId, "aulas", APENAS_EQUIPE);
     const { supabase } = context;
 
     // O PostgREST devolve no máximo 1000 linhas por resposta. Sem ler tudo em lotes, a lista de
@@ -70,7 +70,7 @@ export const salvarAula = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: EntradaAula) => validarAula(input))
   .handler(async ({ data, context }) => {
-    await exigirStaff(context.supabase, context.userId, APENAS_EQUIPE);
+    await exigirArea(context.supabase, context.userId, "aulas", APENAS_EQUIPE);
     return gravarAula(context.supabase, data);
   });
 
@@ -78,7 +78,7 @@ export const excluirAula = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: { id: string }) => validarIdAula(input))
   .handler(async ({ data, context }) => {
-    await exigirStaff(context.supabase, context.userId, APENAS_EQUIPE);
+    await exigirArea(context.supabase, context.userId, "aulas", APENAS_EQUIPE);
     // O select devolve as linhas removidas: lista vazia = a aula não existia (já excluída por outra
     // pessoa), e a tela não deve anunciar "Aula removida." sem que nada tenha mudado.
     const { data: removidas, error } = await context.supabase

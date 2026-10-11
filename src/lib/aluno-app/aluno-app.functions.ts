@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { hojeBrasilia } from "@/lib/datas";
+import { perfilDosPapeis } from "@/lib/relatorios/perfil";
 import type {
   AreaAlunoDados,
   AulaAgenda,
@@ -48,22 +49,40 @@ async function buscarAluno(
   return data;
 }
 
+/**
+ * Liga a conta à ficha do aluno sozinha, mas só quando o e-mail confirmado da conta bate com UMA
+ * única ficha ainda sem conta (a regra e as recusas estão na função SQL `vincular_automatico`).
+ * Qualquer falha ou dúvida devolve falso: o vínculo manual da recepção continua valendo.
+ * Desligue com VINCULO_AUTOMATICO=desligado no servidor.
+ */
+async function vincularAutomaticamente(userId: string): Promise<boolean> {
+  if (process.env["VINCULO_AUTOMATICO"] === "desligado") return false;
+  try {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data, error } = await supabaseAdmin.rpc("vincular_automatico", { _user_id: userId });
+    if (error) throw error;
+    return data === "vinculada";
+  } catch (erro) {
+    console.error("[aluno-app] vínculo automático indisponível", erro);
+    return false;
+  }
+}
+
 export const carregarAreaAluno = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }): Promise<RespostaAreaAluno> => {
     const { supabase, userId } = context;
 
-    const aluno = await buscarAluno(supabase, userId);
+    let aluno = await buscarAluno(supabase, userId);
+    if (!aluno && (await vincularAutomaticamente(userId))) {
+      aluno = await buscarAluno(supabase, userId);
+    }
     if (!aluno) {
       const { data: papeis } = await supabase
         .from("user_roles")
         .select("role")
         .eq("user_id", userId);
-      const perfilAcesso = (papeis ?? []).some((p) => p.role === "staff")
-        ? "staff"
-        : (papeis ?? []).some((p) => p.role === "aluno")
-          ? "aluno"
-          : "sem-perfil";
+      const perfilAcesso = perfilDosPapeis(papeis ?? []);
       return { estado: "sem-vinculo", perfilAcesso };
     }
 

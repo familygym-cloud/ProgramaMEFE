@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { BrandLogo } from "@/components/BrandLogo";
+import { PerfisDaEquipe } from "@/components/vinculos/PerfisDaEquipe";
 import { traduzErroServidor } from "@/lib/erros-servidor";
 import {
   definirVinculo,
@@ -390,6 +391,9 @@ function Vinculos() {
             ) : null}
           </>
         )}
+        {data?.souGestao ? (
+          <PerfisDaEquipe contas={data.contas} perfis={data.perfisDaEquipe} />
+        ) : null}
       </main>
     </div>
   );

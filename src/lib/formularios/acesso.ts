@@ -8,9 +8,9 @@
  */
 import { redirect } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
-import { usuarioEhStaff } from "@/lib/staff";
+import { usuarioPodeAcessar } from "@/lib/staff";
 
 export async function exigirEquipeParaFormularios(userId: string): Promise<void> {
-  const equipe = await usuarioEhStaff(supabase, userId);
+  const equipe = await usuarioPodeAcessar(supabase, userId, "formularios");
   if (!equipe) throw redirect({ to: "/app" });
 }

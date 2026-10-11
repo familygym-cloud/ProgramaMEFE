@@ -99,8 +99,7 @@ function ResetPage() {
     toast.success("Senha atualizada. Você já está conectado.");
     const { data } = await supabase.auth.getUser();
     const destino = data.user ? await destinoPosLogin(data.user.id) : "/app";
-    if (destino === "/dashboard") await navigate({ to: "/dashboard", replace: true });
-    else await navigate({ to: "/app", replace: true });
+    await navigate({ to: destino, replace: true });
   }
 
   async function cancelar() {

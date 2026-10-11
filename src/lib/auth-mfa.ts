@@ -3,6 +3,7 @@ import type { Factor } from "@supabase/supabase-js";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { supabase } from "@/integrations/supabase/client";
+import { destinoDaEquipe, ehEquipe, type DestinoDaEquipe } from "@/lib/papeis";
 import { traduzErroAuth } from "@/lib/auth-erros";
 
 // Verificação em duas etapas (TOTP) e redirecionamento pós-login. Tudo aqui usa o Supabase real;
@@ -98,12 +99,20 @@ export async function exigirSegundaEtapaCumprida(): Promise<void> {
   if (await segundaEtapaPendente()) throw redirect({ to: "/auth", search: { mfa: 1 } });
 }
 
-export type DestinoPosLogin = "/dashboard" | "/app";
+/** Verdadeiro quando a sessão não está no nível de duas etapas (aal2): sem aparelho cadastrado ou sem código. */
+export async function semSegundaEtapaConcluida(): Promise<boolean> {
+  const { data, error } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+  if (error) return false;
+  return data.currentLevel !== "aal2";
+}
+
+export type DestinoPosLogin = DestinoDaEquipe | "/app";
 
 /** Equipe vai para o painel; aluno (ou conta sem papel de equipe) vai para a área do aluno. */
 export async function destinoPosLogin(userId: string): Promise<DestinoPosLogin> {
   const { data } = await supabase.from("user_roles").select("role").eq("user_id", userId);
-  return (data ?? []).some((p) => p.role === "staff") ? "/dashboard" : "/app";
+  const papeis = (data ?? []).map((p) => p.role);
+  return ehEquipe(papeis) ? destinoDaEquipe(papeis) : "/app";
 }
 
 /** Agrupa a chave secreta de quatro em quatro para facilitar a digitação. */
