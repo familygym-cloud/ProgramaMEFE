@@ -13,6 +13,7 @@ import { Toaster } from "@/components/ui/sonner";
 import appCss from "../styles.css?url";
 import urbanistLatim from "@fontsource-variable/urbanist/files/urbanist-latin-wght-normal.woff2?url";
 import { reagirAoEventoDeAuth } from "../lib/auth-sessao";
+import { limparDadosOffline, ouvirInstalacao, registrarServiceWorker } from "../lib/pwa";
 import { urlAbsoluta } from "../lib/site";
 
 const NOME_DO_SITE = "Academia Family Gym";
@@ -159,6 +160,12 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const router = useRouter();
 
+  // Aplicativo instalável e treino offline (service worker só em produção).
+  useEffect(() => {
+    registrarServiceWorker();
+    ouvirInstalacao();
+  }, []);
+
   useEffect(() => {
     let cancelado = false;
     let cancelarAssinatura: (() => void) | undefined;
@@ -181,6 +188,7 @@ function RootComponent() {
             // a próxima pessoa que usar este navegador.
             void queryClient.cancelQueries();
             queryClient.clear();
+            limparDadosOffline();
             void router.invalidate();
           } else if (decisao.acao === "atualizar") {
             void router.invalidate();

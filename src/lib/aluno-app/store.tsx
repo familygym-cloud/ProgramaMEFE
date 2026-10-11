@@ -1,4 +1,12 @@
-import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
@@ -11,6 +19,7 @@ import {
   salvarMeta,
   type RespostaAreaAluno,
 } from "./aluno-app.functions";
+import { salvarTreinosOffline } from "@/lib/pwa";
 import { hojeISO } from "./derive";
 import { criarDadosDemo } from "./fixtures";
 import type { AreaAlunoDados, NovaMeta } from "./types";
@@ -93,6 +102,11 @@ export function AlunoAppProviderReal({
   const recarregar = useCallback(() => {
     void queryClient.invalidateQueries({ queryKey: ["area-aluno"] });
   }, [queryClient]);
+
+  // Guarda as fichas de treino no aparelho para abrir o treino do dia sem internet (/offline.html).
+  useEffect(() => {
+    salvarTreinosOffline(dados);
+  }, [dados]);
 
   const acoes = useMemo<AcoesAluno>(
     () => ({

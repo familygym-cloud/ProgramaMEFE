@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { Ruler } from "lucide-react";
 import { direcaoDesejadaPeso, montarHistorico } from "@/components/app/avaliacoes/avaliacoes";
+import { ComparativoAvaliacoes } from "@/components/app/avaliacoes/ComparativoAvaliacoes";
 import { Evolucao } from "@/components/app/avaliacoes/Evolucao";
 import { HeroAvaliacao } from "@/components/app/avaliacoes/HeroAvaliacao";
 import { HistoricoAvaliacoes } from "@/components/app/avaliacoes/HistoricoAvaliacoes";
@@ -73,6 +74,10 @@ function Pagina() {
           />
         </div>
       )}
+
+      <div className="fg-entrada" style={{ animationDelay: "240ms" }}>
+        <ComparativoAvaliacoes avaliacoes={avaliacoes} medidas={medidas} />
+      </div>
 
       <div className="fg-entrada" style={{ animationDelay: "260ms" }}>
         <MedidasCorporais medidas={medidas} disponivel={modulos.medidas} />

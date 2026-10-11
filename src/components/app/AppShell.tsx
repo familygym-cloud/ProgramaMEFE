@@ -18,9 +18,11 @@ import {
 } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { BrandLogo } from "@/components/BrandLogo";
+import { AjudaFlutuante } from "@/components/app/AjudaFlutuante";
 import { Selo } from "@/components/app/ui";
 import { supabase } from "@/integrations/supabase/client";
 import { definirDemo } from "@/lib/aluno-app/store";
+import { limparDadosOffline } from "@/lib/pwa";
 import { iniciais, primeiroNome } from "@/lib/aluno-app/derive";
 import type { PerfilAluno } from "@/lib/aluno-app/types";
 import { cn } from "@/lib/utils";
@@ -129,6 +131,7 @@ function useSair(demo: boolean) {
     }
     await queryClient.cancelQueries();
     queryClient.clear();
+    limparDadosOffline();
     await supabase.auth.signOut();
     navigate({ to: "/auth", replace: true });
   };
@@ -264,6 +267,8 @@ export function AppShell({
           {children}
         </main>
       </div>
+
+      <AjudaFlutuante perfil={perfil} demo={demo} />
 
       {/* Barra inferior (mobile) */}
       <nav

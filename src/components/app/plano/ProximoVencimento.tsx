@@ -3,6 +3,7 @@ import { Eyebrow, Superficie } from "@/components/app/ui";
 import { formatarBRL } from "@/lib/planos-precos";
 import { cn } from "@/lib/utils";
 import { dataExtensa, plural } from "./datas";
+import { PagarComPix } from "./PagarComPix";
 import type { ResumoMensalidades } from "./mensalidades";
 
 function prazo(dias: number): string {
@@ -83,6 +84,7 @@ export function ProximoVencimento({ resumo }: { resumo: ResumoMensalidades }) {
         >
           {prazo(diasParaProxima)}
         </p>
+        <PagarComPix valor={proxima.valor} identificador={`FG${proxima.id}`} />
         <p className="text-xs text-muted-foreground">
           {proximaAtrasada
             ? "Sem pressa, mas vale regularizar. Fale com a recepção que a gente ajuda."
