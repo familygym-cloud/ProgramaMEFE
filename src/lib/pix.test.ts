@@ -1,5 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { crc16, gerarPixCopiaECola } from "./pix";
+import {
+  CHAVE_PIX_DA_ACADEMIA,
+  cnpjValido,
+  crc16,
+  gerarPixCopiaECola,
+  normalizarChavePix,
+  pixDaAcademia,
+} from "./pix";
 
 describe("crc16", () => {
   it("bate com o vetor de teste padrão do CRC16-CCITT-FALSE", () => {
@@ -45,5 +52,38 @@ describe("gerarPixCopiaECola", () => {
     }) as string;
     expect(pix).toContain(`5925${"N".repeat(25)}`);
     expect(pix).toContain(`6015${"C".repeat(15)}`);
+  });
+});
+
+describe("cnpjValido e normalizarChavePix", () => {
+  it("aceita o CNPJ da academia, com ou sem pontuação", () => {
+    expect(cnpjValido("63973843000194")).toBe(true);
+    expect(normalizarChavePix("63.973.843/0001-94")).toBe("63973843000194");
+    expect(normalizarChavePix("63973843000194")).toBe("63973843000194");
+  });
+
+  it("recusa CNPJ com dígito errado, sequência repetida ou faltando dígito", () => {
+    expect(cnpjValido("63973843000195")).toBe(false);
+    expect(cnpjValido("11111111111111")).toBe(false);
+    expect(normalizarChavePix("63.973.843/0001-95")).toBeNull();
+    expect(normalizarChavePix("63.93.843/0001-94")).toBeNull();
+  });
+
+  it("deixa passar chaves de outros tipos e recusa chave vazia", () => {
+    expect(normalizarChavePix("financeiro@familygym.com.br")).toBe("financeiro@familygym.com.br");
+    expect(normalizarChavePix("  ")).toBeNull();
+  });
+
+  it("o Pix da academia usa o CNPJ padrão e gera um código com ele", () => {
+    const dados = pixDaAcademia();
+    expect(dados?.chave).toBe(CHAVE_PIX_DA_ACADEMIA);
+    const codigo = gerarPixCopiaECola({ ...dados!, valor: 150 }) as string;
+    expect(codigo).toContain("br.gov.bcb.pix0114" + CHAVE_PIX_DA_ACADEMIA);
+  });
+
+  it("não gera Pix para CNPJ inválido", () => {
+    expect(
+      gerarPixCopiaECola({ chave: "63.973.843/0001-95", nome: "Academia", cidade: "Sao Paulo" }),
+    ).toBeNull();
   });
 });

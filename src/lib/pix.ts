@@ -1,5 +1,42 @@
 // Pix "copia e cola" (BR Code estático, padrão EMV do Banco Central), gerado no próprio aparelho.
-// A chave da academia vem de VITE_PIX_CHAVE; sem ela, o app não oferece o Pix.
+// A chave Pix da academia (CNPJ) é a padrão abaixo; VITE_PIX_CHAVE a substitui, por exemplo para
+// trocar de chave sem mexer no código. Chave vazia ou CNPJ inválido: o app não oferece o Pix.
+
+/** CNPJ da Family Gym (chave Pix), só números. */
+export const CHAVE_PIX_DA_ACADEMIA = "63973843000194";
+
+/** Confere os dois dígitos verificadores de um CNPJ (só números, 14 dígitos). */
+export function cnpjValido(digitos: string): boolean {
+  if (!/^\d{14}$/.test(digitos) || /^(\d)\1{13}$/.test(digitos)) return false;
+  const digito = (base: string): number => {
+    const pesos =
+      base.length === 12
+        ? [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]
+        : [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
+    const resto = base.split("").reduce((soma, d, i) => soma + Number(d) * (pesos[i] ?? 0), 0) % 11;
+    return resto < 2 ? 0 : 11 - resto;
+  };
+  const d1 = digito(digitos.slice(0, 12));
+  return d1 === Number(digitos[12]) && digito(digitos.slice(0, 12) + d1) === Number(digitos[13]);
+}
+
+/**
+ * Chave pronta para o código Pix. Chave só de números e pontuação (CNPJ ou CPF) vira só números: o
+ * CNPJ precisa ter 14 dígitos e os dígitos verificadores certos, e qualquer outro tamanho (um dígito
+ * faltando, por exemplo) é recusado, porque um erro de digitação mandaria o dinheiro para outra
+ * pessoa. E-mail, telefone (+55...) e chave aleatória passam como estão.
+ */
+export function normalizarChavePix(chave: string): string | null {
+  const limpa = chave.trim();
+  if (!limpa) return null;
+  if (/^[\d.\-/]+$/.test(limpa) && !/^[0-9a-f]{8}-[0-9a-f]{4}-/i.test(limpa)) {
+    const digitos = limpa.replace(/\D/g, "");
+    if (digitos.length === 14) return cnpjValido(digitos) ? digitos : null;
+    if (digitos.length === 11) return digitos;
+    return null;
+  }
+  return limpa;
+}
 
 export type DadosPix = {
   chave: string;
@@ -41,7 +78,7 @@ export function crc16(texto: string): string {
 
 /** Gera o texto do Pix copia e cola, ou `null` se a chave estiver vazia. */
 export function gerarPixCopiaECola(d: DadosPix): string | null {
-  const chave = d.chave.trim();
+  const chave = normalizarChavePix(d.chave);
   if (!chave) return null;
   const nome = limpar(d.nome, 25) || "ACADEMIA";
   const cidade = limpar(d.cidade, 15) || "SAO PAULO";
@@ -73,7 +110,7 @@ function env(nome: string): string {
 
 /** Dados da academia para o Pix; `null` quando a chave não foi configurada. */
 export function pixDaAcademia(): Omit<DadosPix, "valor" | "identificador"> | null {
-  const chave = env("VITE_PIX_CHAVE");
+  const chave = normalizarChavePix(env("VITE_PIX_CHAVE") || CHAVE_PIX_DA_ACADEMIA);
   if (!chave) return null;
   return {
     chave,

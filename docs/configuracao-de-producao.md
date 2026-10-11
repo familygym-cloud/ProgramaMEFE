@@ -72,8 +72,9 @@ iguais aos da primeira migration, e só se nunca foram ligadas a uma conta).
 
 ## 7. Recursos do aluno que dependem de configuração
 
-- **Pix copia e cola da mensalidade**: defina `VITE_PIX_CHAVE` (chave Pix da academia), e se quiser
-  `VITE_PIX_NOME` e `VITE_PIX_CIDADE`, antes do build. Sem a chave o botão não aparece. A baixa da
+- **Pix copia e cola da mensalidade**: a chave padrão é o CNPJ da Family Gym (`63.973.843/0001-94`, em
+  `src/lib/pix.ts`). Para trocar, defina `VITE_PIX_CHAVE` (e, se quiser, `VITE_PIX_NOME` e
+  `VITE_PIX_CIDADE`) antes do build. CNPJ com dígito errado desliga o botão. A baixa da
   parcela continua sendo feita pela recepção (o app não confirma pagamento sozinho).
 - **Lista de espera nas aulas**: vem da migration `20261011000300_lista_de_espera.sql`. Quando uma vaga
   abre (cancelamento, remoção da reserva ou aumento de vagas), o primeiro da fila entra sozinho. O aluno
