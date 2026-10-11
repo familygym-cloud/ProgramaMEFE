@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { hojeBrasilia } from "@/lib/datas";
+import { perfilDosPapeis } from "@/lib/relatorios/perfil";
 import type {
   AreaAlunoDados,
   AulaAgenda,
@@ -48,22 +49,40 @@ async function buscarAluno(
   return data;
 }
 
+/**
+ * Liga a conta à ficha do aluno sozinha, mas só quando o e-mail confirmado da conta bate com UMA
+ * única ficha ainda sem conta (a regra e as recusas estão na função SQL `vincular_automatico`).
+ * Qualquer falha ou dúvida devolve falso: o vínculo manual da recepção continua valendo.
+ * Desligue com VINCULO_AUTOMATICO=desligado no servidor.
+ */
+async function vincularAutomaticamente(userId: string): Promise<boolean> {
+  if (process.env["VINCULO_AUTOMATICO"] === "desligado") return false;
+  try {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data, error } = await supabaseAdmin.rpc("vincular_automatico", { _user_id: userId });
+    if (error) throw error;
+    return data === "vinculada";
+  } catch (erro) {
+    console.error("[aluno-app] vínculo automático indisponível", erro);
+    return false;
+  }
+}
+
 export const carregarAreaAluno = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }): Promise<RespostaAreaAluno> => {
     const { supabase, userId } = context;
 
-    const aluno = await buscarAluno(supabase, userId);
+    let aluno = await buscarAluno(supabase, userId);
+    if (!aluno && (await vincularAutomaticamente(userId))) {
+      aluno = await buscarAluno(supabase, userId);
+    }
     if (!aluno) {
       const { data: papeis } = await supabase
         .from("user_roles")
         .select("role")
         .eq("user_id", userId);
-      const perfilAcesso = (papeis ?? []).some((p) => p.role === "staff")
-        ? "staff"
-        : (papeis ?? []).some((p) => p.role === "aluno")
-          ? "aluno"
-          : "sem-perfil";
+      const perfilAcesso = perfilDosPapeis(papeis ?? []);
       return { estado: "sem-vinculo", perfilAcesso };
     }
 
@@ -117,7 +136,10 @@ export const carregarAreaAluno = createServerFn({ method: "GET" })
         .order("data", { ascending: true })
         .order("horario", { ascending: true })
         .limit(80),
-      supabase.from("reservas_aula").select("aula_id, status").eq("aluno_id", aluno.id),
+      supabase
+        .from("reservas_aula")
+        .select("aula_id, status, promovida_em")
+        .eq("aluno_id", aluno.id),
     ]);
 
     if (avaliacoesRes.error) throw avaliacoesRes.error;
@@ -162,6 +184,25 @@ export const carregarAreaAluno = createServerFn({ method: "GET" })
     const reservadas = new Set(
       (reservasRes.data ?? []).filter((r) => r.status === "reservada").map((r) => r.aula_id),
     );
+    const promovidas = new Map(
+      (reservasRes.data ?? [])
+        .filter((r) => r.status === "reservada" && r.promovida_em)
+        .map((r) => [r.aula_id, r.promovida_em as string]),
+    );
+    // Posição na fila de espera (só a do próprio aluno; a função do banco não expõe os outros).
+    const posicaoNaFila = new Map<string, number>();
+    const idsNaFila = (reservasRes.data ?? [])
+      .filter((r) => r.status === "espera")
+      .map((r) => r.aula_id);
+    if (modulos.reservas && idsNaFila.length > 0) {
+      const { data: posicoes, error } = await supabase.rpc("minha_posicao_na_fila", {
+        _aula_ids: idsNaFila,
+      });
+      // Sem a função (migration pendente), a fila só perde o número da posição.
+      if (error && !moduloAusente(error) && error.code !== "42883") throw error;
+      for (const p of posicoes ?? []) posicaoNaFila.set(p.aula_id, Number(p.posicao));
+    }
+    const naFila = new Set(idsNaFila);
 
     const agenda: AulaAgenda[] = aulasRows.map((a) => ({
       id: a.id,
@@ -173,6 +214,9 @@ export const carregarAreaAluno = createServerFn({ method: "GET" })
       vagas: a.vagas,
       ocupadas: ocupadasPorAula.get(a.id) ?? 0,
       reservada: reservadas.has(a.id),
+      naFila: naFila.has(a.id),
+      posicaoFila: posicaoNaFila.get(a.id) ?? null,
+      promovidaEm: promovidas.get(a.id) ?? null,
     }));
 
     const treinos: Treino[] = (modulos.treinos ? (treinosRes.data ?? []) : []).map((t) => ({
@@ -329,16 +373,25 @@ export const reservarAula = createServerFn({ method: "POST" })
     });
     if (ocupError) throw ocupError;
     const usadas = Number(ocupadas?.[0]?.ocupadas ?? 0);
-    if (usadas >= aula.vagas) throw new Error("Esta aula está lotada.");
 
-    const { error } = await supabase
-      .from("reservas_aula")
-      .upsert(
-        { aula_id: aula.id, aluno_id: aluno.id, status: "reservada" },
-        { onConflict: "aula_id,aluno_id" },
-      );
+    // Turma lotada: o aluno entra na lista de espera e é promovido sozinho quando abrir vaga.
+    const gravar = (status: "reservada" | "espera") =>
+      supabase
+        .from("reservas_aula")
+        .upsert(
+          { aula_id: aula.id, aluno_id: aluno.id, status },
+          { onConflict: "aula_id,aluno_id" },
+        );
+
+    let resultado: "reservada" | "espera" = usadas >= aula.vagas ? "espera" : "reservada";
+    let { error } = await gravar(resultado);
+    // Alguém pegou a última vaga entre a conferência e a gravação: cai para a fila.
+    if (error && resultado === "reservada" && /lotada/i.test(error.message)) {
+      resultado = "espera";
+      ({ error } = await gravar(resultado));
+    }
     if (error) throw error;
-    return { ok: true };
+    return { ok: true, resultado };
   });
 
 export const cancelarReservaAula = createServerFn({ method: "POST" })

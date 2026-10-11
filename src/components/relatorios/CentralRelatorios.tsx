@@ -118,7 +118,7 @@ function Cabecalho({
               variant="outline"
               onClick={aoAtualizar}
               disabled={atualizando}
-              className="h-11 gap-2 rounded-full border-white/20 bg-transparent px-5 hover:bg-white/10 hover:text-foreground"
+              className="h-11 gap-2 rounded-full border-foreground/20 bg-transparent px-5 hover:bg-foreground/10 hover:text-foreground"
             >
               <RefreshCw
                 className={atualizando ? "animate-spin motion-reduce:animate-none" : ""}
@@ -230,7 +230,7 @@ export function CentralRelatorios({
           <div className="print:hidden">
             <TabsList
               aria-label="Seções do relatório"
-              className="sem-barra-rolagem h-auto w-full justify-start gap-1 overflow-x-auto rounded-full bg-white/[0.05] p-1 sm:w-fit sm:max-w-full"
+              className="sem-barra-rolagem h-auto w-full justify-start gap-1 overflow-x-auto rounded-full bg-foreground/[0.05] p-1 sm:w-fit sm:max-w-full"
             >
               {ABAS_RELATORIO.map((id) => (
                 <TabsTrigger
@@ -267,7 +267,7 @@ export function CentralRelatorios({
         </div>
       ) : null}
 
-      <footer className="hidden border-t border-white/10 pt-3 text-xs text-muted-foreground print:block">
+      <footer className="hidden border-t border-foreground/10 pt-3 text-xs text-muted-foreground print:block">
         Family Gym · Central de relatórios · Gerado em {formatarDataExtensa(relatorio.geradoEm)}
         {modo === "demo" ? ` · ${ROTULO_DEMO}` : ""}
       </footer>

@@ -9,7 +9,7 @@ function Medida({ ligada, children }: { ligada: boolean; children: string }) {
         aria-hidden
         className={cn(
           "grid size-5 shrink-0 place-items-center rounded-full",
-          ligada ? "bg-emerald-400/15 text-emerald-300" : "bg-white/5 text-muted-foreground",
+          ligada ? "bg-foreground/15 text-foreground" : "bg-foreground/5 text-muted-foreground",
         )}
       >
         {ligada ? <Check className="size-3" strokeWidth={3} /> : <Minus className="size-3" />}

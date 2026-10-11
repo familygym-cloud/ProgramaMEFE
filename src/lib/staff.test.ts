@@ -1,7 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { describe, expect, it } from "vitest";
 import type { Database } from "@/integrations/supabase/types";
-import { exigirStaff, rotaExclusivaDaEquipe, usuarioEhStaff } from "./staff";
+import { exigirArea, exigirStaff, usuarioEhStaff } from "./staff";
 
 type Linha = { user_id: string; role: string };
 
@@ -68,25 +68,21 @@ describe("exigirStaff", () => {
   });
 });
 
-describe("rotaExclusivaDaEquipe", () => {
-  it("reconhece as telas de gestão, com ou sem barra final e subcaminhos", () => {
-    expect(rotaExclusivaDaEquipe("/aulas")).toBe(true);
-    expect(rotaExclusivaDaEquipe("/financeiro")).toBe(true);
-    expect(rotaExclusivaDaEquipe("/financeiro/")).toBe(true);
-    expect(rotaExclusivaDaEquipe("/aulas/nova")).toBe(true);
-    expect(rotaExclusivaDaEquipe("/termos")).toBe(true);
-    expect(rotaExclusivaDaEquipe("/termos/")).toBe(true);
-  });
-
-  it("não alcança as telas do aluno nem rotas de nome parecido", () => {
-    expect(rotaExclusivaDaEquipe("/app/aulas")).toBe(false);
-    expect(rotaExclusivaDaEquipe("/dashboard")).toBe(false);
-    expect(rotaExclusivaDaEquipe("/aulas-extras")).toBe(false);
-    expect(rotaExclusivaDaEquipe("/app/termos")).toBe(false);
-    expect(rotaExclusivaDaEquipe("/")).toBe(false);
-  });
-
-  it("deixa /vinculos de fora: é onde a conta autorizada ativa o perfil da equipe", () => {
-    expect(rotaExclusivaDaEquipe("/vinculos")).toBe(false);
+describe("exigirArea", () => {
+  it("segue a matriz de papéis e lança a mensagem dada para quem não cobre a área", async () => {
+    const { cliente } = clienteComPapeis([
+      STAFF,
+      { user_id: "rec-1", role: "recepcao" },
+      { user_id: "prof-1", role: "professor" },
+      { user_id: "aluno-1", role: "aluno" },
+    ]);
+    await expect(exigirArea(cliente, "staff-1", "treinos", "x")).resolves.toBeUndefined();
+    await expect(exigirArea(cliente, "rec-1", "financeiro", "x")).resolves.toBeUndefined();
+    await expect(exigirArea(cliente, "rec-1", "treinos", "Sem acesso.")).rejects.toThrow(
+      "Sem acesso.",
+    );
+    await expect(exigirArea(cliente, "prof-1", "financeiro", "Sem acesso.")).rejects.toThrow();
+    await expect(exigirArea(cliente, "prof-1", "avaliacoes", "x")).resolves.toBeUndefined();
+    await expect(exigirArea(cliente, "aluno-1", "aulas", "Sem acesso.")).rejects.toThrow();
   });
 });

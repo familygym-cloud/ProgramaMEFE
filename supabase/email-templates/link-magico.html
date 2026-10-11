@@ -1,0 +1,89 @@
+<!-- Assunto sugerido: Seu link de acesso à Academia Family Gym -->
+<!doctype html>
+<html lang="pt-BR" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="color-scheme" content="light dark">
+  <meta name="supported-color-schemes" content="light dark">
+  <title>Seu link de acesso à Academia Family Gym</title>
+  <style>
+    :root { color-scheme: light dark; supported-color-schemes: light dark; }
+    body { margin:0; padding:0; -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; }
+    table { border-collapse:collapse; }
+    @media only screen and (max-width: 620px) {
+      .contorno { width:100% !important; }
+      .miolo { padding:28px 20px !important; }
+      .titulo { font-size:26px !important; }
+      .codigo { font-size:28px !important; letter-spacing:6px !important; }
+    }
+    @media (prefers-color-scheme: dark) {
+      .fundo { background-color:#151515 !important; }
+      .cartao { background-color:#151515 !important; border:1px solid rgba(229,229,228,0.25) !important; }
+      .texto, .suave, .link, .titulo-escuro { color:#E5E5E4 !important; }
+      .botao { color:#151515 !important; }
+      .caixa-codigo { background-color:#E5E5E4 !important; }
+      .codigo { color:#151515 !important; }
+    }
+    [data-ogsc] .texto, [data-ogsc] .suave, [data-ogsc] .link { color:#E5E5E4 !important; }
+    [data-ogsb] .cartao { background-color:#151515 !important; }
+  </style>
+</head>
+<body style="margin:0;padding:0;background-color:#151515;" bgcolor="#151515">
+  <!-- Pré-visualização (texto que aparece ao lado do assunto na caixa de entrada) -->
+  <div style="display:none;max-height:0;max-width:0;overflow:hidden;opacity:0;mso-hide:all;font-size:1px;line-height:1px;color:#151515;">Entre na sua conta com um clique, sem digitar a senha.&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;</div>
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#151515" style="background-color:#151515;" class="fundo">
+    <tr>
+      <td align="center" style="padding:32px 12px;">
+        <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px;max-width:600px;" class="contorno">
+          <tr>
+            <td align="left" style="padding:0 8px 20px 8px;">
+              <!-- LOGOTIPO: wordmark em texto. Para usar a imagem da marca, hospede o arquivo em um endereço público (https)
+                   e troque este bloco por: <img src="https://SEU-ENDERECO/logo.png" width="160" alt="Family GYM" style="display:block;border:0;height:auto;"> -->
+              <span style="font-family:'Urbanist', Arial, Helvetica, sans-serif;font-size:26px;font-weight:800;letter-spacing:1px;color:#F9DB5D;text-transform:uppercase;" role="img" aria-label="Family GYM">Family GYM</span>
+            </td>
+          </tr>
+          <tr>
+            <td bgcolor="#E5E5E4" style="background-color:#E5E5E4;border-radius:24px;" class="cartao">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td style="padding:40px 40px 36px 40px;" class="miolo">
+                    <h1 style="margin:0 0 20px 0;font-family:'Urbanist', Arial, Helvetica, sans-serif;font-size:30px;font-weight:700;line-height:1.2;color:#151515;" class="titulo titulo-escuro">Seu link de acesso</h1>
+<p style="margin:0 0 16px 0;font-family:'Urbanist', Arial, Helvetica, sans-serif;font-size:16px;line-height:1.6;color:#151515;" class="texto">Olá! Use o botão abaixo para entrar na conta <strong>{{ .Email }}</strong> sem precisar digitar a senha.</p>
+
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:8px 0 24px 0;">
+                <tr>
+                  <td align="center" bgcolor="#F9DB5D" style="border-radius:999px;background-color:#F9DB5D;">
+                    <a href="{{ .ConfirmationURL }}" target="_blank" style="display:inline-block;padding:14px 32px;font-family:'Urbanist', Arial, Helvetica, sans-serif;font-size:16px;font-weight:700;line-height:1.2;color:#151515;text-decoration:none;border-radius:999px;" class="botao">Entrar na minha conta</a>
+                  </td>
+                </tr>
+              </table>
+              <p style="margin:0 0 6px 0;font-family:'Urbanist', Arial, Helvetica, sans-serif;font-size:13px;line-height:1.5;color:#151515;opacity:0.75;" class="suave">Se o botão não funcionar, copie e cole este endereço no navegador:</p>
+              <p style="margin:0 0 24px 0;font-family:'Urbanist', Arial, Helvetica, sans-serif;font-size:13px;line-height:1.5;word-break:break-all;" class="suave"><a href="{{ .ConfirmationURL }}" target="_blank" style="color:#151515;text-decoration:underline;" class="link">{{ .ConfirmationURL }}</a></p><p style="margin:0 0 12px 0;font-family:'Urbanist', Arial, Helvetica, sans-serif;font-size:16px;line-height:1.6;color:#151515;" class="texto">Se preferir, digite este código de 6 dígitos na tela de acesso:</p>
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin:8px 0 24px 0;">
+                <tr>
+                  <td align="center" bgcolor="#151515" style="background-color:#151515;border-radius:16px;padding:20px 12px;" class="caixa-codigo">
+                    <span style="font-family:'Courier New', Courier, monospace;font-size:34px;font-weight:700;letter-spacing:8px;color:#F9DB5D;" class="codigo">{{ .Token }}</span>
+                  </td>
+                </tr>
+              </table>
+                    <p style="margin:0;font-family:'Urbanist', Arial, Helvetica, sans-serif;font-size:14px;line-height:1.6;color:#151515;opacity:0.8;" class="suave">Se você não fez este pedido, pode ignorar este e-mail com tranquilidade: nada será alterado na sua conta. Nunca compartilhe este link nem o código com ninguém.</p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td align="left" style="padding:20px 8px 0 8px;font-family:'Urbanist', Arial, Helvetica, sans-serif;font-size:12px;line-height:1.6;color:#E5E5E4;opacity:0.8;">
+              Academia Family Gym &middot; R. Dias de Toledo, 456 &ndash; Vila da Saúde, São Paulo &ndash; SP, 04143-030<br>
+              Você recebeu esta mensagem porque este e-mail foi usado na área do aluno. Este é um aviso automático: não responda a este e-mail.
+              <br><a href="{{ .SiteURL }}" target="_blank" style="color:#F9DB5D;text-decoration:underline;">{{ .SiteURL }}</a>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

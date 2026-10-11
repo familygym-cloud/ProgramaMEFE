@@ -43,7 +43,7 @@ export function FrequenciaTreinosMensais({ relatorio, modo }: PropsAba) {
           ]}
         />
         <FrequenciaGraficoTreinos serie={serie} resumo={frase} />
-        <GradeDados className="border-t border-white/10 pt-4">
+        <GradeDados className="border-t border-foreground/10 pt-4">
           <Dado
             rotulo="Média mensal"
             valor={

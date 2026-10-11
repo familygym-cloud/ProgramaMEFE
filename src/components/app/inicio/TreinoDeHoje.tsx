@@ -31,7 +31,7 @@ type Props = {
 const BOTAO_PRINCIPAL =
   "h-12 rounded-full px-7 text-base font-semibold shadow-[0_12px_32px_-12px] shadow-brand-yellow/80";
 const BOTAO_SECUNDARIO =
-  "h-12 rounded-full border-white/20 bg-transparent px-6 text-base hover:bg-white/10";
+  "h-12 rounded-full border-foreground/20 bg-transparent px-6 text-base hover:bg-foreground/10";
 
 /** Separa "Treino A — Peito e Tríceps" em rótulo e título; sem separador, só há título. */
 function separarNome(nome: string): { rotulo: string | null; titulo: string } {
@@ -51,7 +51,7 @@ function MarcaDeAgua() {
 
 function Indicador({ icone, children }: { icone: ReactNode; children: ReactNode }) {
   return (
-    <li className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3.5 py-1.5 text-sm [&_svg]:size-4 [&_svg]:text-brand-yellow">
+    <li className="inline-flex items-center gap-2 rounded-full border border-foreground/10 bg-foreground/5 px-3.5 py-1.5 text-sm [&_svg]:size-4 [&_svg]:text-brand-yellow">
       {icone}
       {children}
     </li>
@@ -96,10 +96,10 @@ function TreinoPendente({ treino, aoRegistrar }: { treino: Treino; aoRegistrar: 
       </ul>
 
       {previa.length > 0 ? (
-        <ol className="relative divide-y divide-white/10 rounded-2xl border border-white/10 bg-black/20">
+        <ol className="relative divide-y divide-foreground/10 rounded-2xl border border-foreground/10 bg-background/20">
           {previa.map((e, i) => (
             <li key={e.id} className="flex items-center gap-3 px-4 py-3 text-sm">
-              <span className="grid size-6 shrink-0 place-items-center rounded-full bg-white/10 text-xs font-semibold">
+              <span className="grid size-6 shrink-0 place-items-center rounded-full bg-foreground/10 text-xs font-semibold">
                 {i + 1}
               </span>
               <span className="min-w-0 flex-1 truncate font-medium">{e.nome}</span>

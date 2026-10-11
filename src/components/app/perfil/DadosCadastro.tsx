@@ -34,7 +34,7 @@ function Dado({
       <dt className="flex items-center gap-3.5 text-xs font-medium uppercase tracking-widest text-muted-foreground">
         <span
           aria-hidden
-          className="grid size-10 shrink-0 place-items-center rounded-xl bg-white/[0.06] [&_svg]:size-[1.15rem]"
+          className="grid size-10 shrink-0 place-items-center rounded-xl bg-foreground/[0.06] [&_svg]:size-[1.15rem]"
         >
           {icone}
         </span>
@@ -93,7 +93,7 @@ export function DadosCadastro({ perfil }: { perfil: PerfilAluno }) {
         </Dado>
       </dl>
 
-      <p className="mt-auto flex items-start gap-3 rounded-2xl border border-dashed border-white/15 px-4 py-3.5 text-sm text-muted-foreground">
+      <p className="mt-auto flex items-start gap-3 rounded-2xl border border-dashed border-foreground/15 px-4 py-3.5 text-sm text-muted-foreground">
         <HeartHandshake className="mt-0.5 size-4 shrink-0 text-brand-yellow" aria-hidden />
         Para alterar nome, plano ou outros dados, fale com a recepção da Family Gym.
       </p>

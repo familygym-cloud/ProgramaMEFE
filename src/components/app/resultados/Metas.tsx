@@ -183,7 +183,7 @@ export function Metas({ dados }: { dados: AreaAlunoDados }) {
         open={removendo !== null}
         onOpenChange={(aberto) => !aberto && setRemovendo(null)}
       >
-        <AlertDialogContent className="max-w-[calc(100vw-2rem)] rounded-3xl border-white/10 sm:max-w-md sm:rounded-3xl">
+        <AlertDialogContent className="max-w-[calc(100vw-2rem)] rounded-3xl border-foreground/10 sm:max-w-md sm:rounded-3xl">
           <AlertDialogHeader className="text-left">
             <AlertDialogTitle className="font-display text-xl">Remover esta meta?</AlertDialogTitle>
             <AlertDialogDescription>
@@ -246,7 +246,7 @@ function CartaoMeta({
         <div className="flex min-w-0 items-center gap-3">
           <span
             aria-hidden
-            className="grid size-10 shrink-0 place-items-center rounded-2xl bg-white/5 text-brand-yellow [&_svg]:size-5"
+            className="grid size-10 shrink-0 place-items-center rounded-2xl bg-foreground/5 text-brand-yellow [&_svg]:size-5"
           >
             <Icone />
           </span>
@@ -274,7 +274,7 @@ function CartaoMeta({
             variant="ghost"
             onClick={aoRemover}
             aria-label={`Remover meta de ${NOME_NA_FRASE[meta.tipo]}`}
-            className="size-11 rounded-full hover:text-red-300"
+            className="size-11 rounded-full hover:text-destructive"
           >
             <Trash2 />
           </Button>
@@ -306,7 +306,7 @@ function CartaoMeta({
       </div>
 
       {meta.prazo ? (
-        <p className="mt-auto border-t border-white/10 pt-3 text-xs text-muted-foreground">
+        <p className="mt-auto border-t border-foreground/10 pt-3 text-xs text-muted-foreground">
           {textoPrazo(meta.prazo, concluida)}
         </p>
       ) : null}

@@ -46,7 +46,7 @@ function Apresentacao({
       {erro ? (
         <p
           role="alert"
-          className="rounded-2xl border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-red-200"
+          className="rounded-2xl border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive"
         >
           {erro}
         </p>
@@ -117,7 +117,7 @@ export function VerificacaoEmDuasEtapas({ dois, demo }: { dois: DoisFatores; dem
           <div className="space-y-4">
             <p
               role="alert"
-              className="rounded-2xl border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-red-200"
+              className="rounded-2xl border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive"
             >
               {dois.erro}
             </p>
@@ -125,7 +125,7 @@ export function VerificacaoEmDuasEtapas({ dois, demo }: { dois: DoisFatores; dem
               type="button"
               variant="outline"
               onClick={dois.recarregar}
-              className="h-11 rounded-xl border-white/15 bg-transparent"
+              className="h-11 rounded-xl border-foreground/15 bg-transparent"
             >
               Tentar de novo
             </Button>

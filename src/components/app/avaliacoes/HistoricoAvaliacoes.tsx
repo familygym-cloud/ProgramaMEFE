@@ -38,7 +38,7 @@ export function HistoricoAvaliacoes({
             anterior.
           </caption>
           <thead>
-            <tr className="border-y border-white/10 text-xs uppercase tracking-widest text-muted-foreground">
+            <tr className="border-y border-foreground/10 text-xs uppercase tracking-widest text-muted-foreground">
               <th scope="col" className="px-5 py-3 font-medium sm:pl-6">
                 Data
               </th>
@@ -61,8 +61,8 @@ export function HistoricoAvaliacoes({
               <tr
                 key={l.avaliacao.id}
                 className={cn(
-                  "border-b border-white/10 last:border-b-0",
-                  l.maisRecente && "bg-white/[0.04]",
+                  "border-b border-foreground/10 last:border-b-0",
+                  l.maisRecente && "bg-foreground/[0.04]",
                 )}
               >
                 <th scope="row" className="px-5 py-3.5 text-left font-medium sm:pl-6">
@@ -106,8 +106,8 @@ export function HistoricoAvaliacoes({
           <li
             key={l.avaliacao.id}
             className={cn(
-              "rounded-2xl border border-white/10 p-4",
-              l.maisRecente && "bg-white/[0.04]",
+              "rounded-2xl border border-foreground/10 p-4",
+              l.maisRecente && "bg-foreground/[0.04]",
             )}
           >
             <div className="flex items-start justify-between gap-3">
@@ -143,7 +143,7 @@ export function HistoricoAvaliacoes({
           variant="outline"
           aria-expanded={todas}
           onClick={() => setTodas((v) => !v)}
-          className="h-11 self-start rounded-full border-white/20 bg-transparent px-5 hover:bg-white/10"
+          className="h-11 self-start rounded-full border-foreground/20 bg-transparent px-5 hover:bg-foreground/10"
         >
           {todas ? "Mostrar menos" : `Mostrar todas (${linhas.length})`}
           <ChevronDown className={cn("transition-transform", todas && "rotate-180")} aria-hidden />

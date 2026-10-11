@@ -10,8 +10,8 @@ const VARIANTES: Record<Variante, string> = {
   primario:
     "bg-brand-yellow text-brand-black shadow-[0_12px_32px_-12px] shadow-brand-yellow/70 hover:-translate-y-0.5 hover:bg-brand-yellow/90 active:translate-y-0",
   secundario:
-    "border border-white/15 bg-white/5 text-foreground hover:border-white/30 hover:bg-white/10",
-  fantasma: "text-foreground/80 hover:bg-white/5 hover:text-foreground",
+    "border border-foreground/15 bg-foreground/5 text-foreground hover:border-foreground/30 hover:bg-foreground/10",
+  fantasma: "text-foreground/80 hover:bg-foreground/5 hover:text-foreground",
   // Usados sobre o bloco amarelo do chamado final.
   escuro:
     "bg-brand-black text-brand-yellow hover:-translate-y-0.5 hover:bg-brand-black/90 active:translate-y-0",

@@ -21,13 +21,13 @@ import {
   Waves,
   type LucideIcon,
 } from "lucide-react";
-import type { CategoriaPlano } from "./precos";
+import type { CategoriaPlano } from "@/lib/planos-info";
 
 export type ItemModalidade = {
   nome: string;
   descricao: string;
   icone: LucideIcon;
-  /** Planos do catálogo oficial que incluem a modalidade. */
+  /** Planos oficiais (planos-info.ts) que incluem a modalidade. */
   planos: string[];
 };
 
@@ -47,7 +47,7 @@ export type FrenteTreino = {
 
 const TERRESTRE = ["Plano Terrestre"];
 
-// Modalidades, planos e idades vêm do catálogo oficial (planos-catalogo.ts).
+// Modalidades, planos e idades seguem os planos oficiais (planos-info.ts).
 // As descrições explicam cada prática em termos gerais, sem prometer horários ou turmas.
 export const frentesTreino: FrenteTreino[] = [
   {

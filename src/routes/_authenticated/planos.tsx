@@ -5,12 +5,12 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { BrandLogo } from "@/components/BrandLogo";
-import {
-  categoriasPlanos,
-  descreverOpcao,
-  formatarBRL,
-  planosCatalogo,
-} from "@/lib/planos-catalogo";
+import { usePrecosDosPlanos } from "@/lib/planos-hook";
+import { categoriasPlanos } from "@/lib/planos-info";
+import { descreverOpcao, formatarBRL, type PlanoCatalogo } from "@/lib/planos-precos";
+
+/** Referência estável para o useMemo quando os valores ainda não chegaram. */
+const SEM_PLANOS: PlanoCatalogo[] = [];
 
 export const Route = createFileRoute("/_authenticated/planos")({
   head: () => ({
@@ -36,10 +36,12 @@ export const Route = createFileRoute("/_authenticated/planos")({
 function Planos() {
   const [filtro, setFiltro] = useState<string>("Todos");
 
+  // Valores vêm do banco: a equipe os lê pela policy de planos_precos (nada disso é público).
+  const precos = usePrecosDosPlanos(false);
+  const planos = precos.estado === "ok" ? precos.planos : SEM_PLANOS;
   const lista = useMemo(
-    () =>
-      filtro === "Todos" ? planosCatalogo : planosCatalogo.filter((p) => p.categoria === filtro),
-    [filtro],
+    () => (filtro === "Todos" ? planos : planos.filter((p) => p.categoria === filtro)),
+    [filtro, planos],
   );
 
   return (
@@ -85,6 +87,24 @@ function Planos() {
             </Button>
           ))}
         </div>
+
+        {precos.estado === "carregando" ? (
+          <p role="status" className="text-sm text-muted-foreground">
+            Carregando os valores…
+          </p>
+        ) : precos.estado === "erro" ? (
+          <div role="alert" className="space-y-3 text-sm">
+            <p className="text-muted-foreground">{precos.mensagem}</p>
+            <Button size="sm" variant="outline" onClick={precos.tentarDeNovo}>
+              Tentar de novo
+            </Button>
+          </div>
+        ) : precos.estado !== "ok" || planos.length === 0 ? (
+          <p role="status" className="max-w-2xl text-sm text-muted-foreground">
+            Os valores dos planos ainda não foram cadastrados no banco. Rode o SQL de carga dos
+            valores no Supabase (veja a seção &ldquo;Valores dos planos&rdquo; do README).
+          </p>
+        ) : null}
 
         <section className="grid gap-4 md:grid-cols-2">
           {lista.map((plano) => (

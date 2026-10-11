@@ -56,8 +56,8 @@ function Campo({
           aria-invalid={erro ? true : undefined}
           aria-describedby={erro ? `${idAjuda} ${idErro}` : idAjuda}
           className={cn(
-            "h-12 rounded-2xl border-white/15 bg-white/[0.03] pl-11 pr-4 text-base md:text-base",
-            erro && "border-red-400/70",
+            "h-12 rounded-2xl bg-foreground/[0.03] pl-11 pr-4 text-base md:text-base",
+            erro && "border-destructive/70",
           )}
           {...entrada}
         />
@@ -66,7 +66,7 @@ function Campo({
         {ajuda}
       </p>
       {erro ? (
-        <p id={idErro} role="alert" className="text-sm font-medium text-red-300">
+        <p id={idErro} role="alert" className="text-sm font-medium text-destructive">
           {erro}
         </p>
       ) : null}
@@ -202,7 +202,7 @@ export function FormularioContato() {
             role="status"
             className={cn(
               "flex min-h-5 items-center gap-1.5 text-sm",
-              confirmado && !alterado ? "font-medium text-emerald-300" : "text-muted-foreground",
+              confirmado && !alterado ? "font-medium text-foreground" : "text-muted-foreground",
             )}
           >
             {confirmado && !alterado ? (

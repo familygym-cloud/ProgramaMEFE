@@ -2,7 +2,7 @@ import { useId, useState } from "react";
 import { Check, ChevronDown, Clock, TriangleAlert, type LucideIcon } from "lucide-react";
 import { BarraProgresso, Eyebrow, Selo, Superficie } from "@/components/app/ui";
 import type { PagamentoAluno } from "@/lib/aluno-app/types";
-import { formatarBRL } from "@/lib/planos-catalogo";
+import { formatarBRL } from "@/lib/planos-precos";
 import { cn } from "@/lib/utils";
 import { dataCurta, plural } from "./datas";
 import { situacaoParcela, type ResumoMensalidades, type SituacaoParcela } from "./mensalidades";
@@ -11,16 +11,16 @@ const VISUAL: Record<
   SituacaoParcela,
   { icone: LucideIcon; marcador: string; rotulo: string; tom: "ok" | "neutro" | "alerta" }
 > = {
-  pago: { icone: Check, marcador: "bg-emerald-400/15 text-emerald-300", rotulo: "Pago", tom: "ok" },
+  pago: { icone: Check, marcador: "bg-foreground/15 text-foreground", rotulo: "Pago", tom: "ok" },
   pendente: {
     icone: Clock,
-    marcador: "bg-white/10 text-foreground/80",
+    marcador: "bg-foreground/10 text-foreground/80",
     rotulo: "Pendente",
     tom: "neutro",
   },
   atrasado: {
     icone: TriangleAlert,
-    marcador: "bg-red-400/15 text-red-300",
+    marcador: "bg-destructive/15 text-destructive",
     rotulo: "Atrasado",
     tom: "alerta",
   },
@@ -55,7 +55,7 @@ function Parcela({
         {primeira && ultima ? null : (
           <span
             aria-hidden
-            className="absolute left-1/2 w-px -translate-x-1/2 bg-white/10"
+            className="absolute left-1/2 w-px -translate-x-1/2 bg-foreground/10"
             style={{
               top: primeira ? CENTRO_MARCADOR : 0,
               bottom: ultima ? `calc(100% - ${CENTRO_MARCADOR}px)` : 0,
@@ -71,7 +71,7 @@ function Parcela({
       <div
         className={cn(
           "mb-1 flex min-w-0 flex-1 items-center justify-between gap-3 rounded-2xl px-3.5 py-3",
-          destaque && "bg-white/[0.06] ring-1 ring-white/15",
+          destaque && "bg-foreground/[0.06] ring-1 ring-foreground/15",
         )}
       >
         <div className="min-w-0">
@@ -151,7 +151,7 @@ export function Mensalidades({ pagamentos, resumo }: Props) {
           aria-expanded={historicoAberto}
           aria-controls={idLista}
           onClick={() => setHistoricoAberto((aberto) => !aberto)}
-          className="flex min-h-11 w-full items-center justify-between gap-3 rounded-2xl border border-white/10 px-4 text-sm font-medium transition-colors hover:bg-white/5"
+          className="flex min-h-11 w-full items-center justify-between gap-3 rounded-2xl border border-foreground/10 px-4 text-sm font-medium transition-colors hover:bg-foreground/5"
         >
           <span>
             {historicoAberto ? "Ocultar" : "Mostrar"}{" "}

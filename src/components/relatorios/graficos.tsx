@@ -25,13 +25,25 @@ import { useAnimar } from "@/components/relatorios/useAnimar";
 import { LARGURA_GRAFICO_IMPRESSAO, useImpressao } from "@/components/relatorios/useImpressao";
 import { cn } from "@/lib/utils";
 
-// Gráficos da Central. Cores vêm das variáveis da marca (amarelo e cinza), que a impressão
-// redefine para tons escuros; cada gráfico tem resumo falado e tabela de dados para leitores de tela.
+// Gráficos da Central. Cores vêm das variáveis da marca (Amarelo para o dado principal, Alabastro
+// para a referência); na impressão o Alabastro vira Onix e o Amarelo ganha contorno Onix. A série
+// nunca depende só da cor: barra x linha, traço contínuo x tracejado e legenda com o mesmo desenho.
+// Cada gráfico tem resumo falado e tabela de dados para leitores de tela.
 
+/** Preenchimento do dado principal (barras). No papel ganha contorno Onix (CONTORNO). */
 export const AMARELO = "var(--brand-yellow)";
+/** Linhas e pontos do dado principal: Amarelo na tela, Onix no papel (Amarelo sobre branco não se lê). */
+export const LINHA = "var(--linha-destaque)";
+/** Linha de referência: Alabastro na tela, Onix no papel. */
 export const CINZA = "var(--brand-grey)";
+/** Contorno das barras: invisível na tela, Onix no papel. */
+export const CONTORNO = "var(--contorno-grafico)";
 export const EIXO = { fontSize: 12, fill: "var(--muted-foreground)" } as const;
 export const GRADE = "var(--border)";
+/** Anel do ponto ativo (cursor sobre a linha): o padrão do Recharts é branco, aqui segue a cor do cartão. */
+export const PONTO_ATIVO = { r: 5, stroke: "var(--card)", strokeWidth: 2 } as const;
+/** Cursor vertical dos gráficos com barras e linha: o padrão do Recharts é um cinza fora da paleta. */
+export const CURSOR_VERTICAL = { stroke: "var(--input)", fill: "none" } as const;
 
 /** Dados do gráfico em tabela, só para leitores de tela. */
 export function TabelaAcessivel({
@@ -130,9 +142,9 @@ export function LegendaGrafico({ itens }: { itens: readonly ItemLegenda[] }) {
               item.marca === "linha"
                 ? "h-0 w-5 border-t-2 border-dashed border-brand-grey"
                 : "size-3 rounded-[4px]",
-              item.marca === "barra" && "bg-brand-yellow",
+              item.marca === "barra" && "bg-brand-yellow ring-1 ring-(--contorno-grafico)",
               item.marca === "andamento" &&
-                "border border-dashed border-brand-yellow bg-brand-yellow/40",
+                "border border-dashed border-(--linha-destaque) bg-brand-yellow/40",
             )}
           />
           {item.rotulo}
@@ -146,7 +158,7 @@ export function LegendaGrafico({ itens }: { itens: readonly ItemLegenda[] }) {
 
 export function CaixaTooltip({ titulo, children }: { titulo: string; children: ReactNode }) {
   return (
-    <div className="min-w-40 rounded-xl border border-white/15 bg-popover/95 p-3 text-xs text-popover-foreground shadow-xl backdrop-blur">
+    <div className="min-w-40 rounded-xl border border-foreground/15 bg-popover/95 p-3 text-xs text-popover-foreground shadow-xl backdrop-blur">
       <p className="mb-1.5 font-semibold">{titulo}</p>
       <div className="space-y-1">{children}</div>
     </div>
@@ -244,14 +256,14 @@ export function GraficoReceitaPrevista({
           width={46}
           tickFormatter={(v: number) => formatarCompacto(v)}
         />
-        <Tooltip cursor={{ fill: "var(--border)", opacity: 0.4 }} content={<TooltipReceita />} />
+        <Tooltip cursor={CURSOR_VERTICAL} content={<TooltipReceita />} />
         <Bar dataKey="recebido" radius={[6, 6, 0, 0]} maxBarSize={34} isAnimationActive={animar}>
           {dados.map((p) => (
             <Cell
               key={p.chave}
               fill={AMARELO}
               fillOpacity={p.emAndamento ? 0.4 : 1}
-              stroke={p.emAndamento ? AMARELO : "none"}
+              stroke={p.emAndamento ? LINHA : CONTORNO}
               strokeDasharray={p.emAndamento ? "4 3" : undefined}
             />
           ))}
@@ -263,7 +275,7 @@ export function GraficoReceitaPrevista({
           strokeWidth={2}
           strokeDasharray="5 4"
           dot={{ r: 3, fill: CINZA, stroke: "none" }}
-          activeDot={{ r: 5 }}
+          activeDot={PONTO_ATIVO}
           isAnimationActive={animar}
         />
       </ComposedChart>
@@ -324,11 +336,12 @@ export function GraficoCadastros({
           width={32}
           allowDecimals={false}
         />
-        <Tooltip cursor={{ fill: "var(--border)", opacity: 0.4 }} content={<TooltipCadastros />} />
+        <Tooltip cursor={CURSOR_VERTICAL} content={<TooltipCadastros />} />
         <Bar
           yAxisId="novos"
           dataKey="novos"
           fill={AMARELO}
+          stroke={CONTORNO}
           radius={[6, 6, 0, 0]}
           maxBarSize={28}
           isAnimationActive={animar}
@@ -340,7 +353,7 @@ export function GraficoCadastros({
           stroke={CINZA}
           strokeWidth={2}
           dot={false}
-          activeDot={{ r: 5 }}
+          activeDot={PONTO_ATIVO}
           isAnimationActive={animar}
         />
       </ComposedChart>
@@ -402,6 +415,7 @@ export function GraficoBarrasRelatorio({
             <Cell
               key={d.nome}
               fill={AMARELO}
+              stroke={CONTORNO}
               fillOpacity={d.valor === maior && maior > 0 ? 1 : 0.55}
             />
           ))}
@@ -420,7 +434,7 @@ export type ItemBarraHorizontal = {
   /** Texto do valor, já formatado. */
   rotuloValor: string;
   detalhe?: string;
-  /** "alerta" pinta a barra de vermelho (ex.: atraso crítico). */
+  /** "alerta" pinta a barra de vermelho com hachura (ex.: atraso crítico). */
   tom?: "normal" | "alerta";
 };
 
@@ -462,11 +476,14 @@ export function BarrasHorizontais({
               <span className="min-w-0 break-words leading-snug">{item.nome}</span>
               <span className="shrink-0 font-semibold tabular-nums">{item.rotuloValor}</span>
             </div>
-            <div aria-hidden className="mt-1.5 h-2 w-full overflow-hidden rounded-full bg-white/10">
+            <div
+              aria-hidden
+              className="mt-1.5 h-2 w-full overflow-hidden rounded-full bg-foreground/10"
+            >
               <div
                 className={cn(
-                  "h-full rounded-full",
-                  item.tom === "alerta" ? "bg-red-400" : "bg-brand-yellow",
+                  "h-full rounded-full ring-1 ring-(--contorno-grafico)",
+                  item.tom === "alerta" ? "hachura bg-destructive" : "bg-brand-yellow",
                 )}
                 style={{
                   width: `${maior > 0 ? Math.max(percentualDe(item.valor, maior), item.valor > 0 ? 2 : 0) : 0}%`,

@@ -126,7 +126,7 @@ export function Frequencia({ dados }: { dados: AreaAlunoDados }) {
             </ul>
           )}
           {diaForte && diaForte.treinos > 0 ? (
-            <p className="mt-6 rounded-2xl border border-white/10 bg-white/[0.03] p-4 text-sm text-muted-foreground">
+            <p className="mt-6 rounded-2xl border border-foreground/10 bg-foreground/[0.03] p-4 text-sm text-muted-foreground">
               Seu dia mais forte é{" "}
               <strong className="font-semibold text-foreground">
                 {diaForte.nome.toLowerCase()}

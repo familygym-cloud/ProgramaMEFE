@@ -1,7 +1,8 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { Link } from "@tanstack/react-router";
-import { Loader2, Mail, MailCheck, PlayCircle } from "lucide-react";
+import { Loader2, Mail, PlayCircle } from "lucide-react";
 import { CampoAuth, CampoSenha } from "@/components/auth/CampoAuth";
+import { ConfiraSeuEmail } from "@/components/auth/ConfiraSeuEmail";
 import { ForcaSenha } from "@/components/auth/ForcaSenha";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -46,7 +47,8 @@ export function FormularioAcesso({
   const [carregando, setCarregando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
   const [aviso, setAviso] = useState<string | null>(null);
-  const [pendente, setPendente] = useState<string | null>(null);
+  // E-mail aguardando confirmação; `jaEnviado` diz se o e-mail acabou de sair (cadastro).
+  const [pendente, setPendente] = useState<{ email: string; jaEnviado: boolean } | null>(null);
 
   const textos = TEXTOS[modo];
 
@@ -58,21 +60,6 @@ export function FormularioAcesso({
     setModo(novo);
     setErro(null);
     setAviso(null);
-  }
-
-  async function reenviar() {
-    if (!pendente) return;
-    setErro(null);
-    setAviso(null);
-    setCarregando(true);
-    const { error } = await supabase.auth.resend({
-      type: "signup",
-      email: pendente,
-      options: { emailRedirectTo: `${window.location.origin}/auth` },
-    });
-    setCarregando(false);
-    if (error) return setErro(traduzErroAuth(error));
-    setAviso("Novo e-mail de confirmação enviado.");
   }
 
   async function esqueciSenha() {
@@ -102,7 +89,8 @@ export function FormularioAcesso({
         const { error } = await supabase.auth.signInWithPassword({ email: em, password: senha });
         if (error) {
           if (error.message.toLowerCase().includes("email not confirmed")) {
-            setPendente(em);
+            setSenha("");
+            setPendente({ email: em, jaEnviado: false });
             return;
           }
           throw error;
@@ -123,14 +111,34 @@ export function FormularioAcesso({
           await aoAutenticar();
           return;
         }
-        setPendente(em);
-        setModo("login");
+        setSenha("");
+        setPendente({ email: em, jaEnviado: true });
       }
     } catch (err) {
       setErro(traduzErroAuth(err));
     } finally {
       setCarregando(false);
     }
+  }
+
+  if (pendente) {
+    return (
+      <ConfiraSeuEmail
+        email={pendente.email}
+        jaEnviado={pendente.jaEnviado}
+        aoUsarOutroEmail={() => {
+          setPendente(null);
+          setEmail("");
+          setSenha("");
+          trocarModo("signup");
+        }}
+        aoJaConfirmei={() => {
+          setEmail(pendente.email);
+          setPendente(null);
+          trocarModo("login");
+        }}
+      />
+    );
   }
 
   return (
@@ -145,7 +153,7 @@ export function FormularioAcesso({
       <div
         role="group"
         aria-label="Tipo de acesso"
-        className="fg-entrada grid grid-cols-2 gap-1 rounded-full border border-white/10 bg-white/[0.04] p-1"
+        className="fg-entrada grid grid-cols-2 gap-1 rounded-full border border-foreground/10 bg-foreground/[0.04] p-1"
         style={{ animationDelay: "60ms" }}
       >
         {(["login", "signup"] as const).map((m) => (
@@ -157,7 +165,7 @@ export function FormularioAcesso({
             className={cn(
               "h-11 rounded-full px-4 text-sm font-semibold transition-colors",
               modo === m
-                ? "bg-white text-brand-black"
+                ? "bg-foreground text-brand-black"
                 : "text-muted-foreground hover:text-foreground",
             )}
           >
@@ -210,36 +218,10 @@ export function FormularioAcesso({
           )}
         </div>
 
-        {pendente ? (
-          <div
-            role="status"
-            className="space-y-3 rounded-2xl border border-brand-yellow/40 bg-brand-yellow/10 p-4"
-          >
-            <div className="flex items-center gap-2">
-              <MailCheck aria-hidden className="size-5 text-brand-yellow" />
-              <p className="text-sm font-semibold text-brand-yellow">Aguardando validação</p>
-            </div>
-            <p className="text-sm leading-relaxed text-foreground/80">
-              Enviamos um link de confirmação para{" "}
-              <strong className="font-semibold text-foreground">{pendente}</strong>. Abra o e-mail
-              (verifique também o spam) e clique no link. Só depois disso o acesso será liberado.
-            </p>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={reenviar}
-              disabled={carregando}
-              className="h-11 w-full rounded-2xl border-brand-yellow/40 bg-transparent text-brand-yellow hover:bg-brand-yellow hover:text-brand-black"
-            >
-              Reenviar e-mail de confirmação
-            </Button>
-          </div>
-        ) : null}
-
         {erro ? (
           <p
             role="alert"
-            className="rounded-2xl border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-red-200"
+            className="rounded-2xl border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive"
           >
             {erro}
           </p>
@@ -265,14 +247,14 @@ export function FormularioAcesso({
 
       <div className="fg-entrada space-y-4" style={{ animationDelay: "180ms" }}>
         <div className="flex items-center gap-3 text-xs uppercase tracking-[0.2em] text-muted-foreground">
-          <span className="h-px flex-1 bg-white/10" />
+          <span className="h-px flex-1 bg-foreground/10" />
           ou
-          <span className="h-px flex-1 bg-white/10" />
+          <span className="h-px flex-1 bg-foreground/10" />
         </div>
         <Button
           asChild
           variant="outline"
-          className="h-12 w-full rounded-2xl border-white/15 bg-transparent text-base font-medium hover:bg-white/10"
+          className="h-12 w-full rounded-2xl border-foreground/15 bg-transparent text-base font-medium hover:bg-foreground/10"
         >
           <Link to="/app" search={{ demo: true }}>
             <PlayCircle aria-hidden />

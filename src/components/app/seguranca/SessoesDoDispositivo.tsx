@@ -27,7 +27,7 @@ export function SessoesDoDispositivo({ demo }: { demo: boolean }) {
       className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between sm:gap-8"
     >
       <div className="flex items-start gap-3.5">
-        <span className="grid size-11 shrink-0 place-items-center rounded-2xl bg-white/5">
+        <span className="grid size-11 shrink-0 place-items-center rounded-2xl bg-foreground/5">
           <MonitorSmartphone aria-hidden className="size-5" />
         </span>
         <div className="space-y-1">
@@ -43,7 +43,7 @@ export function SessoesDoDispositivo({ demo }: { demo: boolean }) {
         type="button"
         variant="outline"
         onClick={() => setAberto(true)}
-        className="h-12 shrink-0 rounded-2xl border-white/15 bg-transparent px-6 text-base font-medium hover:bg-white/10"
+        className="h-12 shrink-0 rounded-2xl border-foreground/15 bg-transparent px-6 text-base font-medium hover:bg-foreground/10"
       >
         Sair de outros dispositivos
       </Button>

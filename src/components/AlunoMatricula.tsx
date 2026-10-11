@@ -24,7 +24,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { listarAgendaAluno } from "@/lib/aluno-agenda.functions";
-import { descreverOpcao, formatarBRL, planoDoAluno } from "@/lib/planos-catalogo";
+import { usePrecosDosPlanos } from "@/lib/planos-hook";
+import { encontrarPlano } from "@/lib/planos-info";
+import { descreverOpcao, formatarBRL } from "@/lib/planos-precos";
 import type { Membro } from "@/lib/familygym-data";
 
 function dataBR(d: string) {
@@ -116,7 +118,11 @@ export function AlunoMatricula({ aluno }: { aluno: Membro }) {
   const falhou = Boolean(error);
   const tentarDeNovo = () => void refetch();
 
-  const catalogo = planoDoAluno(aluno.plano);
+  // Os valores vêm do banco (só a equipe e alunos ativos os recebem); o resto do plano é público.
+  const precos = usePrecosDosPlanos(false);
+  const info = encontrarPlano(aluno.plano);
+  const catalogo =
+    precos.estado === "ok" ? precos.planos.find((p) => p.slug === info?.slug) : undefined;
 
   return (
     <div className="grid gap-4 lg:grid-cols-3">
@@ -140,8 +146,8 @@ export function AlunoMatricula({ aluno }: { aluno: Membro }) {
           <Info
             icon={Dumbbell}
             label="Plano"
-            value={catalogo?.nome ?? aluno.plano}
-            sub={catalogo?.resumo}
+            value={info?.nome ?? aluno.plano}
+            sub={info?.resumo}
           />
           <Info icon={Clock} label="Turno" value={aluno.turno || "—"} />
           <Info
@@ -153,7 +159,13 @@ export function AlunoMatricula({ aluno }: { aluno: Membro }) {
             icon={Users}
             label="Taxa de matrícula"
             value={catalogo ? formatarBRL(catalogo.matricula) : "—"}
-            sub={catalogo ? "Valor de tabela, cobrado na adesão" : "Confirme com a recepção"}
+            sub={
+              catalogo
+                ? "Valor de tabela, cobrado na adesão"
+                : precos.estado === "carregando"
+                  ? "Carregando…"
+                  : "Confirme com a recepção"
+            }
           />
         </div>
 
@@ -173,8 +185,8 @@ export function AlunoMatricula({ aluno }: { aluno: Membro }) {
                 </Badge>
               ) : null}
             </div>
-            {catalogo.inclui?.length ? (
-              <p className="text-xs text-muted-foreground">Inclui: {catalogo.inclui.join(", ")}.</p>
+            {info?.inclui?.length ? (
+              <p className="text-xs text-muted-foreground">Inclui: {info.inclui.join(", ")}.</p>
             ) : null}
             {catalogo.observacoes?.length ? (
               <ul className="list-disc space-y-1 pl-4 text-xs text-muted-foreground">
@@ -186,14 +198,14 @@ export function AlunoMatricula({ aluno }: { aluno: Membro }) {
           </div>
         ) : null}
 
-        {catalogo?.modalidades?.length ? (
+        {info?.modalidades?.length ? (
           <div className="space-y-2 rounded-xl border border-border p-4">
             <div className="flex items-center gap-1.5 text-sm font-medium">
               <Sparkles className="size-4 text-primary" />
               Modalidades liberadas no plano
             </div>
             <div className="flex flex-wrap gap-1.5">
-              {catalogo.modalidades.map((m) => (
+              {info.modalidades.map((m) => (
                 <Badge key={m} variant="outline" className="font-normal">
                   {m}
                 </Badge>

@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#151515" />
+    <title>Sem internet | Academia Family Gym</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <style>
+      :root {
+        color-scheme: dark;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: #151515;
+        color: #e5e5e4;
+        font-family: Urbanist, "Helvetica Neue", Arial, sans-serif;
+        line-height: 1.5;
+      }
+      main {
+        max-width: 36rem;
+        margin: 0 auto;
+        padding: 1.5rem 1rem 3rem;
+      }
+      h1 {
+        font-size: 1.75rem;
+        margin: 0.25rem 0 0.5rem;
+      }
+      .eyebrow {
+        color: #f9db5d;
+        font-size: 0.75rem;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+      }
+      .muted {
+        color: rgba(229, 229, 228, 0.7);
+        font-size: 0.9rem;
+      }
+      .cartao {
+        border: 1px solid rgba(229, 229, 228, 0.15);
+        border-radius: 1.25rem;
+        padding: 1rem;
+        margin: 1rem 0;
+        background: rgba(229, 229, 228, 0.05);
+      }
+      .cartao h2 {
+        margin: 0 0 0.25rem;
+        font-size: 1.15rem;
+      }
+      .tag {
+        display: inline-block;
+        background: #f9db5d;
+        color: #151515;
+        font-weight: 700;
+        font-size: 0.7rem;
+        padding: 0.15rem 0.6rem;
+        border-radius: 999px;
+        margin-bottom: 0.5rem;
+      }
+      ol {
+        margin: 0.5rem 0 0;
+        padding-left: 1.25rem;
+      }
+      li {
+        margin: 0.4rem 0;
+      }
+      li small {
+        display: block;
+        color: rgba(229, 229, 228, 0.7);
+      }
+      button,
+      a.botao {
+        display: inline-flex;
+        align-items: center;
+        min-height: 2.75rem;
+        padding: 0 1.25rem;
+        border-radius: 999px;
+        border: 0;
+        background: #f9db5d;
+        color: #151515;
+        font: inherit;
+        font-weight: 700;
+        cursor: pointer;
+        text-decoration: none;
+      }
+      :focus-visible {
+        outline: 3px solid #f9db5d;
+        outline-offset: 3px;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <p class="eyebrow">Sem internet</p>
+      <h1>Seu treino continua com você</h1>
+      <p class="muted" id="situacao">Procurando o treino salvo neste aparelho…</p>
+      <div id="treinos"></div>
+      <p><button type="button" id="tentar">Tentar de novo</button></p>
+    </main>
+    <script>
+      (function () {
+        var DIAS = [
+          "domingo",
+          "segunda-feira",
+          "terça-feira",
+          "quarta-feira",
+          "quinta-feira",
+          "sexta-feira",
+          "sábado",
+        ];
+        var situacao = document.getElementById("situacao");
+        var lista = document.getElementById("treinos");
+        document.getElementById("tentar").addEventListener("click", function () {
+          location.href = "/app";
+        });
+
+        function el(tag, texto, classe) {
+          var e = document.createElement(tag);
+          if (texto) e.textContent = texto;
+          if (classe) e.className = classe;
+          return e;
+        }
+
+        var salvo = null;
+        try {
+          salvo = JSON.parse(localStorage.getItem("fg:treinos-offline") || "null");
+        } catch (e) {}
+        if (!salvo || !Array.isArray(salvo.treinos) || salvo.treinos.length === 0) {
+          situacao.textContent =
+            "Ainda não há treino salvo neste aparelho. Abra o aplicativo com internet uma vez e ele passa a funcionar também sem conexão.";
+          return;
+        }
+        var hoje = new Date().getDay();
+        var doDia = salvo.treinos.filter(function (t) {
+          return t.diaSemana === hoje;
+        });
+        var mostrar = doDia.length ? doDia : salvo.treinos;
+        var quando = salvo.atualizadoEm
+          ? new Date(salvo.atualizadoEm).toLocaleDateString("pt-BR")
+          : "";
+        situacao.textContent =
+          (doDia.length
+            ? "Treino de hoje (" + DIAS[hoje] + ")"
+            : "Hoje não há treino marcado. Suas fichas:") + (quando ? " · salvo em " + quando : "");
+
+        mostrar.forEach(function (t) {
+          var c = el("section", null, "cartao");
+          if (t.diaSemana === hoje) c.appendChild(el("span", "Hoje", "tag"));
+          c.appendChild(el("h2", t.nome + (t.foco ? " — " + t.foco : "")));
+          if (t.observacoes) c.appendChild(el("p", t.observacoes, "muted"));
+          var ol = document.createElement("ol");
+          (t.exercicios || []).forEach(function (x) {
+            var li = el("li", x.nome);
+            var det =
+              x.series +
+              " × " +
+              x.repeticoes +
+              (x.cargaKg ? " · " + x.cargaKg + " kg" : "") +
+              (x.descansoSeg ? " · descanso " + x.descansoSeg + " s" : "");
+            li.appendChild(el("small", det));
+            ol.appendChild(li);
+          });
+          c.appendChild(ol);
+          lista.appendChild(c);
+        });
+      })();
+    </script>
+  </body>
+</html>

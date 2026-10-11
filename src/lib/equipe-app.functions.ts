@@ -1,4 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { usuarioPodeAcessar } from "@/lib/staff";
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { Database } from "@/integrations/supabase/types";
@@ -55,15 +56,19 @@ function erroDoBanco(erro: ErroBanco, acao: string): Error {
   return new Error(`Não foi possível ${acao}. Tente novamente em instantes.`);
 }
 
-async function garantirStaff(supabase: Cliente, userId: string, acao: string) {
-  const { data, error } = await supabase
-    .from("user_roles")
-    .select("role")
-    .eq("user_id", userId)
-    .eq("role", "staff")
-    .limit(1);
-  if (error) throw erroDoBanco(error, "verificar o seu acesso");
-  if ((data ?? []).length === 0) throw new Error(`Apenas a equipe (staff) pode ${acao}.`);
+async function garantirStaff(
+  supabase: Cliente,
+  userId: string,
+  acao: string,
+  area: "treinos" | "avaliacoes",
+) {
+  let permitido: boolean;
+  try {
+    permitido = await usuarioPodeAcessar(supabase, userId, area);
+  } catch (erro) {
+    throw erroDoBanco(erro as ErroBanco, "verificar o seu acesso");
+  }
+  if (!permitido) throw new Error(`Apenas gestão e professores podem ${acao}.`);
 }
 
 async function buscarAlunos(supabase: Cliente): Promise<AlunoEquipe[]> {
@@ -90,7 +95,7 @@ export const listarEquipeTreinos = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }): Promise<DadosEquipeTreinos> => {
     const { supabase, userId } = context;
-    await garantirStaff(supabase, userId, "prescrever treinos");
+    await garantirStaff(supabase, userId, "prescrever treinos", "treinos");
 
     const [alunos, treinosRes] = await Promise.all([
       buscarAlunos(supabase),
@@ -138,7 +143,7 @@ export const salvarTreino = createServerFn({ method: "POST" })
   .inputValidator((entrada: EntradaTreino) => validarEntrada(treinoSchema, entrada))
   .handler(async ({ data, context }): Promise<{ id: string }> => {
     const { supabase, userId } = context;
-    await garantirStaff(supabase, userId, "prescrever treinos");
+    await garantirStaff(supabase, userId, "prescrever treinos", "treinos");
 
     const campos = {
       aluno_id: data.alunoId,
@@ -232,7 +237,7 @@ export const excluirTreino = createServerFn({ method: "POST" })
   .inputValidator((entrada: { id: string }) => validarEntrada(idSchema, entrada))
   .handler(async ({ data, context }): Promise<{ ok: true }> => {
     const { supabase, userId } = context;
-    await garantirStaff(supabase, userId, "excluir treinos");
+    await garantirStaff(supabase, userId, "excluir treinos", "treinos");
 
     // Os exercícios saem junto (ON DELETE CASCADE).
     const { data: removidos, error } = await supabase
@@ -253,7 +258,7 @@ export const listarEquipeAlunos = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }): Promise<AlunoEquipe[]> => {
     const { supabase, userId } = context;
-    await garantirStaff(supabase, userId, "registrar avaliações");
+    await garantirStaff(supabase, userId, "registrar avaliações", "avaliacoes");
     return buscarAlunos(supabase);
   });
 
@@ -265,7 +270,7 @@ export const carregarHistoricoAvaliacoes = createServerFn({ method: "GET" })
   .inputValidator((entrada: { alunoId: string }) => validarEntrada(alunoIdSchema, entrada))
   .handler(async ({ data, context }): Promise<HistoricoAvaliacoes> => {
     const { supabase, userId } = context;
-    await garantirStaff(supabase, userId, "registrar avaliações");
+    await garantirStaff(supabase, userId, "registrar avaliações", "avaliacoes");
 
     const [avaliacoesRes, medidasRes] = await Promise.all([
       supabase
@@ -330,7 +335,7 @@ export const registrarAvaliacao = createServerFn({ method: "POST" })
   .inputValidator((entrada: EntradaAvaliacao) => validarEntrada(avaliacaoSchema, entrada))
   .handler(async ({ data, context }): Promise<ResultadoAvaliacao> => {
     const { supabase, userId } = context;
-    await garantirStaff(supabase, userId, "registrar avaliações");
+    await garantirStaff(supabase, userId, "registrar avaliações", "avaliacoes");
 
     const { data: aluno, error: erroAluno } = await supabase
       .from("alunos")

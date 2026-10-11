@@ -2,6 +2,8 @@ import { Link } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
 import { BrandLogo } from "@/components/BrandLogo";
 import { botaoMarca } from "./botoes";
+import { ComoChegar } from "./ComoChegar";
+import { FaleConosco } from "./FaleConosco";
 import { CONTAINER } from "./SecaoSite";
 import { useSessao } from "./sessao";
 
@@ -9,12 +11,18 @@ import { useSessao } from "./sessao";
 export function CtaFinal({
   titulo = "Pronto para treinar em família?",
   texto = "Crie a sua conta e acompanhe treinos, aulas e resultados. Ou dê uma volta pela área do aluno antes, sem compromisso.",
-  mostrarValores = false,
+  mostrarPlanos = false,
+  mostrarGrade = false,
+  mostrarContato = true,
 }: {
   titulo?: string;
   texto?: string;
-  /** Inclui o atalho para /valores (útil em páginas que ainda não falaram de preços). */
-  mostrarValores?: boolean;
+  /** Inclui o atalho para /valores, a página de planos (útil em páginas que ainda não falaram deles). */
+  mostrarPlanos?: boolean;
+  /** Inclui o atalho para a grade de aulas (/grade). */
+  mostrarGrade?: boolean;
+  /** Linha de baixo com "Fale conosco" e "Como chegar" (ligada por padrão). */
+  mostrarContato?: boolean;
 }) {
   const { logado } = useSessao();
 
@@ -45,15 +53,31 @@ export function CtaFinal({
                 Criar conta <ArrowRight />
               </Link>
             )}
-            {mostrarValores ? (
+            {mostrarPlanos ? (
               <Link to="/valores" className={botaoMarca("contorno-escuro", "lg")}>
-                Ver planos e valores
+                Ver os planos
+              </Link>
+            ) : null}
+            {mostrarGrade ? (
+              <Link to="/grade" className={botaoMarca("contorno-escuro", "lg")}>
+                Ver a grade de aulas
               </Link>
             ) : null}
             <Link to="/app" search={{ demo: true }} className={botaoMarca("contorno-escuro", "lg")}>
               Ver a área do aluno em ação
             </Link>
           </div>
+          {mostrarContato ? (
+            <div className="mt-10 flex flex-col gap-5 border-t border-brand-black/15 pt-8 sm:flex-row sm:items-center sm:justify-between">
+              <p className="max-w-md text-base font-medium text-brand-black/85 text-pretty">
+                Prefere conversar antes? Fale com a recepção ou veja como chegar à academia.
+              </p>
+              <div className="flex flex-col gap-3 sm:flex-row">
+                <FaleConosco variante="escuro" tamanho="lg" />
+                <ComoChegar variante="contorno-escuro" tamanho="lg" />
+              </div>
+            </div>
+          ) : null}
         </div>
       </div>
     </section>

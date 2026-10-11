@@ -27,13 +27,13 @@ function LinhaRanking({
 }) {
   const noPodio = posicao <= PODIO;
   return (
-    <li className="flex items-start gap-3 border-b border-white/10 py-3 first:pt-0 last:border-b-0 last:pb-0 print:break-inside-avoid">
+    <li className="flex items-start gap-3 border-b border-foreground/10 py-3 first:pt-0 last:border-b-0 last:pb-0 print:break-inside-avoid">
       <span
         className={cn(
           "grid size-8 shrink-0 place-items-center rounded-full font-display text-sm font-bold tabular-nums",
           noPodio
             ? "bg-brand-yellow text-brand-black"
-            : "border border-white/15 text-muted-foreground",
+            : "border border-foreground/15 text-muted-foreground",
         )}
       >
         <span className="sr-only">Posição </span>
@@ -42,7 +42,10 @@ function LinhaRanking({
       <div className="min-w-0 flex-1">
         <p className="break-words font-medium leading-snug">{aluno.nome}</p>
         <p className="break-words text-xs leading-snug text-muted-foreground">{aluno.plano}</p>
-        <div aria-hidden className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-white/10">
+        <div
+          aria-hidden
+          className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-foreground/10"
+        >
           <div
             className="h-full rounded-full bg-brand-yellow"
             style={{ width: `${Math.max(percentualDe(aluno.treinos, maiorNumeroDeTreinos), 2)}%` }}

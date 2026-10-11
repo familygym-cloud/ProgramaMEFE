@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
+import { CircleCheck, OctagonAlert, TriangleAlert, type LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { CelulaCalor } from "@/lib/aluno-app/derive";
 
@@ -17,7 +18,7 @@ export function Superficie({
   return (
     <Tag
       className={cn(
-        "relative overflow-hidden rounded-3xl border border-white/10 bg-card/80 p-5 shadow-[0_1px_0_0_rgba(255,255,255,0.04)_inset] backdrop-blur sm:p-6",
+        "relative overflow-hidden rounded-3xl border border-foreground/10 bg-card/80 p-5 shadow-[0_1px_0_0_color-mix(in_srgb,var(--fg-alabastro)_5%,transparent)_inset] backdrop-blur sm:p-6",
         brilho &&
           "before:pointer-events-none before:absolute before:-right-16 before:-top-16 before:size-56 before:rounded-full before:bg-brand-yellow/15 before:blur-3xl",
         className,
@@ -176,7 +177,7 @@ export function ProgressRing({
           r={raio}
           fill="none"
           strokeWidth={espessura}
-          className="stroke-white/10"
+          className="stroke-foreground/10"
         />
         <circle
           cx={tamanho / 2}
@@ -207,7 +208,7 @@ export function BarraProgresso({
   const v = Math.max(0, Math.min(100, valor));
   return (
     <div
-      className={cn("h-2 w-full overflow-hidden rounded-full bg-white/10", className)}
+      className={cn("h-2 w-full overflow-hidden rounded-full bg-foreground/10", className)}
       role="progressbar"
       aria-valuenow={Math.round(v)}
       aria-valuemin={0}
@@ -222,22 +223,43 @@ export function BarraProgresso({
   );
 }
 
+/**
+ * Selo de situação. Cor nunca é o único sinal: ok, atenção e alerta levam ícone e texto.
+ * - ok: Alabastro com marca de verificação (pago, em dia, concluído);
+ * - atencao: Amarelo com triângulo (vencendo, pendente, em risco);
+ * - alerta: vermelho funcional com octógono (atrasado, crítico, inativo);
+ * - realce: Amarelo sem ícone, só para chamar a atenção a algo que não é um aviso (ex.: "Próxima");
+ * - destaque: Amarelo cheio com texto Onix.
+ * `semIcone` evita o ícone automático quando o próprio conteúdo já traz um.
+ */
+export type TomSelo = "neutro" | "ok" | "atencao" | "alerta" | "realce" | "destaque";
+
+const ICONE_DO_TOM: Partial<Record<TomSelo, LucideIcon>> = {
+  ok: CircleCheck,
+  atencao: TriangleAlert,
+  alerta: OctagonAlert,
+};
+
 export function Selo({
   children,
   tom = "neutro",
   className,
+  semIcone = false,
 }: {
   children: ReactNode;
-  tom?: "neutro" | "ok" | "atencao" | "alerta" | "destaque";
+  tom?: TomSelo;
   className?: string;
+  semIcone?: boolean;
 }) {
-  const tons = {
-    neutro: "border-white/15 bg-white/5 text-foreground/80",
-    ok: "border-emerald-400/30 bg-emerald-400/10 text-emerald-300",
-    atencao: "border-brand-yellow/40 bg-brand-yellow/10 text-brand-yellow",
-    alerta: "border-red-400/40 bg-red-400/10 text-red-300",
+  const tons: Record<TomSelo, string> = {
+    neutro: "border-foreground/15 bg-foreground/5 text-foreground/80",
+    ok: "border-foreground/35 bg-foreground/10 text-foreground",
+    atencao: "border-primary/50 bg-primary/10 text-primary",
+    alerta: "border-destructive/50 bg-destructive/10 text-destructive",
+    realce: "border-primary/40 bg-primary/10 text-primary",
     destaque: "border-brand-yellow bg-brand-yellow text-brand-black",
-  } as const;
+  };
+  const Icone = semIcone ? undefined : ICONE_DO_TOM[tom];
   return (
     <span
       className={cn(
@@ -246,6 +268,7 @@ export function Selo({
         className,
       )}
     >
+      {Icone ? <Icone className="size-3 shrink-0" strokeWidth={2.5} aria-hidden /> : null}
       {children}
     </span>
   );
@@ -267,7 +290,7 @@ export function EstadoVazio({
   return (
     <div
       className={cn(
-        "flex flex-col items-center gap-3 rounded-3xl border border-dashed border-white/15 px-6 py-12 text-center",
+        "flex flex-col items-center gap-3 rounded-3xl border border-dashed border-foreground/15 px-6 py-12 text-center",
         className,
       )}
     >
@@ -294,7 +317,7 @@ export function ModuloIndisponivel({ nome }: { nome: string }) {
 }
 
 const NIVEIS_CALOR = [
-  "bg-white/[0.06]",
+  "bg-foreground/[0.06]",
   "bg-brand-yellow/25",
   "bg-brand-yellow/50",
   "bg-brand-yellow/75",

@@ -8,7 +8,7 @@ import type { ModoRelatorio } from "@/lib/relatorios/abas";
 import { cn } from "@/lib/utils";
 
 const CLASSE_VOLTAR =
-  "h-11 shrink-0 gap-2 rounded-full border-white/20 bg-transparent px-4 text-sm hover:bg-white/10 hover:text-foreground print:hidden";
+  "h-11 shrink-0 gap-2 rounded-full border-foreground/20 bg-transparent px-4 text-sm hover:bg-foreground/10 hover:text-foreground print:hidden";
 
 /** Volta à lista de alunos da Central (a versão real ou a de demonstração). */
 export function LinkVoltarAosAlunos({
@@ -55,14 +55,14 @@ function SeletorPeriodo({
         if (valor !== "" && ehMesesPeriodo(novo)) aoMudar(novo);
       }}
       aria-label="Período do relatório"
-      className="w-full justify-start gap-1 rounded-full bg-white/[0.05] p-1 sm:w-auto"
+      className="w-full justify-start gap-1 rounded-full bg-foreground/[0.05] p-1 sm:w-auto"
     >
       {MESES_PERIODO.map((m) => (
         <ToggleGroupItem
           key={m}
           value={String(m)}
           aria-label={`Últimos ${ROTULO_PERIODO[m]}`}
-          className="h-11 min-w-0 flex-1 rounded-full px-4 text-sm text-muted-foreground hover:bg-white/10 hover:text-foreground data-[state=on]:bg-brand-yellow data-[state=on]:font-semibold data-[state=on]:text-brand-black sm:flex-none"
+          className="h-11 min-w-0 flex-1 rounded-full px-4 text-sm text-muted-foreground hover:bg-foreground/10 hover:text-foreground data-[state=on]:bg-brand-yellow data-[state=on]:font-semibold data-[state=on]:text-brand-black sm:flex-none"
         >
           {ROTULO_PERIODO[m]}
         </ToggleGroupItem>

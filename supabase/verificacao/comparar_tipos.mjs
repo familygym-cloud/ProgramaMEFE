@@ -52,7 +52,11 @@ const tsDoTipo = (tipo) =>
     ? "number"
     : tipo === "boolean"
       ? "boolean"
-      : "string";
+      : ["json", "jsonb"].includes(tipo)
+        ? "Json"
+        : tipo === "ARRAY"
+          ? "string[]"
+          : "string";
 
 const divergencias = [];
 for (const tabela of new Set([...Object.keys(esperado), ...Object.keys(banco)])) {

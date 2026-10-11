@@ -6,7 +6,7 @@ Aplicação web da Academia Family Gym, com três frentes no mesmo projeto:
 - **Área do aluno** (`/app`): treinos, aulas e reservas, avaliações, resultados, plano e mensalidades, perfil e segurança (verificação em duas etapas).
 - **Painel da equipe** (perfil `staff`): Central de Relatórios com dados reais (visão geral, financeiro, frequência, saúde, termos e alunos, com exportação CSV e impressão/PDF, mais o relatório individual do aluno), vínculos com contas de acesso, planos, aulas e presenças, financeiro, prescrição de treinos e registro de avaliações.
 
-O projeto nasceu no [Lovable](https://lovable.dev) (editor do projeto: <https://lovable.dev/projects/daeb8427-631f-465e-becb-3230320eb0d8>; app publicado: <https://familygym-healthhub.lovable.app>) e este repositório é a fonte do código. Ele também roda fora do Lovable, seguindo este guia.
+O site roda no **Cloudflare Workers**; banco de dados e login ficam no **Supabase** (projeto próprio da academia). Este repositório é a fonte do código.
 
 ## Stack
 
@@ -20,7 +20,7 @@ O projeto nasceu no [Lovable](https://lovable.dev) (editor do projeto: <https://
 
 - **Node.js 22.12 ou mais novo** (exigido pelo TanStack Start e pelo Vitest)
 - **[Bun](https://bun.sh)** como gerenciador de pacotes. O repositório tem `bun.lock` e o `bunfig.toml` ignora versões publicadas há menos de 24 h (proteção contra pacotes comprometidos); `npm` não respeita isso e criaria um `package-lock.json` duplicado.
-- Um projeto Supabase (o do Lovable Cloud ou um seu)
+- Um projeto Supabase seu (banco e login)
 - Opcionais: [Supabase CLI](https://supabase.com/docs/guides/cli) para aplicar migrations e `psql` para rodar a verificação do banco
 
 ## Como rodar
@@ -67,18 +67,18 @@ Nunca coloque a `SUPABASE_SERVICE_ROLE_KEY` em arquivo versionado nem em variáv
 
 O esquema inteiro vive em **`supabase/migrations/`**. Aplicar toda a cadeia em um banco vazio reproduz as tabelas e colunas que o código usa (`src/integrations/supabase/types.ts`). Cada arquivo roda uma vez, em ordem de nome:
 
-| Migration                                                  | O que faz                                                                                                                                                                                            |
-| ---------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `20260805160135_…` a `20260811172706_…`                    | Esquema original do Lovable: `alunos`, `avaliacoes`, `check_ins`, `assinaturas_relatorio`, `user_roles`, funções `private.*` e RLS. A primeira também insere 8 alunos de demonstração (veja abaixo). |
-| `20260812000000_executar_funcoes_private.sql`              | Dá `EXECUTE` em `private.has_role` e `private.is_meu_aluno` a `authenticated`. Sem isso toda consulta de usuário logado falha com `permission denied for function has_role`.                         |
-| `20260812000100_private_meu_aluno_id.sql`                  | Função de apoio às policies (avalia uma vez por consulta, em vez de uma vez por linha).                                                                                                              |
-| `20260908113916_…`, `20260909093918_…`, `20260911141941_…` | Cópias idempotentes de `drizzle/migrations/0000` a `0002`: `alunos.turno` e `termo_valido_ate`, `pagamentos`, `aulas` e `aula_presencas`.                                                            |
-| `20261004000000_modulos_area_do_aluno.sql`                 | Treinos, reservas de aula (com regra de lotação no banco), metas, medidas corporais e contato do aluno.                                                                                              |
-| `20261004120000_vinculos_atomicos_e_bootstrap_staff.sql`   | Funções chamadas só pelo servidor: vínculos em lote e ativação do primeiro staff.                                                                                                                    |
-| `20261004130000_…` a `20261004130300_…`                    | Policies otimizadas, chaves estrangeiras para `auth.users`, restrições de domínio, `updated_at` automático e limpeza de índice.                                                                      |
-| `20261010000000_salvar_aula.sql`                           | Função `salvar_aula`: grava a aula e a lista de presenças numa única transação (nada se perde se um passo falhar). Chamada pelo servidor com o token de quem salva (RLS vale).                       |
+| Migration                                                  | O que faz                                                                                                                                                                                 |
+| ---------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `20260805160135_…` a `20260811172706_…`                    | Esquema original: `alunos`, `avaliacoes`, `check_ins`, `assinaturas_relatorio`, `user_roles`, funções `private.*` e RLS. A primeira também insere 8 alunos de demonstração (veja abaixo). |
+| `20260812000000_executar_funcoes_private.sql`              | Dá `EXECUTE` em `private.has_role` e `private.is_meu_aluno` a `authenticated`. Sem isso toda consulta de usuário logado falha com `permission denied for function has_role`.              |
+| `20260812000100_private_meu_aluno_id.sql`                  | Função de apoio às policies (avalia uma vez por consulta, em vez de uma vez por linha).                                                                                                   |
+| `20260908113916_…`, `20260909093918_…`, `20260911141941_…` | Cópias idempotentes de `drizzle/migrations/0000` a `0002`: `alunos.turno` e `termo_valido_ate`, `pagamentos`, `aulas` e `aula_presencas`.                                                 |
+| `20261004000000_modulos_area_do_aluno.sql`                 | Treinos, reservas de aula (com regra de lotação no banco), metas, medidas corporais e contato do aluno.                                                                                   |
+| `20261004120000_vinculos_atomicos_e_bootstrap_staff.sql`   | Funções chamadas só pelo servidor: vínculos em lote e ativação do primeiro staff.                                                                                                         |
+| `20261004130000_…` a `20261004130300_…`                    | Policies otimizadas, chaves estrangeiras para `auth.users`, restrições de domínio, `updated_at` automático e limpeza de índice.                                                           |
+| `20261010000000_salvar_aula.sql`                           | Função `salvar_aula`: grava a aula e a lista de presenças numa única transação (nada se perde se um passo falhar). Chamada pelo servidor com o token de quem salva (RLS vale).            |
 
-As cópias do Drizzle têm timestamp **entre** `20260811172706` e `20261004000000` porque a migration de 2026-10-04 altera `public.aulas`. Elas são idempotentes (`IF NOT EXISTS`, `DROP POLICY IF EXISTS` antes de cada `CREATE POLICY`, carga inicial de `termo_valido_ate` só quando a coluna é criada), então rodam sem efeito no banco do Lovable, que já tem esses objetos.
+As cópias do Drizzle têm timestamp **entre** `20260811172706` e `20261004000000` porque a migration de 2026-10-04 altera `public.aulas`. Elas são idempotentes (`IF NOT EXISTS`, `DROP POLICY IF EXISTS` antes de cada `CREATE POLICY`, carga inicial de `termo_valido_ate` só quando a coluna é criada), então rodam sem efeito em um banco que já tenha esses objetos.
 
 Regras para mudar o esquema:
 
@@ -95,7 +95,7 @@ supabase link --project-ref <ref-do-projeto>   # ou troque project_id em supabas
 supabase db push
 ```
 
-Em um banco que já tem os objetos do Drizzle (como o do Lovable), o mesmo `supabase db push` serve: as migrations novas têm timestamp maior que o da última migration original (`20260811172706`) e as cópias do Drizzle são idempotentes, então não alteram o que já existe. Para um Supabase local (Docker): `supabase start` e `supabase db reset`.
+Em um banco que já tem os objetos originais, o mesmo `supabase db push` serve: as migrations novas têm timestamp maior que o da última migration original (`20260811172706`) e as cópias do Drizzle são idempotentes, então não alteram o que já existe. Para um Supabase local (Docker): `supabase start` e `supabase db reset`.
 
 Sem a CLI, abra cada arquivo de `supabase/migrations/` no **SQL Editor** do Supabase, na ordem do nome, e execute.
 
@@ -109,36 +109,13 @@ where connamespace = 'public'::regnamespace and conname like '%\_chk';   -- 11 r
 
 A migration `20261004130200_restricoes_de_dominio.sql` só cria cada restrição se nenhuma linha existente a violar; se alguma linha legada violar, ela emite um `WARNING` com o nome da restrição e segue. Corrija as linhas apontadas e rode de novo o bloco `DO` do arquivo (SQL Editor ou `psql -f`; é idempotente).
 
-### O papel da pasta `drizzle/`
+### Cópias do Drizzle
 
-`drizzle/` é **legado do Lovable**. O Lovable aplicava `drizzle/migrations/0000` a `0002` no banco dele com o `drizzle-kit` (por isso o `drizzle.config.ts` lê `LOVABLE_DB_MIGRATION_URL`); `drizzle/schema.ts` está em branco de propósito e os snapshots em `meta/` não descrevem tabelas. Nada disso é fonte de verdade: o esquema completo está em `supabase/migrations/`, que já inclui as três migrations do Drizzle. Não apague a pasta (o Lovable pode continuar usando) e não rode `drizzle-kit generate` aqui. Se o Lovable gerar um `0003` novo, copie-o para `supabase/migrations/` com um timestamp na ordem certa e idempotente, como foi feito com os três primeiros.
+Três migrations de `supabase/migrations/` (`0000` a `0002` originais) vieram de uma ferramenta que não é mais usada; a pasta `drizzle/` foi removida. O esquema completo está só em `supabase/migrations/`; crie migrations novas ali, com timestamp crescente e idempotentes.
 
 ### Dados de demonstração da primeira migration
 
-`20260805160135_…` insere 8 alunos fictícios (e-mails `@email.com`), com avaliações e check-ins de julho de 2026. Todo banco novo nasce com eles. Antes de operar com alunos reais, apague-os (remove também avaliações, check-ins, pagamentos e reservas ligados, por `ON DELETE CASCADE`):
-
-```sql
--- Confira antes: deve listar só os 8 alunos fictícios.
-select nome, email from public.alunos where email in (
-  'ana.ribeiro@email.com', 'carlos.menezes@email.com', 'duarte.familia@email.com', 'bia.lima@email.com',
-  'joaquim.alves@email.com', 'marina.souza@email.com', 'pedro.nogueira@email.com', 'luisa.campos@email.com');
-
-delete from public.alunos where email in (
-  'ana.ribeiro@email.com', 'carlos.menezes@email.com', 'duarte.familia@email.com', 'bia.lima@email.com',
-  'joaquim.alves@email.com', 'marina.souza@email.com', 'pedro.nogueira@email.com', 'luisa.campos@email.com');
-```
-
-### Verificação do banco
-
-`supabase/verificacao/` tem testes SQL de RLS, permissões e regras (reserva com lotação, validações, chaves estrangeiras, `updated_at`), um teste de duas sessões reservando a última vaga e a conferência de tabelas e colunas com o `types.ts`. Rode só em um banco **descartável**:
-
-```sh
-createdb teste
-CONFIRMO_BANCO_DESCARTAVEL=sim DATABASE_URL=postgresql://postgres@localhost:5432/teste \
-  supabase/verificacao/executar.sh --stubs --migrar --concorrencia --tipos
-```
-
-`--stubs` cria os papéis e o `auth.uid()` em um Postgres puro; em um Supabase local (depois de `supabase db reset`) omita `--stubs` e `--migrar`.
+`20260805160135_…` insere 8 alunos fictícios (e-mails `@email.com`). A migration `20261011000200_…` apaga exatamente essas fichas (se nunca foram ligadas a uma conta), então um banco novo termina sem dados de demonstração. Os testes de `supabase/verificacao/` recriam essas fichas por conta própria (`01b_fixture_alunos.sql`).
 
 ## Autenticação (Supabase Auth)
 
@@ -146,7 +123,7 @@ O app envia `emailRedirectTo = <origem>/auth` no cadastro e no reenvio da confir
 
 No painel do Supabase, em **Authentication > URL Configuration**:
 
-- **Site URL**: o endereço de produção (ex.: `https://familygym-healthhub.lovable.app`).
+- **Site URL**: o endereço de produção (ex.: `https://familygym.<sua-conta>.workers.dev` ou o domínio próprio).
 - **Redirect URLs**: `https://<dominio>/auth`, `https://<dominio>/reset-password` e, para desenvolvimento, `http://localhost:8080/auth` e `http://localhost:8080/reset-password`.
 
 Também confira **Confirm email** ligado (o app pede o e-mail confirmado para entrar, para vincular aluno e para ativar o primeiro staff) e a **verificação em duas etapas (TOTP)** habilitada (a tela de Segurança usa fatores TOTP).
@@ -173,36 +150,75 @@ on conflict (user_id, role) do nothing;
 
 Alternativa sem SQL: defina `STAFF_BOOTSTRAP_EMAIL` no servidor com o e-mail da conta; enquanto não existir nenhum staff, essa conta (com e-mail confirmado) vê na tela de vínculos o botão para ativar o perfil da equipe.
 
+## Identidade visual: cores e fontes
+
+### Cores
+
+A interface usa **somente três cores**, declaradas uma única vez em `src/styles.css` (`:root`):
+
+| Nome            | Variável         | Valor                         |
+| --------------- | ---------------- | ----------------------------- |
+| Preto Onix      | `--fg-onix`      | `#151515` (RGB 21, 21, 21)    |
+| Amarelo Real    | `--fg-amarelo`   | `#F9DB5D` (RGB 249, 219, 93)  |
+| Cinza Alabastro | `--fg-alabastro` | `#E5E5E4` (RGB 229, 229, 228) |
+
+Qualquer outro tom é transparência ou mistura entre elas (`color-mix`, opacidade `/10`, `/20`...). Os tokens do shadcn/Tailwind (`background`, `foreground`, `card`, `primary`, `muted`, `border`, `chart-1..5`, `brand-*`...) apontam para essas três variáveis; não escreva hexadecimal, `rgb()`, `oklch()` nem classes de paleta do Tailwind (`red-400`, `emerald-300`, `white`, `black`...) nos componentes.
+
+- **Tema escuro é o padrão**: fundo Onix, texto Alabastro, destaque Amarelo. Para um bloco claro (fundo Alabastro, texto Onix), aplique a classe `tema-claro` ao bloco: os tokens se invertem sozinhos.
+- **Amarelo nunca é texto sobre Alabastro** (contraste de 1,09:1). Sobre Alabastro ele só aparece como preenchimento, com texto Onix. Amarelo como texto só sobre Onix.
+- **Estados**: sucesso (pago, em dia, concluído) usa Alabastro com ícone de verificação; atenção (pendente, vencendo, em risco) usa Amarelo com ícone de triângulo; a informação nunca fica só na cor, sempre há ícone e texto (veja `Selo` em `src/components/app/ui.tsx`). O único vermelho do sistema é o token `destructive`, reservado a erro, ação destrutiva, atraso e situação crítica.
+- **Gráficos** (`src/components/app/charts.tsx`, `src/components/relatorios/graficos.tsx`) distinguem as séries também por barra x linha, traço contínuo x tracejado, marcador (círculo x losango) e a classe `hachura` (listras), com legenda desenhada igual à série.
+- **Impressão e PDF** dos relatórios (`@media print` em `src/styles.css`): papel branco, texto Onix, destaques em Amarelo com texto e contorno Onix, sem vermelho. Atraso e alerta continuam legíveis pelo ícone e pelo texto.
+- **Logos** (`src/assets/brand/*.svg`): "branco" desenha em Alabastro, "preto" em Onix, e o amarelo é o Amarelo Real exato. O favicon, os ícones do aplicativo e a imagem de compartilhamento (`public/`) seguem a mesma paleta.
+
+### Fontes
+
+- **Títulos: New Order** (peso único, Regular). Vale para `h1` a `h6` e para as classes `font-titulo` e `font-display`.
+- **Textos: Urbanist** (variável, auto-hospedada pelo pacote `@fontsource-variable/urbanist`). Vale para todo o restante: parágrafos, botões, campos, tabelas e os rótulos em caixa-alta.
+- Não há outras famílias. Mesmo `font-mono` usa a Urbanist (com algarismos tabulares).
+
+**A New Order não está no repositório.** O arquivo OTF deve ficar em:
+
+```
+public/fonts/NewOrder-Regular.otf
+```
+
+Ele é licenciado, o repositório é público e a licença de uso na web ainda não foi confirmada; por isso `public/fonts/*.otf` e `public/fonts/*.woff2` estão no `.gitignore` e o arquivo **não é versionado**. Copie-o para essa pasta em cada máquina e em cada build de publicação (o `@font-face` aponta para `/fonts/NewOrder-Regular.otf`).
+
+- Sem o arquivo, nada quebra: o título cai automaticamente na Urbanist em peso 800 (`--font-titulo: "New Order", "Urbanist Variable", ...`), e o único efeito visível é o 404 do arquivo no console em desenvolvimento.
+- Se o repositório for privado, ou se a licença permitir uso web, versione o arquivo com `git add -f public/fonts/NewOrder-Regular.otf` (o `-f` é necessário porque o `.gitignore` o ignora) e, se quiser, remova as duas linhas de `public/fonts/` do `.gitignore`.
+- O `@font-face` declara o intervalo de pesos `100 900` para a face única, então `font-bold`/`font-semibold` em títulos não geram negrito sintetizado (reforçado por `font-synthesis: none`).
+
 ## Deploy no Cloudflare Workers
 
-O build gera o Worker em `.output/` (preset `cloudflare-module` do Nitro, com `nodejs_compat`) e um `.wrangler/deploy/config.json` que aponta para `.output/server/wrangler.json`.
+O build gera o Worker em `.output/` (preset `cloudflare-module` do Nitro, com `nodejs_compat`) e um `.wrangler/deploy/config.json` apontando para `.output/server/wrangler.json`. O nome do Worker é `familygym` (`vite.config.ts`).
 
-1. **Build** com as variáveis públicas no ambiente (CI ou terminal):
+Passo a passo, na primeira vez:
 
-   ```sh
-   VITE_SUPABASE_URL=https://<ref>.supabase.co \
-   VITE_SUPABASE_PUBLISHABLE_KEY=<chave-publica> \
-   bun run build
-   ```
-
-2. **Segredos do Worker** (valem para qualquer deploy seguinte; o `wrangler.json` é regerado a cada build, então não guarde variáveis nele):
+1. **Supabase**: crie o projeto (guia completo de SMTP, duas etapas e perfis da equipe em `docs/configuracao-de-producao.md`), aplique as migrations (`supabase db push`), configure **Authentication > URL Configuration** (seção abaixo) e um **SMTP próprio** (o padrão do Supabase só entrega a membros da equipe e limita a cerca de 2 e-mails por hora). Modelos de e-mail em português: `supabase/email-templates/`, quando existirem.
+2. **Login na Cloudflare**: `npx wrangler login` (ou exporte `CLOUDFLARE_API_TOKEN` e `CLOUDFLARE_ACCOUNT_ID` em CI).
+3. **Variáveis públicas do build** (valores públicos, embutidos no JavaScript do navegador). Copie `.env.example` para `.env.local` e preencha `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY` e `VITE_SITE_URL`. Opcionalmente `VITE_CONTATO_*` para trocar WhatsApp e endereço (há padrões no código).
+4. **Segredos do Worker** (valem para os deploys seguintes):
 
    ```sh
-   npx wrangler secret put SUPABASE_SERVICE_ROLE_KEY --name <nome-do-worker>
-   npx wrangler secret put STAFF_BOOTSTRAP_EMAIL --name <nome-do-worker>   # opcional
+   npx wrangler secret put SUPABASE_SERVICE_ROLE_KEY --name familygym
+   npx wrangler secret put STAFF_BOOTSTRAP_EMAIL --name familygym   # opcional
    ```
 
-   O nome do Worker está em `.output/server/wrangler.json` (campo `name`). Variáveis que não são secretas podem ir no próprio deploy (`npx wrangler deploy --var NOME:valor`). Se preferir cadastrá-las no painel da Cloudflare (Workers > Settings > Variables and Secrets), faça o deploy com `--keep-vars` para o `wrangler deploy` não removê-las.
+   Se cadastrar variáveis no painel da Cloudflare, faça o deploy com `--keep-vars`.
 
-3. **Deploy**, na raiz do projeto, depois do build:
+5. **Deploy**: `bun run deploy` (faz `vite build && wrangler deploy`). Para testar localmente no runtime do Worker: `bun run build && bun run preview`.
+6. **Domínio próprio** (opcional): Cloudflare > Workers > `familygym` > Settings > Domains & Routes; depois ajuste Site URL e Redirect URLs no Supabase.
 
-   ```sh
-   npx wrangler deploy
-   ```
+### Integrações por API
 
-`SUPABASE_URL` e `SUPABASE_PUBLISHABLE_KEY` no Worker são opcionais: sem elas o servidor usa as `VITE_*` embutidas no build.
+Catraca, Tecnofit e outros sistemas usam a API em `/api/v1` (chaves criadas em `/integracoes`). Guia: `docs/api-integracao.md`; descrição OpenAPI em `/api/v1/openapi.json`.
 
-> O passo a passo do deploy segue o que o build gera neste repositório, mas não foi executado de ponta a ponta (exige credenciais da Cloudflare).
+### Valores reais dos planos
+
+Os valores **não estão no código** (só dentro da área do aluno, com plano ativo). Depois das migrations, rode o SQL de carga dos valores reais, entregue à parte, no **SQL Editor** do Supabase. Não o versione.
+
+> O deploy não foi executado de ponta a ponta (exige credenciais da Cloudflare); o Worker gerado foi validado localmente no runtime `workerd`.
 
 ## Modo demonstração
 

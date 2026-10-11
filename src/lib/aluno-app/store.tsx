@@ -1,4 +1,13 @@
-import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
@@ -11,6 +20,7 @@ import {
   salvarMeta,
   type RespostaAreaAluno,
 } from "./aluno-app.functions";
+import { salvarTreinosOffline } from "@/lib/pwa";
 import { hojeISO } from "./derive";
 import { criarDadosDemo } from "./fixtures";
 import type { AreaAlunoDados, NovaMeta } from "./types";
@@ -94,19 +104,40 @@ export function AlunoAppProviderReal({
     void queryClient.invalidateQueries({ queryKey: ["area-aluno"] });
   }, [queryClient]);
 
+  // As ações precisam do estado mais recente sem se recriarem a cada atualização dos dados.
+  const dadosRef = useRef(dados);
+  dadosRef.current = dados;
+
+  // Guarda as fichas de treino no aparelho para abrir o treino do dia sem internet (/offline.html).
+  useEffect(() => {
+    salvarTreinosOffline(dados);
+  }, [dados]);
+
   const acoes = useMemo<AcoesAluno>(
     () => ({
       reservarAula: async (aulaId) => {
-        await comToast("Aula reservada! Te esperamos lá.", async () => {
-          await reservarAula({ data: { aulaId } });
+        try {
+          const r = await reservarAula({ data: { aulaId } });
           recarregar();
-        });
+          toast.success(
+            r.resultado === "espera"
+              ? "Você entrou na lista de espera. Se abrir uma vaga, ela é sua automaticamente."
+              : "Aula reservada! Te esperamos lá.",
+          );
+        } catch (e) {
+          toast.error(mensagemErro(e));
+          throw e;
+        }
       },
       cancelarReserva: async (aulaId) => {
-        await comToast("Reserva cancelada.", async () => {
-          await cancelarReservaAula({ data: { aulaId } });
-          recarregar();
-        });
+        const naFila = dadosRef.current.agenda.find((a) => a.id === aulaId)?.naFila === true;
+        await comToast(
+          naFila ? "Você saiu da lista de espera." : "Reserva cancelada.",
+          async () => {
+            await cancelarReservaAula({ data: { aulaId } });
+            recarregar();
+          },
+        );
       },
       registrarTreino: async (input) => {
         await comToast("Treino registrado. Bom trabalho!", async () => {
@@ -147,28 +178,39 @@ export function AlunoAppProviderReal({
 
 export function AlunoAppProviderDemo({ children }: { children: ReactNode }) {
   const [dados, setDados] = useState<AreaAlunoDados>(() => criarDadosDemo());
+  const dadosDemoRef = useRef(dados);
+  dadosDemoRef.current = dados;
 
   const acoes = useMemo<AcoesAluno>(
     () => ({
       reservarAula: async (aulaId) => {
+        const alvo = dadosDemoRef.current.agenda.find((a) => a.id === aulaId);
+        const entrouNaFila =
+          !!alvo && !alvo.reservada && !alvo.naFila && alvo.ocupadas >= alvo.vagas;
         setDados((d) => ({
           ...d,
-          agenda: d.agenda.map((a) =>
-            a.id === aulaId && !a.reservada
-              ? { ...a, reservada: true, ocupadas: a.ocupadas + 1 }
-              : a,
-          ),
+          agenda: d.agenda.map((a) => {
+            if (a.id !== aulaId || a.reservada || a.naFila) return a;
+            if (a.ocupadas >= a.vagas) return { ...a, naFila: true, posicaoFila: 1 };
+            return { ...a, reservada: true, ocupadas: a.ocupadas + 1 };
+          }),
         }));
-        toast.success("Aula reservada! (demonstração)");
+        toast.success(
+          entrouNaFila
+            ? "Você entrou na lista de espera. (demonstração)"
+            : "Aula reservada! (demonstração)",
+        );
       },
       cancelarReserva: async (aulaId) => {
         setDados((d) => ({
           ...d,
-          agenda: d.agenda.map((a) =>
-            a.id === aulaId && a.reservada
+          agenda: d.agenda.map((a) => {
+            if (a.id !== aulaId) return a;
+            if (a.naFila) return { ...a, naFila: false, posicaoFila: null };
+            return a.reservada
               ? { ...a, reservada: false, ocupadas: Math.max(0, a.ocupadas - 1) }
-              : a,
-          ),
+              : a;
+          }),
         }));
         toast.success("Reserva cancelada. (demonstração)");
       },

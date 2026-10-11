@@ -1,12 +1,8 @@
-<!-- LOVABLE:BEGIN -->
+# Instruções para agentes
 
-> [!IMPORTANT]
-> This project is connected to [Lovable](https://lovable.dev). Avoid rewriting
-> published git history — force pushing, or rebasing/amending/squashing commits
-> that are already pushed — as it rewrites history on Lovable's side and the
-> user will likely lose their project history.
->
-> Commits you push to the connected branch sync back to Lovable and show up in
-> the editor, so keep the branch in a working state.
+Projeto da Academia Family Gym: TanStack Start (React 19) com Supabase (banco e login), publicado no
+Cloudflare Workers. Veja o README para rodar, testar e publicar.
 
-<!-- LOVABLE:END -->
+- Antes de commitar: `bun run typecheck`, `bun run lint`, `bun run format:check` e `bun run test`.
+- Nenhum preço no site público e nenhum dado de saúde enviado ao servidor pelos formulários.
+- Paleta: Preto Ônix #151515, Amarelo Real #F9DB5D e Cinza Alabastro #E5E5E4; títulos em New Order e textos em Urbanist.

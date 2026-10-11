@@ -3,8 +3,8 @@ import { cn } from "@/lib/utils";
 import { formatarVariacao } from "./avaliacoes";
 
 /**
- * Mudança entre dois registros, com seta e texto (nunca só cor). Fica verde quando vai no sentido
- * que o aluno deseja; sem sentido definido, o tom é neutro, sem julgar a variação.
+ * Mudança entre dois registros, com seta e texto (nunca só cor). Fica em destaque (Alabastro) quando vai no
+ * sentido que o aluno deseja; sem sentido definido, o tom é neutro, sem julgar a variação.
  */
 export function Variacao({
   valor,
@@ -39,7 +39,7 @@ export function Variacao({
     <span
       className={cn(
         "inline-flex items-center gap-1 text-xs font-semibold",
-        naDirecao ? "text-emerald-300" : "text-foreground/80",
+        naDirecao ? "text-foreground" : "text-foreground/80",
         className,
       )}
     >

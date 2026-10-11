@@ -10,7 +10,7 @@ import { Variacao } from "./Variacao";
 
 function NotaDoGrafico({ icone, children }: { icone: ReactNode; children: ReactNode }) {
   return (
-    <p className="mt-4 flex items-center gap-2.5 rounded-2xl border border-white/10 px-3.5 py-2.5 text-sm text-muted-foreground">
+    <p className="mt-4 flex items-center gap-2.5 rounded-2xl border border-foreground/10 px-3.5 py-2.5 text-sm text-muted-foreground">
       <span aria-hidden className="shrink-0 [&_svg]:size-4">
         {icone}
       </span>

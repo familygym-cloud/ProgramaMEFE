@@ -6,7 +6,7 @@ import { formatarContagem, formatarDescanso } from "./formatar";
 import type { Descanso } from "./useDescanso";
 
 const BOTAO =
-  "h-11 flex-1 rounded-full border-white/20 bg-transparent px-4 hover:bg-white/10 sm:flex-none";
+  "h-11 flex-1 rounded-full border-foreground/20 bg-transparent px-4 hover:bg-foreground/10 sm:flex-none";
 
 /** Descanso entre as séries de um exercício: botão para iniciar ou o cronômetro em andamento. */
 export function DescansoDoExercicio({
@@ -25,7 +25,7 @@ export function DescansoDoExercicio({
         type="button"
         variant="outline"
         onClick={() => descanso.iniciar(exercicio.id, exercicio.descansoSeg)}
-        className="h-11 rounded-full border-white/20 bg-transparent px-5 hover:bg-white/10"
+        className="h-11 rounded-full border-foreground/20 bg-transparent px-5 hover:bg-foreground/10"
       >
         <Timer aria-hidden />
         Descanso de {formatarDescanso(exercicio.descansoSeg)}

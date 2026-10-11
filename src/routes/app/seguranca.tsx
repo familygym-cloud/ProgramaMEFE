@@ -9,12 +9,15 @@ import { useAlunoApp } from "@/lib/aluno-app/store";
 
 export const Route = createFileRoute("/app/seguranca")({
   head: () => ({ meta: [{ title: "Segurança | Academia Family Gym" }] }),
+  validateSearch: (busca: Record<string, unknown>): { obrigatorio?: true } =>
+    busca["obrigatorio"] === true || busca["obrigatorio"] === "true" ? { obrigatorio: true } : {},
   component: Pagina,
 });
 
 function Pagina() {
   const { dados } = useAlunoApp();
   const dois = useDoisFatores(dados.demo);
+  const { obrigatorio } = Route.useSearch();
 
   return (
     <div className="space-y-8 sm:space-y-10">
@@ -25,6 +28,16 @@ function Pagina() {
           descricao="Proteja o seu acesso à Family Gym: verificação em duas etapas, senha e aparelhos conectados."
         />
       </div>
+
+      {obrigatorio && dois.fatores.length === 0 ? (
+        <p
+          role="alert"
+          className="rounded-2xl border border-brand-yellow/40 bg-brand-yellow/10 px-4 py-3 text-sm"
+        >
+          Para abrir as ferramentas da equipe é preciso ativar a verificação em duas etapas.
+          Cadastre o aplicativo autenticador abaixo; depois é só entrar de novo.
+        </p>
+      ) : null}
 
       <div className="fg-entrada" style={{ animationDelay: "80ms" }}>
         <ResumoProtecao duasEtapas={dois.fatores.length > 0} carregando={dois.carregando} />

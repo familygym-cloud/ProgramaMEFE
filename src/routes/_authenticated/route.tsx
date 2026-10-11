@@ -1,8 +1,9 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { isAuthRetryableFetchError } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
-import { exigirSegundaEtapaCumprida } from "@/lib/auth-mfa";
-import { rotaExclusivaDaEquipe, usuarioEhStaff } from "@/lib/staff";
+import { exigirSegundaEtapaCumprida, semSegundaEtapaConcluida } from "@/lib/auth-mfa";
+import { areaDaRota, destinoDaEquipe, ehEquipe, podeAcessar } from "@/lib/papeis";
+import { papeisDoUsuario } from "@/lib/staff";
 
 export const Route = createFileRoute("/_authenticated")({
   ssr: false,
@@ -19,10 +20,19 @@ export const Route = createFileRoute("/_authenticated")({
     }
     await exigirSegundaEtapaCumprida();
 
-    if (rotaExclusivaDaEquipe(location.pathname)) {
-      // Se a consulta falhar, deixa passar: a tela mostra o erro e o servidor continua recusando.
-      const equipe = await usuarioEhStaff(supabase, user.id).catch(() => true);
-      if (!equipe) throw redirect({ to: "/app" });
+    // Se a consulta de papéis falhar, deixa passar: a tela mostra o erro e o servidor/RLS recusam.
+    const papeis = await papeisDoUsuario(supabase, user.id).catch(() => null);
+    if (papeis && ehEquipe(papeis)) {
+      // A equipe só trabalha com verificação em duas etapas (o banco também exige). Quem ainda não
+      // cadastrou o aplicativo autenticador é levado a cadastrar antes de abrir qualquer ferramenta.
+      if (await semSegundaEtapaConcluida()) {
+        throw redirect({ to: "/app/seguranca", search: { obrigatorio: true } });
+      }
+    }
+
+    const area = areaDaRota(location.pathname);
+    if (area && papeis && !podeAcessar(papeis, area)) {
+      throw redirect({ to: ehEquipe(papeis) ? destinoDaEquipe(papeis) : "/app" });
     }
     return { user };
   },

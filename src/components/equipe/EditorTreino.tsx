@@ -97,7 +97,7 @@ export function EditorTreino({
             type="button"
             onClick={onFechar}
             aria-label="Fechar editor"
-            className="-mr-2 -mt-2 grid size-11 shrink-0 place-items-center rounded-xl text-muted-foreground transition-colors hover:bg-white/10 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-yellow/60"
+            className="-mr-2 -mt-2 grid size-11 shrink-0 place-items-center rounded-xl text-muted-foreground transition-colors hover:bg-foreground/10 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-yellow/60"
           >
             <X className="size-5" aria-hidden />
           </button>
@@ -166,7 +166,7 @@ export function EditorTreino({
             )}
           </Campo>
 
-          <label className="flex min-h-14 cursor-pointer items-center justify-between gap-4 rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 sm:col-span-2">
+          <label className="flex min-h-14 cursor-pointer items-center justify-between gap-4 rounded-2xl border border-foreground/10 bg-foreground/[0.03] px-4 py-3 sm:col-span-2">
             <span className="min-w-0">
               <span className="block text-sm font-medium">Treino ativo</span>
               <span id="descricao-treino-ativo" className="block text-xs text-muted-foreground">
@@ -178,7 +178,7 @@ export function EditorTreino({
               aria-describedby="descricao-treino-ativo"
               checked={form.ativo}
               onCheckedChange={(ativo) => editor.definir("ativo", ativo)}
-              className="data-[state=checked]:bg-brand-yellow data-[state=unchecked]:bg-white/20"
+              className="data-[state=checked]:bg-brand-yellow data-[state=unchecked]:bg-foreground/20"
             />
           </label>
         </div>
@@ -187,12 +187,12 @@ export function EditorTreino({
           <ListaExerciciosEditor editor={editor} />
         </div>
 
-        <div className="sticky bottom-0 z-10 -mx-5 -mb-5 mt-8 flex flex-col gap-3 rounded-b-3xl border-t border-white/10 bg-card/95 px-5 pb-seguro pt-3 backdrop-blur sm:-mx-6 sm:-mb-6 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+        <div className="sticky bottom-0 z-10 -mx-5 -mb-5 mt-8 flex flex-col gap-3 rounded-b-3xl border-t border-foreground/10 bg-card/95 px-5 pb-seguro pt-3 backdrop-blur sm:-mx-6 sm:-mb-6 sm:flex-row sm:items-center sm:justify-between sm:px-6">
           <p
             role="status"
             className={
               quantidadeErros > 0
-                ? "text-sm font-medium text-red-300"
+                ? "text-sm font-medium text-destructive"
                 : "hidden text-sm text-muted-foreground sm:block"
             }
           >
@@ -212,7 +212,7 @@ export function EditorTreino({
                 disabled={ocupado}
                 onClick={() => setConfirmarExclusao(true)}
                 aria-label="Excluir treino"
-                className="h-12 shrink-0 gap-2 rounded-full border-red-400/40 bg-transparent px-4 text-red-300 hover:bg-red-400/10 hover:text-red-200 sm:px-5"
+                className="h-12 shrink-0 gap-2 rounded-full border-destructive/40 bg-transparent px-4 text-destructive hover:bg-destructive/10 hover:text-destructive sm:px-5"
               >
                 {excluindo ? <Loader2 className="animate-spin" /> : <Trash2 />}
                 <span className="hidden sm:inline">Excluir</span>
@@ -234,7 +234,7 @@ export function EditorTreino({
         open={confirmarExclusao}
         onOpenChange={(aberto) => !excluindo && setConfirmarExclusao(aberto)}
       >
-        <AlertDialogContent className="w-[calc(100%-2rem)] rounded-3xl border-white/15 bg-card sm:rounded-3xl">
+        <AlertDialogContent className="w-[calc(100%-2rem)] rounded-3xl border-foreground/15 bg-card sm:rounded-3xl">
           <AlertDialogHeader>
             <AlertDialogTitle className="font-display text-xl">
               Excluir este treino?
@@ -246,13 +246,13 @@ export function EditorTreino({
           <AlertDialogFooter className="gap-2 sm:gap-0">
             <AlertDialogCancel
               disabled={excluindo}
-              className="h-11 rounded-full border-white/20 bg-transparent px-6"
+              className="h-11 rounded-full border-foreground/20 bg-transparent px-6"
             >
               Manter treino
             </AlertDialogCancel>
             <AlertDialogAction
               disabled={excluindo}
-              className="h-11 gap-2 rounded-full bg-red-600 px-6 text-white hover:bg-red-700"
+              className="h-11 gap-2 rounded-full bg-destructive px-6 text-destructive-foreground hover:bg-destructive/90"
               onClick={(e) => {
                 // O diálogo só fecha depois da exclusão (ou do erro), para o botão mostrar o andamento.
                 e.preventDefault();

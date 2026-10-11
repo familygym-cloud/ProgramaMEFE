@@ -11,14 +11,15 @@ import {
   segmentosEscalaImc,
 } from "./avaliacoes";
 
-// Uma cor por faixa (mesmos tons do Selo de classificação): atenção, ok, atenção, alerta, alerta.
+// Uma cor por faixa (mesmos tons do Selo de classificação): atenção, ok, atenção, alerta, alerta, alerta.
+// Faixas vizinhas da mesma cor se distinguem pela hachura, e a legenda abaixo escreve o nome de cada uma.
 const COR_FAIXA = [
+  "bg-brand-yellow hachura",
+  "bg-foreground",
   "bg-brand-yellow",
-  "bg-emerald-400",
-  "bg-brand-yellow",
-  "bg-red-400/70",
-  "bg-red-400",
-  "bg-red-400",
+  "bg-destructive/70",
+  "bg-destructive",
+  "bg-destructive hachura",
 ] as const;
 
 /** Marcações da régua: início e fim da escala e os cortes entre as faixas. */
@@ -58,10 +59,10 @@ export function MedidorIMC({ imc }: { imc: number }) {
             className="absolute top-0 flex -translate-x-1/2 flex-col items-center transition-[left] duration-1000 ease-out motion-reduce:transition-none"
             style={{ left: `${pronto ? posicao : 0}%` }}
           >
-            <span className="rounded-full bg-white px-3 py-1 font-display text-sm font-bold leading-none text-brand-black shadow-lg">
+            <span className="rounded-full bg-foreground px-3 py-1 font-display text-sm font-bold leading-none text-brand-black shadow-lg">
               {formatarNumero(imc)}
             </span>
-            <span className="h-2.5 w-0.5 bg-white" />
+            <span className="h-2.5 w-0.5 bg-foreground" />
           </div>
 
           <div className="flex h-4 overflow-hidden rounded-full">
@@ -104,7 +105,7 @@ export function MedidorIMC({ imc }: { imc: number }) {
             aria-current={i === ativa ? "true" : undefined}
             className={cn(
               "flex items-start gap-2.5 rounded-2xl border px-3 py-2.5",
-              i === ativa ? "border-white/25 bg-white/[0.07]" : "border-transparent",
+              i === ativa ? "border-foreground/25 bg-foreground/[0.07]" : "border-transparent",
             )}
           >
             <span aria-hidden className={cn("mt-1 size-2.5 shrink-0 rounded-full", COR_FAIXA[i])} />

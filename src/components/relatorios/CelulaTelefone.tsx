@@ -17,7 +17,7 @@ export function CelulaTelefone({
       href={`tel:${digitos}`}
       className={cn(
         // A área de toque passa de 44 px na vertical sem aumentar a linha (before:).
-        "relative whitespace-nowrap underline decoration-white/30 underline-offset-4 before:absolute before:-inset-x-1 before:-inset-y-3 hover:decoration-current",
+        "relative whitespace-nowrap underline decoration-foreground/30 underline-offset-4 before:absolute before:-inset-x-1 before:-inset-y-3 hover:decoration-current",
         className,
       )}
     >

@@ -144,12 +144,12 @@ export function BarraRegistro({
   quantidadeErros: number;
 }) {
   return (
-    <div className="sticky bottom-0 z-10 -mx-4 mt-6 flex flex-col gap-3 border-t border-white/10 bg-background/90 px-4 pb-seguro pt-3 backdrop-blur sm:-mx-6 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:mx-0 lg:rounded-3xl lg:border lg:bg-card/95 lg:px-5 lg:py-3">
+    <div className="sticky bottom-0 z-10 -mx-4 mt-6 flex flex-col gap-3 border-t border-foreground/10 bg-background/90 px-4 pb-seguro pt-3 backdrop-blur sm:-mx-6 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:mx-0 lg:rounded-3xl lg:border lg:bg-card/95 lg:px-5 lg:py-3">
       <p
         role="status"
         className={
           quantidadeErros > 0
-            ? "text-sm font-medium text-red-300"
+            ? "text-sm font-medium text-destructive"
             : "hidden text-sm text-muted-foreground sm:block"
         }
       >

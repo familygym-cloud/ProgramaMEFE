@@ -39,7 +39,7 @@ export function DicasDeUso() {
           <li key={passo.titulo} className="flex gap-4">
             <span
               aria-hidden
-              className="grid size-8 shrink-0 place-items-center rounded-full border border-white/15 font-display text-sm font-bold"
+              className="grid size-8 shrink-0 place-items-center rounded-full border border-foreground/15 font-display text-sm font-bold"
             >
               {i + 1}
             </span>
@@ -51,7 +51,7 @@ export function DicasDeUso() {
         ))}
       </ol>
 
-      <p className="flex items-start gap-3 rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-muted-foreground">
+      <p className="flex items-start gap-3 rounded-2xl border border-foreground/10 bg-foreground/[0.03] px-4 py-3 text-sm text-muted-foreground">
         <HeartPulse className="mt-0.5 size-4 shrink-0 text-brand-yellow" aria-hidden />
         Sentiu dor ou desconforto? Pare o exercício e avise seu professor. Técnica e conforto vêm
         antes da carga.

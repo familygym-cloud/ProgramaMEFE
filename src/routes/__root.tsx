@@ -11,8 +11,9 @@ import { useEffect, type ReactNode } from "react";
 
 import { Toaster } from "@/components/ui/sonner";
 import appCss from "../styles.css?url";
+import urbanistLatim from "@fontsource-variable/urbanist/files/urbanist-latin-wght-normal.woff2?url";
 import { reagirAoEventoDeAuth } from "../lib/auth-sessao";
-import { reportLovableError } from "../lib/lovable-error-reporting";
+import { limparDadosOffline, ouvirInstalacao, registrarServiceWorker } from "../lib/pwa";
 import { urlAbsoluta } from "../lib/site";
 
 const NOME_DO_SITE = "Academia Family Gym";
@@ -47,7 +48,7 @@ function ErrorComponent({ error, reset }: { error: unknown; reset: () => void })
   console.error(error);
   const router = useRouter();
   useEffect(() => {
-    reportLovableError(error, { boundary: "tanstack_root_error_component" });
+    // O erro já foi enviado ao console acima; aqui entraria um serviço de monitoramento, se houver.
   }, [error]);
 
   return (
@@ -109,6 +110,22 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "theme-color", content: "#151515" },
     ],
     links: [
+      // Fontes antes do CSS: Urbanist (textos, auto-hospedada) e New Order (títulos, em
+      // public/fonts, fora do git: sem o arquivo o título cai na Urbanist e o 404 é inofensivo).
+      {
+        rel: "preload",
+        as: "font",
+        type: "font/woff2",
+        href: urbanistLatim,
+        crossOrigin: "anonymous",
+      },
+      {
+        rel: "preload",
+        as: "font",
+        type: "font/otf",
+        href: "/fonts/NewOrder-Regular.otf",
+        crossOrigin: "anonymous",
+      },
       {
         rel: "stylesheet",
         href: appCss,
@@ -143,6 +160,12 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const router = useRouter();
 
+  // Aplicativo instalável e treino offline (service worker só em produção).
+  useEffect(() => {
+    registrarServiceWorker();
+    ouvirInstalacao();
+  }, []);
+
   useEffect(() => {
     let cancelado = false;
     let cancelarAssinatura: (() => void) | undefined;
@@ -165,6 +188,7 @@ function RootComponent() {
             // a próxima pessoa que usar este navegador.
             void queryClient.cancelQueries();
             queryClient.clear();
+            limparDadosOffline();
             void router.invalidate();
           } else if (decisao.acao === "atualizar") {
             void router.invalidate();

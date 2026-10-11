@@ -6,7 +6,7 @@ const PASSOS: { icone: LucideIcon; titulo: string; texto: string }[] = [
     icone: ClipboardList,
     titulo: "Escolha o seu plano",
     texto:
-      "Compare modalidades, periodicidades e valores. Tem família na jogada? Veja as condições especiais.",
+      "Conheça as modalidades e o que cada plano inclui. Para se matricular, fale com a recepção da Family Gym.",
   },
   {
     icone: UserPlus,
@@ -33,12 +33,12 @@ export function ComoFunciona() {
         {PASSOS.map(({ icone: Icone, titulo, texto }, i) => (
           <li
             key={titulo}
-            className="fg-entrada relative overflow-hidden rounded-3xl border border-white/10 bg-card/60 p-6 sm:p-7"
+            className="fg-entrada relative overflow-hidden rounded-3xl border border-foreground/10 bg-card/60 p-6 sm:p-7"
             style={{ animationDelay: `${i * 100}ms` }}
           >
             <span
               aria-hidden="true"
-              className="pointer-events-none absolute -right-2 -top-4 select-none font-display text-[7rem] font-bold leading-none text-white/[0.04]"
+              className="pointer-events-none absolute -right-2 -top-4 select-none font-display text-[7rem] font-bold leading-none text-foreground/[0.04]"
             >
               {i + 1}
             </span>

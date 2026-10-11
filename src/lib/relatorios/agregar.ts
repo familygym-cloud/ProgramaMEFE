@@ -44,7 +44,7 @@ import {
 } from "../aluno-app/derive";
 import type { CheckIn } from "../aluno-app/types";
 import { hojeBrasilia } from "../datas";
-import { planosCatalogo } from "../planos-catalogo";
+import { planosInfo } from "../planos-info";
 import type {
   AlunoBruto,
   AlunoInadimplente,
@@ -203,7 +203,7 @@ function criarResolvedor(
  * "Plano Melhor Idade" viram uma linha só no relatório.
  */
 const PLANOS_OFICIAIS: ReadonlyMap<string, string> = new Map(
-  planosCatalogo.flatMap((p) => {
+  planosInfo.flatMap((p) => {
     const chaves = new Set([
       chaveTexto(p.slug),
       chaveTexto(p.slug.replace(/-/g, " ")),

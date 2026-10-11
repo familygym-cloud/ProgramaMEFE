@@ -44,7 +44,7 @@ export function PainelSessao({
         </dl>
       </div>
 
-      <div className="space-y-1.5 border-t border-white/10 pt-5">
+      <div className="space-y-1.5 border-t border-foreground/10 pt-5">
         <p className="text-[0.68rem] font-medium uppercase tracking-wider text-muted-foreground">
           Tempo de treino
         </p>

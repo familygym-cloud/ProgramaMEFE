@@ -33,7 +33,7 @@ const TODOS = "__todos__";
 
 /** O texto do valor corta com reticências (o `line-clamp` do shadcn não faz isso em uma linha só). */
 const CLASSE_SELECT =
-  "h-11 rounded-full border-white/20 bg-white/[0.03] px-4 text-sm shadow-none hover:bg-white/[0.07] data-[state=open]:bg-white/[0.07] [&>span]:block! [&>span]:min-w-0 [&>span]:truncate";
+  "h-11 rounded-full bg-foreground/[0.03] px-4 text-sm shadow-none hover:bg-foreground/[0.07] data-[state=open]:bg-foreground/[0.07] [&>span]:block! [&>span]:min-w-0 [&>span]:truncate";
 
 type OpcaoSeletor = {
   valor: string;
@@ -77,7 +77,7 @@ function SeletorFiltro({
           )}
         </SelectValue>
       </SelectTrigger>
-      <SelectContent className="rounded-2xl border-white/15">
+      <SelectContent className="rounded-2xl border-foreground/15">
         <SelectItem value={TODOS} className="min-h-11">
           {todos}
         </SelectItem>
@@ -139,7 +139,7 @@ export function FiltrosAlunos({
           onChange={(e) => aoMudarFiltro({ ...filtro, busca: e.target.value })}
           placeholder="Nome, plano ou telefone"
           autoComplete="off"
-          className="h-11 rounded-full border-white/20 bg-white/[0.03] pl-11 pr-11 text-base shadow-none md:text-sm [&::-webkit-search-cancel-button]:appearance-none"
+          className="h-11 rounded-full border-foreground/20 bg-foreground/[0.03] pl-11 pr-11 text-base shadow-none md:text-sm [&::-webkit-search-cancel-button]:appearance-none"
         />
         {filtro.busca ? (
           <button
@@ -204,7 +204,7 @@ export function FiltrosAlunos({
             <SelectTrigger aria-label="Ordenar por" className={CLASSE_SELECT}>
               <SelectValue />
             </SelectTrigger>
-            <SelectContent className="rounded-2xl border-white/15">
+            <SelectContent className="rounded-2xl border-foreground/15">
               {COLUNAS_ORDEM_ALUNOS.map((coluna) => (
                 <SelectItem key={coluna} value={coluna} className="min-h-11">
                   Ordenar por: {ROTULO_COLUNA_ORDEM[coluna].toLowerCase()}
@@ -218,7 +218,7 @@ export function FiltrosAlunos({
           variant="outline"
           onClick={() => aoMudarOrdem({ ...ordem, direcao: crescente ? "desc" : "asc" })}
           aria-label={`Inverter a ordem. Agora: ${descreverOrdem(ordem)}`}
-          className="size-11 shrink-0 rounded-full border-white/20 bg-transparent p-0 hover:bg-white/10 hover:text-foreground"
+          className="size-11 shrink-0 rounded-full border-foreground/20 bg-transparent p-0 hover:bg-foreground/10 hover:text-foreground"
         >
           <IconeOrdem aria-hidden />
         </Button>
@@ -236,7 +236,7 @@ export function FiltrosAlunos({
             type="button"
             variant="ghost"
             onClick={() => aoMudarFiltro(SEM_FILTRO)}
-            className="-mr-3 h-11 gap-2 rounded-full px-3 text-sm text-brand-yellow hover:bg-white/10 hover:text-brand-yellow"
+            className="-mr-3 h-11 gap-2 rounded-full px-3 text-sm text-brand-yellow hover:bg-foreground/10 hover:text-brand-yellow"
           >
             <X aria-hidden /> Limpar filtros
           </Button>

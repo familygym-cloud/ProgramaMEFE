@@ -91,7 +91,7 @@ export function DiaDaAgenda({
                 <Button
                   type="button"
                   onClick={() => onIrParaDia(proximoDia)}
-                  className="h-11 rounded-full bg-white px-5 font-semibold text-brand-black hover:bg-white/85"
+                  className="h-11 rounded-full bg-foreground px-5 font-semibold text-brand-black hover:bg-foreground/85"
                 >
                   Ir para {diaCurto(proximoDia, hoje)}
                   <ArrowRight aria-hidden />
@@ -102,7 +102,7 @@ export function DiaDaAgenda({
                   type="button"
                   variant="outline"
                   onClick={onLimparFiltro}
-                  className="h-11 rounded-full border-white/20 bg-transparent px-5 hover:bg-white/10"
+                  className="h-11 rounded-full border-foreground/20 bg-transparent px-5 hover:bg-foreground/10"
                 >
                   Ver todas as modalidades
                 </Button>

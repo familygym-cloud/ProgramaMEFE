@@ -5,14 +5,16 @@ import { CtaFinal } from "@/components/site/CtaFinal";
 import { perguntasFrequentes } from "@/components/site/faq";
 import { FrentesFamilia } from "@/components/site/FrentesFamilia";
 import { HeroLanding } from "@/components/site/HeroLanding";
+import { FaixaMefe } from "@/components/mefe/FaixaMefe";
 import { PlanosDestaque } from "@/components/site/PlanosDestaque";
 import { SecaoFaq } from "@/components/site/SecaoFaq";
+import { SecaoOndeEstamos } from "@/components/site/SecaoOndeEstamos";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { marcasCanonicas } from "@/lib/site";
 
 const TITULO = "Academia Family Gym | Treine em família. Evolua sempre.";
 const DESCRICAO =
-  "Musculação, aulas coletivas, lutas, natação, melhor idade e kids em uma academia pensada para toda a família. Veja planos e valores e conheça a área do aluno.";
+  "Musculação, aulas coletivas, lutas, natação, melhor idade e kids em uma academia pensada para toda a família. Conheça os planos, a grade de aulas e a área do aluno.";
 
 const dadosEstruturados = {
   "@context": "https://schema.org",
@@ -49,9 +51,11 @@ function Home() {
     <SiteLayout>
       <HeroLanding />
       <FrentesFamilia />
+      <FaixaMefe />
       <AreaAlunoVitrine />
       <ComoFunciona />
       <PlanosDestaque />
+      <SecaoOndeEstamos />
       <SecaoFaq itens={perguntasFrequentes} />
       <CtaFinal />
     </SiteLayout>

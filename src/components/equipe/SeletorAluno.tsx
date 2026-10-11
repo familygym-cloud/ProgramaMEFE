@@ -23,7 +23,7 @@ export function AvatarAluno({ nome, className }: { nome: string; className?: str
     <span
       aria-hidden
       className={cn(
-        "grid size-11 shrink-0 place-items-center rounded-2xl bg-white/[0.07] font-display text-sm font-bold tracking-wide text-foreground",
+        "grid size-11 shrink-0 place-items-center rounded-2xl bg-foreground/[0.07] font-display text-sm font-bold tracking-wide text-foreground",
         className,
       )}
     >
@@ -60,7 +60,7 @@ export function SeletorAluno({
           <button
             type="button"
             aria-label={atual ? `Aluno selecionado: ${atual.nome}. Trocar aluno` : "Escolher aluno"}
-            className="flex min-h-16 w-full items-center gap-4 rounded-2xl border border-white/15 bg-white/[0.03] px-4 py-2.5 text-left transition-colors hover:border-white/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-yellow/60 data-[state=open]:border-brand-yellow/60"
+            className="flex min-h-16 w-full items-center gap-4 rounded-2xl border border-foreground/15 bg-foreground/[0.03] px-4 py-2.5 text-left transition-colors hover:border-foreground/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-yellow/60 data-[state=open]:border-brand-yellow/60"
           >
             {atual ? (
               <>
@@ -76,7 +76,7 @@ export function SeletorAluno({
               </>
             ) : (
               <>
-                <span className="grid size-11 shrink-0 place-items-center rounded-2xl border border-dashed border-white/20 text-muted-foreground">
+                <span className="grid size-11 shrink-0 place-items-center rounded-2xl border border-dashed border-foreground/20 text-muted-foreground">
                   <Search className="size-5" aria-hidden />
                 </span>
                 <span className="flex-1 text-base text-muted-foreground">
@@ -89,7 +89,7 @@ export function SeletorAluno({
         </PopoverTrigger>
         <PopoverContent
           align="start"
-          className="w-(--radix-popover-trigger-width) max-w-[36rem] overflow-hidden rounded-2xl border-white/15 bg-popover p-0"
+          className="w-(--radix-popover-trigger-width) max-w-[36rem] overflow-hidden rounded-2xl border-foreground/15 bg-popover p-0"
         >
           <Command filter={filtrar}>
             <CommandInput placeholder="Buscar pelo nome do aluno" className="h-12 text-base" />
@@ -104,7 +104,7 @@ export function SeletorAluno({
                     setAberto(false);
                     onChange(aluno.id);
                   }}
-                  className="min-h-12 gap-3 rounded-xl px-3 py-2 data-[selected=true]:bg-white/10 data-[selected=true]:text-foreground"
+                  className="min-h-12 gap-3 rounded-xl px-3 py-2 data-[selected=true]:bg-foreground/10 data-[selected=true]:text-foreground"
                 >
                   <AvatarAluno nome={aluno.nome} className="size-9 rounded-xl text-xs" />
                   <span className="min-w-0 flex-1">

@@ -16,7 +16,7 @@ export function CabecalhoPagina({
   lateral?: ReactNode;
 }) {
   return (
-    <section className="relative isolate overflow-hidden border-b border-white/10">
+    <section className="relative isolate overflow-hidden border-b border-foreground/10">
       <div
         aria-hidden="true"
         className="bg-grade absolute inset-0 -z-10 [mask-image:radial-gradient(ellipse_90%_100%_at_50%_0%,black_10%,transparent_75%)]"

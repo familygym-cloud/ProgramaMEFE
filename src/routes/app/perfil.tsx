@@ -3,6 +3,7 @@ import { DadosCadastro } from "@/components/app/perfil/DadosCadastro";
 import { FormularioContato } from "@/components/app/perfil/FormularioContato";
 import { IdentidadeAluno } from "@/components/app/perfil/IdentidadeAluno";
 import { PrivacidadeDados } from "@/components/app/perfil/PrivacidadeDados";
+import { InstalarApp } from "@/components/app/perfil/InstalarApp";
 import { PageHeader } from "@/components/app/ui";
 import { useAlunoApp } from "@/lib/aluno-app/store";
 
@@ -38,6 +39,10 @@ function Pagina() {
         <div className="lg:col-span-2">
           <FormularioContato />
         </div>
+      </div>
+
+      <div className="fg-entrada" style={{ animationDelay: "170ms" }}>
+        <InstalarApp />
       </div>
 
       <div className="fg-entrada" style={{ animationDelay: "200ms" }}>

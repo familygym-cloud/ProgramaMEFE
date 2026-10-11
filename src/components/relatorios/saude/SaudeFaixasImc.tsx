@@ -8,16 +8,20 @@ import { formatarPercentual, pluralizar } from "@/lib/relatorios/formatar";
 import { detalharFaixasImc, type FaixaImcDetalhada } from "@/lib/relatorios/saude";
 import { cn } from "@/lib/utils";
 
-/** Cor de cada faixa, do cinza (abaixo do peso) ao vermelho escuro; no papel escurecem juntas. */
+/**
+ * Preenchimento de cada faixa, só com a paleta: Alabastro (abaixo do peso e saudável), Amarelo
+ * (sobrepeso e obesidade I e II) e o vermelho funcional (obesidade III). As faixas vizinhas
+ * se distinguem também pela hachura, e no papel (Alabastro vira Onix) continuam diferentes.
+ */
 const COR_FAIXA: Record<string, string> = {
-  "Abaixo do peso": "bg-brand-grey",
-  "Peso saudável": "bg-emerald-400 print:bg-emerald-700",
-  Sobrepeso: "bg-brand-yellow",
-  "Obesidade grau I": "bg-orange-400 print:bg-orange-600",
-  "Obesidade grau II": "bg-red-400",
-  "Obesidade grau III": "bg-red-600 print:bg-red-950",
+  "Abaixo do peso": "bg-foreground/40",
+  "Peso saudável": "bg-foreground",
+  Sobrepeso: "bg-brand-yellow/60",
+  "Obesidade grau I": "bg-brand-yellow",
+  "Obesidade grau II": "bg-brand-yellow hachura",
+  "Obesidade grau III": "bg-destructive hachura",
 };
-const COR_PADRAO = "bg-white/40";
+const COR_PADRAO = "bg-foreground/20";
 
 const corDaFaixa = (faixa: string): string => COR_FAIXA[faixa] ?? COR_PADRAO;
 
@@ -48,7 +52,7 @@ function BarraEmpilhada({ faixas }: { faixas: readonly FaixaImcDetalhada[] }) {
 
 function LinhaFaixa({ faixa }: { faixa: FaixaImcDetalhada }) {
   return (
-    <li className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 print:break-inside-avoid">
+    <li className="flex items-center gap-3 rounded-2xl border border-foreground/10 bg-foreground/[0.03] px-4 py-3 print:break-inside-avoid">
       <span
         aria-hidden
         className={cn("size-3.5 shrink-0 rounded-[5px]", corDaFaixa(faixa.faixa))}

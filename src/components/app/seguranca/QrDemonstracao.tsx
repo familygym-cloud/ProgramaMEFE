@@ -65,8 +65,8 @@ export function QrDemonstracao({ className }: { className?: string }) {
       shapeRendering="crispEdges"
       className={cn("block", className)}
     >
-      <rect x={-2} y={-2} width={LADO + 4} height={LADO + 4} fill="#ffffff" />
-      <path d={CAMINHO} fill="#151515" />
+      <rect x={-2} y={-2} width={LADO + 4} height={LADO + 4} fill="var(--fg-alabastro)" />
+      <path d={CAMINHO} fill="var(--fg-onix)" />
     </svg>
   );
 }

@@ -89,6 +89,12 @@ export type AulaAgenda = {
   ocupadas: number;
   /** O aluno logado já reservou esta aula. */
   reservada: boolean;
+  /** O aluno está na lista de espera desta aula lotada. */
+  naFila: boolean;
+  /** Posição na fila (1 = próximo a entrar), ou `null` fora da fila. */
+  posicaoFila: number | null;
+  /** Quando o aluno saiu da fila e ganhou a vaga (ISO), ou `null`. */
+  promovidaEm: string | null;
 };
 
 export type StatusPagamento = "pago" | "pendente" | "atrasado" | string;

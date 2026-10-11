@@ -17,7 +17,7 @@ function LinhaAssinatura({
   valor: string;
 }) {
   return (
-    <div className="grid grid-cols-[1fr_auto] items-center gap-x-4 border-b border-white/10 py-3 first:pt-0 last:border-b-0 last:pb-0">
+    <div className="grid grid-cols-[1fr_auto] items-center gap-x-4 border-b border-foreground/10 py-3 first:pt-0 last:border-b-0 last:pb-0">
       <dt className="col-start-1 row-start-1 min-w-0 text-sm font-medium">{rotulo}</dt>
       <dd className="col-start-1 row-start-2 mt-0.5 min-w-0 text-xs leading-snug text-muted-foreground">
         {detalhe}

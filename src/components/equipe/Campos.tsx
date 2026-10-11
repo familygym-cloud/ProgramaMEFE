@@ -6,10 +6,10 @@ import { cn } from "@/lib/utils";
 
 /** Visual dos campos de texto da equipe: 48px de altura (alvo de toque confortável) e cantos largos. */
 export const CLASSE_CAMPO =
-  "h-12 rounded-2xl border-white/15 bg-white/[0.03] px-4 text-base shadow-none hover:border-white/25 focus-visible:border-brand-yellow/70 focus-visible:ring-2 focus-visible:ring-brand-yellow/40 aria-[invalid=true]:border-red-400/70 aria-[invalid=true]:ring-red-400/30 md:text-base";
+  "h-12 rounded-2xl bg-foreground/[0.03] px-4 text-base shadow-none hover:border-foreground/70 focus-visible:border-brand-yellow/70 focus-visible:ring-2 focus-visible:ring-brand-yellow/40 aria-[invalid=true]:border-destructive/70 aria-[invalid=true]:ring-destructive/30 md:text-base";
 
 export const CLASSE_AREA_TEXTO =
-  "min-h-24 rounded-2xl border-white/15 bg-white/[0.03] px-4 py-3 text-base shadow-none hover:border-white/25 focus-visible:border-brand-yellow/70 focus-visible:ring-2 focus-visible:ring-brand-yellow/40 aria-[invalid=true]:border-red-400/70 aria-[invalid=true]:ring-red-400/30 md:text-base";
+  "min-h-24 rounded-2xl bg-foreground/[0.03] px-4 py-3 text-base shadow-none hover:border-foreground/70 focus-visible:border-brand-yellow/70 focus-visible:ring-2 focus-visible:ring-brand-yellow/40 aria-[invalid=true]:border-destructive/70 aria-[invalid=true]:ring-destructive/30 md:text-base";
 
 type PropsDoControle = {
   id: string;
@@ -54,7 +54,7 @@ export function Campo({
           id={idMensagem}
           className={cn(
             "flex items-start gap-1.5 text-xs leading-relaxed",
-            erro ? "text-red-300" : "text-muted-foreground",
+            erro ? "text-destructive" : "text-muted-foreground",
           )}
         >
           {erro ? <AlertCircle className="mt-0.5 size-3.5 shrink-0" aria-hidden /> : null}
@@ -161,7 +161,7 @@ export function OpcoesSegmentadas<T extends string | number | null>({
             key={opcao.rotulo}
             value={String(indice)}
             title={opcao.descricao}
-            className="flex min-h-12 items-center justify-center rounded-2xl border border-white/15 bg-white/[0.03] px-3 text-sm font-medium text-foreground/80 transition-colors hover:border-white/30 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-yellow/60 data-[state=checked]:border-brand-yellow data-[state=checked]:bg-brand-yellow/10 data-[state=checked]:text-brand-yellow"
+            className="flex min-h-12 items-center justify-center rounded-2xl border border-input bg-foreground/[0.03] px-3 text-sm font-medium text-foreground/80 transition-colors hover:border-foreground/70 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-yellow/60 data-[state=checked]:border-brand-yellow data-[state=checked]:bg-brand-yellow/10 data-[state=checked]:text-brand-yellow"
           >
             {opcao.rotulo}
           </RadioGroup.Item>
