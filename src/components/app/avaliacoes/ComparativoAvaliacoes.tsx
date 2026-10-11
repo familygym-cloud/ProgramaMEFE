@@ -117,59 +117,39 @@ export function ComparativoAvaliacoes({
           Não há medidas registradas nessas datas. Tente outras datas.
         </p>
       ) : (
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[22rem] text-sm">
-            <caption className="sr-only">
-              Comparação entre {dataCurta(antesData)} e {dataCurta(depoisData)}
-            </caption>
-            <thead>
-              <tr className="text-left text-xs uppercase tracking-widest text-muted-foreground">
-                <th scope="col" className="py-2 pr-3 font-medium">
-                  Medida
-                </th>
-                <th scope="col" className="py-2 pr-3 font-medium">
-                  {dataCurta(antesData)}
-                </th>
-                <th scope="col" className="py-2 pr-3 font-medium">
-                  {dataCurta(depoisData)}
-                </th>
-                <th scope="col" className="py-2 text-right font-medium">
-                  Diferença
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-foreground/10">
-              {linhas.map((l) => {
-                const Icone =
-                  l.diferenca === null || l.diferenca === 0
-                    ? Minus
-                    : l.diferenca < 0
-                      ? TrendingDown
-                      : TrendingUp;
-                return (
-                  <tr key={l.campo}>
-                    <th scope="row" className="py-3 pr-3 text-left font-medium">
-                      {l.rotulo}
-                    </th>
-                    <td className="py-3 pr-3 tabular-nums text-foreground/85">
+        <div>
+          <p className="sr-only">
+            Comparação entre {dataCurta(antesData)} e {dataCurta(depoisData)}
+          </p>
+          <ul className="divide-y divide-foreground/10">
+            {linhas.map((l) => {
+              const Icone =
+                l.diferenca === null || l.diferenca === 0
+                  ? Minus
+                  : l.diferenca < 0
+                    ? TrendingDown
+                    : TrendingUp;
+              return (
+                <li key={l.campo} className="flex items-center justify-between gap-4 py-3">
+                  <div className="min-w-0">
+                    <p className="font-medium">{l.rotulo}</p>
+                    <p className="text-sm tabular-nums text-muted-foreground">
                       {valor(l.antes, l.casas, l.unidade)}
-                    </td>
-                    <td className="py-3 pr-3 tabular-nums">
-                      {valor(l.depois, l.casas, l.unidade)}
-                    </td>
-                    <td className="py-3 text-right tabular-nums font-semibold">
-                      <span className="inline-flex items-center justify-end gap-1.5">
-                        <Icone aria-hidden className="size-3.5" />
-                        {l.diferenca === null
-                          ? "—"
-                          : `${formatarVariacao(l.diferenca, l.casas)}${l.unidade ? ` ${l.unidade}` : ""}`}
-                      </span>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+                      <span aria-hidden> → </span>
+                      <span className="sr-only"> para </span>
+                      <span className="text-foreground">{valor(l.depois, l.casas, l.unidade)}</span>
+                    </p>
+                  </div>
+                  <p className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-foreground/10 px-3 py-1.5 text-sm font-semibold tabular-nums">
+                    <Icone aria-hidden className="size-3.5" />
+                    {l.diferenca === null
+                      ? "—"
+                      : `${formatarVariacao(l.diferenca, l.casas)}${l.unidade ? ` ${l.unidade}` : ""}`}
+                  </p>
+                </li>
+              );
+            })}
+          </ul>
         </div>
       )}
       <p className="text-xs text-muted-foreground">
