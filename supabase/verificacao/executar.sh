@@ -51,5 +51,6 @@ fi
 "${PSQL[@]}" -f 06_papeis_equipe.sql
 "${PSQL[@]}" -f 07_lista_de_espera.sql
 "${PSQL[@]}" -f 08_integracoes_api.sql
+"${PSQL[@]}" -f 09_interessados.sql
 if (( CONCORRENCIA )); then DATABASE_URL="$DATABASE_URL" ./concorrencia.sh; fi
 if (( TIPOS )); then DATABASE_URL="$DATABASE_URL" node comparar_tipos.mjs; fi

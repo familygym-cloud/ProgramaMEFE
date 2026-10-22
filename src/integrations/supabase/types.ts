@@ -14,6 +14,51 @@ export type Database = {
   }
   public: {
     Tables: {
+      interessados: {
+        Row: {
+          anotacao: string | null
+          atualizado_em: string
+          consentimento_em: string
+          criado_em: string
+          email: string | null
+          id: string
+          interesse: string
+          mensagem: string | null
+          nome: string
+          status: string
+          telefone: string
+          tipo: string
+        }
+        Insert: {
+          anotacao?: string | null
+          atualizado_em?: string
+          consentimento_em: string
+          criado_em?: string
+          email?: string | null
+          id?: string
+          interesse: string
+          mensagem?: string | null
+          nome: string
+          status?: string
+          telefone: string
+          tipo: string
+        }
+        Update: {
+          anotacao?: string | null
+          atualizado_em?: string
+          consentimento_em?: string
+          criado_em?: string
+          email?: string | null
+          id?: string
+          interesse?: string
+          mensagem?: string | null
+          nome?: string
+          status?: string
+          telefone?: string
+          tipo?: string
+        }
+        Relationships: []
+      }
       acessos: {
         Row: {
           aluno_id: string
@@ -750,6 +795,17 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      registrar_interessado: {
+        Args: {
+          _email: string
+          _interesse: string
+          _mensagem: string
+          _nome: string
+          _telefone: string
+          _tipo: string
+        }
+        Returns: string
+      }
       api_baixar_pagamento: {
         Args: {
           _aluno: string

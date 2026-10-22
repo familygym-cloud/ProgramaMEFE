@@ -63,6 +63,9 @@ export function CtaFinal({
                 Ver a grade de aulas
               </Link>
             ) : null}
+            <Link to="/comece" className={botaoMarca("contorno-escuro", "lg")}>
+              Quero me matricular
+            </Link>
             <Link to="/app" search={{ demo: true }} className={botaoMarca("contorno-escuro", "lg")}>
               Ver a área do aluno em ação
             </Link>

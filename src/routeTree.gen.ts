@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as ComeceRouteImport } from './routes/comece'
 import { Route as EquipeDemoRouteImport } from './routes/equipe-demo'
 import { Route as GradeRouteImport } from './routes/grade'
 import { Route as MefeRouteImport } from './routes/mefe'
@@ -27,6 +28,7 @@ import { Route as AuthenticatedAulasRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedFinanceiroRouteImport } from './routes/_authenticated/financeiro'
 import { Route as AuthenticatedIntegracoesRouteImport } from './routes/_authenticated/integracoes'
+import { Route as AuthenticatedInteressadosRouteImport } from './routes/_authenticated/interessados'
 import { Route as AuthenticatedPlanosRouteImport } from './routes/_authenticated/planos'
 import { Route as AuthenticatedPrescricaoTreinosRouteImport } from './routes/_authenticated/prescricao-treinos'
 import { Route as AuthenticatedRegistrarAvaliacaoRouteImport } from './routes/_authenticated/registrar-avaliacao'
@@ -73,6 +75,11 @@ const AppRoute = AppRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ComeceRoute = ComeceRouteImport.update({
+  id: '/comece',
+  path: '/comece',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EquipeDemoRoute = EquipeDemoRouteImport.update({
@@ -144,6 +151,12 @@ const AuthenticatedIntegracoesRoute =
   AuthenticatedIntegracoesRouteImport.update({
     id: '/integracoes',
     path: '/integracoes',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedInteressadosRoute =
+  AuthenticatedInteressadosRouteImport.update({
+    id: '/interessados',
+    path: '/interessados',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedPlanosRoute = AuthenticatedPlanosRouteImport.update({
@@ -296,6 +309,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
   '/auth': typeof AuthRoute
+  '/comece': typeof ComeceRoute
   '/equipe-demo': typeof EquipeDemoRoute
   '/grade': typeof GradeRoute
   '/mefe': typeof MefeRoute
@@ -310,6 +324,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/financeiro': typeof AuthenticatedFinanceiroRoute
   '/integracoes': typeof AuthenticatedIntegracoesRoute
+  '/interessados': typeof AuthenticatedInteressadosRoute
   '/planos': typeof AuthenticatedPlanosRoute
   '/prescricao-treinos': typeof AuthenticatedPrescricaoTreinosRoute
   '/registrar-avaliacao': typeof AuthenticatedRegistrarAvaliacaoRoute
@@ -342,6 +357,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/comece': typeof ComeceRoute
   '/equipe-demo': typeof EquipeDemoRoute
   '/grade': typeof GradeRoute
   '/mefe': typeof MefeRoute
@@ -356,6 +372,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/financeiro': typeof AuthenticatedFinanceiroRoute
   '/integracoes': typeof AuthenticatedIntegracoesRoute
+  '/interessados': typeof AuthenticatedInteressadosRoute
   '/planos': typeof AuthenticatedPlanosRoute
   '/prescricao-treinos': typeof AuthenticatedPrescricaoTreinosRoute
   '/registrar-avaliacao': typeof AuthenticatedRegistrarAvaliacaoRoute
@@ -391,6 +408,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/app': typeof AppRouteWithChildren
   '/auth': typeof AuthRoute
+  '/comece': typeof ComeceRoute
   '/equipe-demo': typeof EquipeDemoRoute
   '/grade': typeof GradeRoute
   '/mefe': typeof MefeRoute
@@ -405,6 +423,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/financeiro': typeof AuthenticatedFinanceiroRoute
   '/_authenticated/integracoes': typeof AuthenticatedIntegracoesRoute
+  '/_authenticated/interessados': typeof AuthenticatedInteressadosRoute
   '/_authenticated/planos': typeof AuthenticatedPlanosRoute
   '/_authenticated/prescricao-treinos': typeof AuthenticatedPrescricaoTreinosRoute
   '/_authenticated/registrar-avaliacao': typeof AuthenticatedRegistrarAvaliacaoRoute
@@ -440,6 +459,7 @@ export interface FileRouteTypes {
     | '/'
     | '/app'
     | '/auth'
+    | '/comece'
     | '/equipe-demo'
     | '/grade'
     | '/mefe'
@@ -454,6 +474,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/financeiro'
     | '/integracoes'
+    | '/interessados'
     | '/planos'
     | '/prescricao-treinos'
     | '/registrar-avaliacao'
@@ -486,6 +507,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/comece'
     | '/equipe-demo'
     | '/grade'
     | '/mefe'
@@ -500,6 +522,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/financeiro'
     | '/integracoes'
+    | '/interessados'
     | '/planos'
     | '/prescricao-treinos'
     | '/registrar-avaliacao'
@@ -534,6 +557,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/app'
     | '/auth'
+    | '/comece'
     | '/equipe-demo'
     | '/grade'
     | '/mefe'
@@ -548,6 +572,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard'
     | '/_authenticated/financeiro'
     | '/_authenticated/integracoes'
+    | '/_authenticated/interessados'
     | '/_authenticated/planos'
     | '/_authenticated/prescricao-treinos'
     | '/_authenticated/registrar-avaliacao'
@@ -583,6 +608,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AppRoute: typeof AppRouteWithChildren
   AuthRoute: typeof AuthRoute
+  ComeceRoute: typeof ComeceRoute
   EquipeDemoRoute: typeof EquipeDemoRoute
   GradeRoute: typeof GradeRoute
   MefeRoute: typeof MefeRoute
@@ -630,6 +656,13 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/comece': {
+      id: '/comece'
+      path: '/comece'
+      fullPath: '/comece'
+      preLoaderRoute: typeof ComeceRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/equipe-demo': {
@@ -728,6 +761,13 @@ declare module '@tanstack/react-router' {
       path: '/integracoes'
       fullPath: '/integracoes'
       preLoaderRoute: typeof AuthenticatedIntegracoesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/interessados': {
+      id: '/_authenticated/interessados'
+      path: '/interessados'
+      fullPath: '/interessados'
+      preLoaderRoute: typeof AuthenticatedInteressadosRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/planos': {
@@ -934,6 +974,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedFinanceiroRoute: typeof AuthenticatedFinanceiroRoute
   AuthenticatedIntegracoesRoute: typeof AuthenticatedIntegracoesRoute
+  AuthenticatedInteressadosRoute: typeof AuthenticatedInteressadosRoute
   AuthenticatedPlanosRoute: typeof AuthenticatedPlanosRoute
   AuthenticatedPrescricaoTreinosRoute: typeof AuthenticatedPrescricaoTreinosRoute
   AuthenticatedRegistrarAvaliacaoRoute: typeof AuthenticatedRegistrarAvaliacaoRoute
@@ -949,6 +990,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedFinanceiroRoute: AuthenticatedFinanceiroRoute,
   AuthenticatedIntegracoesRoute: AuthenticatedIntegracoesRoute,
+  AuthenticatedInteressadosRoute: AuthenticatedInteressadosRoute,
   AuthenticatedPlanosRoute: AuthenticatedPlanosRoute,
   AuthenticatedPrescricaoTreinosRoute: AuthenticatedPrescricaoTreinosRoute,
   AuthenticatedRegistrarAvaliacaoRoute: AuthenticatedRegistrarAvaliacaoRoute,
@@ -1023,6 +1065,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AppRoute: AppRouteWithChildren,
   AuthRoute: AuthRoute,
+  ComeceRoute: ComeceRoute,
   EquipeDemoRoute: EquipeDemoRoute,
   GradeRoute: GradeRoute,
   MefeRoute: MefeRoute,

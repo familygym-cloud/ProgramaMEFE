@@ -81,3 +81,16 @@ iguais aos da primeira migration, e só se nunca foram ligadas a uma conta).
   vê o aviso na tela inicial; não há e-mail nem WhatsApp automático.
 - **App instalável e treino offline**: o service worker (`public/sw.js`) só é registrado no site
   publicado. O treino salvo no aparelho é apagado ao sair da conta.
+
+## 8. Pedidos de matrícula pelo site (interessados)
+
+O formulário público fica em `/comece` ("Quero me matricular", "Quero conhecer a academia", "Tenho uma
+dúvida"). Os pedidos caem na tela **Interessados** (`/interessados`, gestão e recepção), com botão de
+WhatsApp já com a mensagem pronta, situação (novo, contatado, matriculado, descartado) e anotação. Vem
+da migration `20261011000500_interessados.sql`.
+
+- O pedido guarda a concordância da pessoa com o contato (data e hora). Quem preenche não precisa de conta.
+- Pedido repetido (mesmo telefone e mesmo tipo em 24 horas) não cria outro registro.
+- Proteções: campo-isca contra robôs e limite de 300 pedidos por hora. Para reforçar, ative o Cloudflare
+  Turnstile no formulário (próxima etapa).
+- Dado pessoal: apague os pedidos antigos conforme a política de retenção da academia.

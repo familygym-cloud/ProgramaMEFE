@@ -84,6 +84,11 @@ export function SiteFooter() {
               Programa MEFE
             </Link>
           </li>
+          <li>
+            <Link to="/comece" className={CLASSE_LINK}>
+              Quero me matricular
+            </Link>
+          </li>
         </Coluna>
 
         <Coluna titulo="Para o aluno">
