@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { AvisoDeArmazenamento } from "./AvisoDeArmazenamento";
 import { BarraDeContatoMobile } from "./BarraDeContatoMobile";
 import { SiteFooter } from "./SiteFooter";
 import { SiteHeader } from "./SiteHeader";
@@ -19,6 +20,7 @@ export function SiteLayout({ children }: { children: ReactNode }) {
         <main id="conteudo">{children}</main>
         <SiteFooter />
         <BarraDeContatoMobile />
+        <AvisoDeArmazenamento />
       </div>
     </SessaoProvider>
   );

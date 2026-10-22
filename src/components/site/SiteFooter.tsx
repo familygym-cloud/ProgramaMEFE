@@ -121,7 +121,20 @@ export function SiteFooter() {
           )}
         >
           <p>© {new Date().getFullYear()} Academia Family Gym. Todos os direitos reservados.</p>
-          <p>Os valores dos planos ficam na área do aluno.</p>
+          <nav aria-label="Informações legais" className="flex flex-wrap gap-x-5">
+            <Link
+              to="/privacidade"
+              className="inline-flex min-h-11 items-center hover:text-foreground"
+            >
+              Privacidade
+            </Link>
+            <Link
+              to="/termos-de-uso"
+              className="inline-flex min-h-11 items-center hover:text-foreground"
+            >
+              Termos de uso
+            </Link>
+          </nav>
         </div>
       </div>
     </footer>

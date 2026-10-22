@@ -23,6 +23,11 @@ export function montarUrlAbsoluta(base: string | null, caminho: string): string 
  */
 const URL_DO_SITE = normalizarUrlDoSite(import.meta.env["VITE_SITE_URL"]);
 
+/** Endereço do site sem barra final (ex.: https://familygym.com.br), ou `null` se não configurado. */
+export function urlDoSite(): string | null {
+  return URL_DO_SITE;
+}
+
 export function urlAbsoluta(caminho: string): string | null {
   return montarUrlAbsoluta(URL_DO_SITE, caminho);
 }

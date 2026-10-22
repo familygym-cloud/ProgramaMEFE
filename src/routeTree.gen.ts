@@ -17,7 +17,11 @@ import { Route as EquipeDemoRouteImport } from './routes/equipe-demo'
 import { Route as GradeRouteImport } from './routes/grade'
 import { Route as MefeRouteImport } from './routes/mefe'
 import { Route as ModalidadesRouteImport } from './routes/modalidades'
+import { Route as PrivacidadeRouteImport } from './routes/privacidade'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as TermosDeUsoRouteImport } from './routes/termos-de-uso'
 import { Route as ValoresRouteImport } from './routes/valores'
 import { Route as AuthenticatedAulasRouteImport } from './routes/_authenticated/aulas'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
@@ -91,9 +95,29 @@ const ModalidadesRoute = ModalidadesRouteImport.update({
   path: '/modalidades',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PrivacidadeRoute = PrivacidadeRouteImport.update({
+  id: '/privacidade',
+  path: '/privacidade',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
+  id: '/robots.txt',
+  path: '/robots.txt',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermosDeUsoRoute = TermosDeUsoRouteImport.update({
+  id: '/termos-de-uso',
+  path: '/termos-de-uso',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ValoresRoute = ValoresRouteImport.update({
@@ -276,7 +300,11 @@ export interface FileRoutesByFullPath {
   '/grade': typeof GradeRoute
   '/mefe': typeof MefeRoute
   '/modalidades': typeof ModalidadesRoute
+  '/privacidade': typeof PrivacidadeRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/robots.txt': typeof RobotsDottxtRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/termos-de-uso': typeof TermosDeUsoRoute
   '/valores': typeof ValoresRoute
   '/aulas': typeof AuthenticatedAulasRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
@@ -318,7 +346,11 @@ export interface FileRoutesByTo {
   '/grade': typeof GradeRoute
   '/mefe': typeof MefeRoute
   '/modalidades': typeof ModalidadesRoute
+  '/privacidade': typeof PrivacidadeRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/robots.txt': typeof RobotsDottxtRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/termos-de-uso': typeof TermosDeUsoRoute
   '/valores': typeof ValoresRoute
   '/aulas': typeof AuthenticatedAulasRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
@@ -363,7 +395,11 @@ export interface FileRoutesById {
   '/grade': typeof GradeRoute
   '/mefe': typeof MefeRoute
   '/modalidades': typeof ModalidadesRoute
+  '/privacidade': typeof PrivacidadeRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/robots.txt': typeof RobotsDottxtRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/termos-de-uso': typeof TermosDeUsoRoute
   '/valores': typeof ValoresRoute
   '/_authenticated/aulas': typeof AuthenticatedAulasRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
@@ -408,7 +444,11 @@ export interface FileRouteTypes {
     | '/grade'
     | '/mefe'
     | '/modalidades'
+    | '/privacidade'
     | '/reset-password'
+    | '/robots.txt'
+    | '/sitemap.xml'
+    | '/termos-de-uso'
     | '/valores'
     | '/aulas'
     | '/dashboard'
@@ -450,7 +490,11 @@ export interface FileRouteTypes {
     | '/grade'
     | '/mefe'
     | '/modalidades'
+    | '/privacidade'
     | '/reset-password'
+    | '/robots.txt'
+    | '/sitemap.xml'
+    | '/termos-de-uso'
     | '/valores'
     | '/aulas'
     | '/dashboard'
@@ -494,7 +538,11 @@ export interface FileRouteTypes {
     | '/grade'
     | '/mefe'
     | '/modalidades'
+    | '/privacidade'
     | '/reset-password'
+    | '/robots.txt'
+    | '/sitemap.xml'
+    | '/termos-de-uso'
     | '/valores'
     | '/_authenticated/aulas'
     | '/_authenticated/dashboard'
@@ -539,7 +587,11 @@ export interface RootRouteChildren {
   GradeRoute: typeof GradeRoute
   MefeRoute: typeof MefeRoute
   ModalidadesRoute: typeof ModalidadesRoute
+  PrivacidadeRoute: typeof PrivacidadeRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  RobotsDottxtRoute: typeof RobotsDottxtRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  TermosDeUsoRoute: typeof TermosDeUsoRoute
   ValoresRoute: typeof ValoresRoute
   ApiV1AcessosRoute: typeof ApiV1AcessosRouteWithChildren
   ApiV1AlunosRoute: typeof ApiV1AlunosRouteWithChildren
@@ -608,11 +660,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ModalidadesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/privacidade': {
+      id: '/privacidade'
+      path: '/privacidade'
+      fullPath: '/privacidade'
+      preLoaderRoute: typeof PrivacidadeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/reset-password': {
       id: '/reset-password'
       path: '/reset-password'
       fullPath: '/reset-password'
       preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/robots.txt': {
+      id: '/robots.txt'
+      path: '/robots.txt'
+      fullPath: '/robots.txt'
+      preLoaderRoute: typeof RobotsDottxtRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/termos-de-uso': {
+      id: '/termos-de-uso'
+      path: '/termos-de-uso'
+      fullPath: '/termos-de-uso'
+      preLoaderRoute: typeof TermosDeUsoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/valores': {
@@ -947,7 +1027,11 @@ const rootRouteChildren: RootRouteChildren = {
   GradeRoute: GradeRoute,
   MefeRoute: MefeRoute,
   ModalidadesRoute: ModalidadesRoute,
+  PrivacidadeRoute: PrivacidadeRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  RobotsDottxtRoute: RobotsDottxtRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
+  TermosDeUsoRoute: TermosDeUsoRoute,
   ValoresRoute: ValoresRoute,
   ApiV1AcessosRoute: ApiV1AcessosRouteWithChildren,
   ApiV1AlunosRoute: ApiV1AlunosRouteWithChildren,

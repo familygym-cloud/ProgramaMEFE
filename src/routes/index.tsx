@@ -10,7 +10,8 @@ import { PlanosDestaque } from "@/components/site/PlanosDestaque";
 import { SecaoFaq } from "@/components/site/SecaoFaq";
 import { SecaoOndeEstamos } from "@/components/site/SecaoOndeEstamos";
 import { SiteLayout } from "@/components/site/SiteLayout";
-import { marcasCanonicas } from "@/lib/site";
+import { dadosDaAcademia } from "@/lib/seo";
+import { contatoDaAcademia, marcasCanonicas, urlDoSite } from "@/lib/site";
 
 const TITULO = "Academia Family Gym | Treine em família. Evolua sempre.";
 const DESCRICAO =
@@ -41,7 +42,13 @@ export const Route = createFileRoute("/")({
       ...canonica.meta,
     ],
     links: canonica.links,
-    scripts: [{ type: "application/ld+json", children: JSON.stringify(dadosEstruturados) }],
+    scripts: [
+      { type: "application/ld+json", children: JSON.stringify(dadosEstruturados) },
+      {
+        type: "application/ld+json",
+        children: JSON.stringify(dadosDaAcademia(urlDoSite(), contatoDaAcademia)),
+      },
+    ],
   }),
   component: Home,
 });
