@@ -38,6 +38,7 @@ export type PagamentoFinanceiro = Pagamento & {
   alunoId: string;
   alunoNome: string;
   plano: string;
+  telefone: string | null;
 };
 
 /** Visão geral do financeiro (staff): todas as mensalidades com aluno e plano. */
@@ -66,7 +67,11 @@ export const listarFinanceiro = createServerFn({ method: "GET" })
       ),
       buscarTudo(
         (de, ate) =>
-          context.supabase.from("alunos").select("id, nome, plano").order("id").range(de, ate),
+          context.supabase
+            .from("alunos")
+            .select("id, nome, plano, telefone")
+            .order("id")
+            .range(de, ate),
         MAX_LOTES,
         idDaLinha,
       ),
@@ -82,6 +87,7 @@ export const listarFinanceiro = createServerFn({ method: "GET" })
         alunoId: p.aluno_id,
         alunoNome: aluno?.nome ?? "Aluno removido",
         plano: aluno?.plano ?? "—",
+        telefone: aluno?.telefone ?? null,
       };
     });
   });
