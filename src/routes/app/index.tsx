@@ -90,7 +90,7 @@ function Pagina() {
       semana: semanaAtual(checkIns, hoje),
       // O mapa inclui a semana atual na última coluna; aqui interessam só as três anteriores.
       anteriores: mapaDeCalor(checkIns, 4, hoje).slice(0, 3),
-      checkInsHoje: checkIns.filter((c) => c.data === hoje),
+      checkInsHoje: checkIns.filter((c) => c.data === hoje && c.origem !== "acesso"),
       treinosMes: treinosNoMes(checkIns, hoje),
       minutosMes: minutosNoMes(checkIns, hoje),
       totalTreinos: new Set(checkIns.map((c) => c.data)).size,

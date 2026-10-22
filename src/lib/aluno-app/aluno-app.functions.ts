@@ -1,6 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { addDays, parseISO } from "date-fns";
 import { hojeBrasilia } from "@/lib/datas";
+import { comPresencas, paraISO } from "./derive";
 import { perfilDosPapeis } from "@/lib/relatorios/perfil";
 import type {
   AreaAlunoDados,
@@ -96,6 +98,7 @@ export const carregarAreaAluno = createServerFn({ method: "GET" })
       metasRes,
       aulasRes,
       reservasRes,
+      acessosRes,
     ] = await Promise.all([
       supabase
         .from("avaliacoes")
@@ -140,6 +143,13 @@ export const carregarAreaAluno = createServerFn({ method: "GET" })
         .from("reservas_aula")
         .select("aula_id, status, promovida_em")
         .eq("aluno_id", aluno.id),
+      // Presenças da catraca dos últimos 400 dias (a tabela só existe depois da migration de integrações).
+      supabase
+        .from("acessos")
+        .select("dia")
+        .eq("aluno_id", aluno.id)
+        .gte("dia", paraISO(addDays(parseISO(hoje), -400)))
+        .limit(1000),
     ]);
 
     if (avaliacoesRes.error) throw avaliacoesRes.error;
@@ -303,12 +313,15 @@ export const carregarAreaAluno = createServerFn({ method: "GET" })
         imc: Number(a.imc),
       })),
       medidas,
-      checkIns: (checkInsRes.data ?? []).map((c) => ({
-        id: c.id,
-        data: c.data,
-        atividade: c.atividade,
-        duracaoMin: c.duracao_min,
-      })),
+      checkIns: comPresencas(
+        (checkInsRes.data ?? []).map((c) => ({
+          id: c.id,
+          data: c.data,
+          atividade: c.atividade,
+          duracaoMin: c.duracao_min,
+        })),
+        acessosRes.error ? [] : (acessosRes.data ?? []).map((a) => a.dia),
+      ),
       treinos,
       agenda,
       pagamentos,

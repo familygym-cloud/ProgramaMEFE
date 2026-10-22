@@ -102,5 +102,4 @@ Enquanto isso, a API já funciona com qualquer catraca ou sistema que consiga ch
 - **Confirmação automática de Pix:** a rota `POST /pagamentos/baixa` está pronta, mas quem a chamaria é o
   provedor de pagamento (Mercado Pago, Asaas, Efí...) por webhook, e a chave Pix simples da academia não
   avisa ninguém. Com um desses provedores, é um adaptador pequeno.
-- **Frequência do aluno:** os acessos da catraca ficam gravados, mas ainda não entram na sequência de dias
-  nem nas conquistas da área do aluno.
+- **Frequência do aluno:** pronto. Os dias em que a catraca registrou entrada contam na sequência, no mapa e na meta mensal do aluno (como "Presença na academia", sem duração). Presença sozinha não marca o treino do dia como concluído.

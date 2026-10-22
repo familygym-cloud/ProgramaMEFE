@@ -51,6 +51,11 @@ export type CheckIn = {
   data: string;
   atividade: string;
   duracaoMin: number;
+  /**
+   * "acesso": presença registrada na catraca, sem treino lançado naquele dia. Conta como dia de
+   * frequência (sequência, mapa, metas), mas não como "treino concluído" nem entra nas médias de duração.
+   */
+  origem?: "acesso";
 };
 
 export type Exercicio = {
