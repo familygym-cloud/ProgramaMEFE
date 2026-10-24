@@ -13,7 +13,7 @@ export default tseslint.config(
       ".vinxi",
       ".tanstack",
       ".wrangler",
-      // Gerados (Lovable/TanStack) e sobrescritos a cada sincronização: erros aqui não são corrigíveis à mão.
+      // Gerados (TanStack) e sobrescritos a cada sincronização: erros aqui não são corrigíveis à mão.
       "src/routeTree.gen.ts",
       "src/integrations/supabase/*.ts",
       "!src/integrations/supabase/*.test.ts",

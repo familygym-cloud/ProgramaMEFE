@@ -36,3 +36,11 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Valores reais dos planos: nunca versionar (o repositório é público). Veja supabase/seeds/.
+supabase/seeds/*.privado.sql
+supabase/seeds/*reais*
+
+# Fonte New Order (licenciada): não versionar enquanto o repositório for público. Veja README (Fontes).
+public/fonts/*.otf
+public/fonts/*.woff2

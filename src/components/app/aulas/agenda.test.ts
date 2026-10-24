@@ -21,6 +21,9 @@ function aula(parcial: Partial<AulaAgenda>): AulaAgenda {
     vagas: 10,
     ocupadas: 0,
     reservada: false,
+    naFila: false,
+    posicaoFila: null,
+    promovidaEm: null,
     ...parcial,
   };
 }

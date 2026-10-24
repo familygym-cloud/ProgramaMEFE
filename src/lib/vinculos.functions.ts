@@ -1,14 +1,17 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { buscarTudo, idDaLinha, MAX_LOTES } from "@/lib/relatorios/carga";
-import { exigirStaff } from "@/lib/staff";
+import { ehPapelDaEquipe, PAPEIS_DA_EQUIPE, type PapelEquipe } from "@/lib/papeis";
+import { exigirArea, usuarioPodeAcessar } from "@/lib/staff";
 import {
   emailAutorizadoParaBootstrap,
   ERRO_APENAS_EQUIPE,
   erroDoRpc,
   listarTodasAsContas,
   validarLote,
+  validarPapelEquipe,
   validarVinculo,
+  type ItemPapelEquipe,
   type ItemVinculo,
   type VinculosDados,
 } from "@/lib/vinculos";
@@ -64,7 +67,7 @@ export const garantirPerfilStaff = createServerFn({ method: "POST" })
 export const listarVinculos = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }): Promise<VinculosDados> => {
-    await exigirStaff(context.supabase, context.userId, ERRO_APENAS_EQUIPE);
+    await exigirArea(context.supabase, context.userId, "vinculos", ERRO_APENAS_EQUIPE);
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
@@ -90,8 +93,21 @@ export const listarVinculos = createServerFn({ method: "GET" })
       }),
     ]);
 
+    const souGestao = await usuarioPodeAcessar(context.supabase, context.userId, "relatorios");
+    const perfisDaEquipe: Record<string, PapelEquipe> = {};
+    if (souGestao) {
+      const { data: papeis, error } = await supabaseAdmin
+        .from("user_roles")
+        .select("user_id, role")
+        .in("role", [...PAPEIS_DA_EQUIPE]);
+      if (error) throw error;
+      for (const p of papeis ?? []) if (ehPapelDaEquipe(p.role)) perfisDaEquipe[p.user_id] = p.role;
+    }
+
     return {
       contas,
+      souGestao,
+      perfisDaEquipe,
       alunos: alunos.map((a) => ({
         id: a.id,
         nome: a.nome,
@@ -117,7 +133,7 @@ export const definirVinculo = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: ItemVinculo) => validarVinculo(input))
   .handler(async ({ data, context }) => {
-    await exigirStaff(context.supabase, context.userId, ERRO_APENAS_EQUIPE);
+    await exigirArea(context.supabase, context.userId, "vinculos", ERRO_APENAS_EQUIPE);
     await gravarVinculos([data]);
     return { ok: true };
   });
@@ -126,6 +142,29 @@ export const definirVinculosEmLote = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: { itens: ItemVinculo[] }) => validarLote(input))
   .handler(async ({ data, context }) => {
-    await exigirStaff(context.supabase, context.userId, ERRO_APENAS_EQUIPE);
+    await exigirArea(context.supabase, context.userId, "vinculos", ERRO_APENAS_EQUIPE);
     return { atualizados: await gravarVinculos(data.itens) };
+  });
+
+/**
+ * Define o perfil de equipe de uma conta (ou retira, com `papel: null`). Só a gestão. A função SQL é
+ * transacional, exige e-mail confirmado e não deixa o sistema sem nenhuma conta de gestão.
+ */
+export const definirPapelDaEquipe = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: ItemPapelEquipe) => validarPapelEquipe(input))
+  .handler(async ({ data, context }) => {
+    await exigirArea(
+      context.supabase,
+      context.userId,
+      "relatorios",
+      "Apenas a gestão pode definir os perfis da equipe.",
+    );
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin.rpc("definir_papel_equipe", {
+      _user_id: data.userId,
+      _papel: data.papel as string,
+    });
+    if (error) throw erroDoRpc(error, "salvar o perfil da equipe");
+    return { ok: true };
   });

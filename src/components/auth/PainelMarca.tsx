@@ -25,7 +25,7 @@ export function PainelMarca() {
   return (
     <aside
       aria-label="Academia Family Gym"
-      className="bg-grade relative hidden flex-col justify-between overflow-hidden border-r border-white/10 bg-sidebar px-12 py-12 lg:sticky lg:top-0 lg:flex lg:h-dvh xl:px-16"
+      className="bg-grade relative hidden flex-col justify-between overflow-hidden border-r border-foreground/10 bg-sidebar px-12 py-12 lg:sticky lg:top-0 lg:flex lg:h-dvh xl:px-16"
     >
       <div
         aria-hidden
@@ -66,7 +66,7 @@ export function PainelMarca() {
               className="fg-entrada flex items-start gap-4"
               style={{ animationDelay: `${200 + i * 90}ms` }}
             >
-              <span className="grid size-11 shrink-0 place-items-center rounded-2xl border border-white/10 bg-white/[0.05] text-foreground [&_svg]:size-5">
+              <span className="grid size-11 shrink-0 place-items-center rounded-2xl border border-foreground/10 bg-foreground/[0.05] text-foreground [&_svg]:size-5">
                 <Icone aria-hidden />
               </span>
               <div>

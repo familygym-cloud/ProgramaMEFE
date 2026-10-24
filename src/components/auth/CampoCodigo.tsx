@@ -40,7 +40,7 @@ export function CampoCodigo({
       key={indice}
       index={indice}
       className={cn(
-        "h-14 w-10 rounded-xl border border-white/15 bg-white/[0.04] font-display text-2xl font-semibold first:rounded-xl first:border last:rounded-xl sm:w-12",
+        "h-14 w-10 rounded-xl border border-input bg-foreground/[0.04] font-display text-2xl font-semibold first:rounded-xl first:border last:rounded-xl sm:w-12",
         invalido && "border-destructive/70",
         // O slot ativo recebe a classe z-10 do componente base; usamos isso para destacá-lo.
         "[&.z-10]:border-brand-yellow [&.z-10]:ring-2 [&.z-10]:ring-brand-yellow/40",
@@ -64,7 +64,7 @@ export function CampoCodigo({
       containerClassName="justify-center gap-2.5"
     >
       <InputOTPGroup className="gap-1.5 sm:gap-2">{[0, 1, 2].map(slot)}</InputOTPGroup>
-      <InputOTPSeparator className="text-white/30 [&_svg]:size-3.5" />
+      <InputOTPSeparator className="text-foreground/30 [&_svg]:size-3.5" />
       <InputOTPGroup className="gap-1.5 sm:gap-2">{[3, 4, 5].map(slot)}</InputOTPGroup>
     </InputOTP>
   );

@@ -1,3 +1,4 @@
+import { ehPapelDaEquipe, type PapelEquipe } from "@/lib/papeis";
 import { ehUuid } from "@/lib/uuid";
 
 // Regras puras da tela de vínculos (aluno <-> conta de acesso). Ficam fora de
@@ -22,12 +23,30 @@ export type AlunoVinculo = {
 export type VinculosDados = {
   alunos: AlunoVinculo[];
   contas: ContaUsuario[];
+  /** Perfil de equipe de cada conta que tem um (id da conta -> perfil). Só a gestão recebe preenchido. */
+  perfisDaEquipe: Record<string, PapelEquipe>;
+  /** Quem pediu é da gestão e pode mudar perfis. */
+  souGestao: boolean;
 };
+
+export type ItemPapelEquipe = { userId: string; papel: PapelEquipe | null };
+
+export function validarPapelEquipe(input: unknown): ItemPapelEquipe {
+  if (typeof input !== "object" || input === null) throw new Error("Pedido inválido.");
+  const { userId, papel } = input as Record<string, unknown>;
+  if (typeof userId !== "string" || !/^[0-9a-f-]{36}$/i.test(userId)) {
+    throw new Error("Conta inválida.");
+  }
+  if (papel !== null && !(typeof papel === "string" && ehPapelDaEquipe(papel))) {
+    throw new Error("Perfil inválido.");
+  }
+  return { userId, papel: papel as PapelEquipe | null };
+}
 
 export type ItemVinculo = { alunoId: string; userId: string | null };
 
 /** Mensagem do servidor para quem não é da equipe; a tela a usa para oferecer a ativação do perfil. */
-export const ERRO_APENAS_EQUIPE = "Apenas a equipe (staff) pode gerenciar vínculos.";
+export const ERRO_APENAS_EQUIPE = "Apenas gestão e recepção podem gerenciar vínculos.";
 
 /** Limite por requisição: uma única chamada ao banco, mas o corpo do pedido não deve crescer sem fim. */
 export const MAX_ITENS_LOTE = 500;

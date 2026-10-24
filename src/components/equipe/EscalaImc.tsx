@@ -7,11 +7,11 @@ const MAX = 40;
 
 // Faixas do IMC adulto (OMS). A cor segue o mesmo critério do selo de classificação.
 const FAIXAS = [
-  { ate: 18.5, cor: "bg-brand-yellow" },
-  { ate: 25, cor: "bg-emerald-400" },
+  { ate: 18.5, cor: "bg-brand-yellow hachura" },
+  { ate: 25, cor: "bg-foreground" },
   { ate: 30, cor: "bg-brand-yellow" },
-  { ate: 35, cor: "bg-red-400/70" },
-  { ate: MAX, cor: "bg-red-400" },
+  { ate: 35, cor: "bg-destructive/70" },
+  { ate: MAX, cor: "bg-destructive hachura" },
 ] as const;
 
 const MARCAS = [18.5, 25, 30, 35] as const;
@@ -53,8 +53,8 @@ export function EscalaImc({ imc }: { imc: number }) {
         className="absolute top-0 flex -translate-x-1/2 flex-col items-center transition-[left] duration-500 ease-out motion-reduce:transition-none"
         style={{ left: `${posicao(imc)}%` }}
       >
-        <span className="h-[1.1rem] w-1 rounded-full bg-white" />
-        <span className="-mt-0.5 size-2.5 rounded-full bg-white" />
+        <span className="h-[1.1rem] w-1 rounded-full bg-foreground" />
+        <span className="-mt-0.5 size-2.5 rounded-full bg-foreground" />
       </span>
       <div aria-hidden className="relative mt-2 h-4 text-[0.7rem] text-muted-foreground">
         {MARCAS.map((marca) => (

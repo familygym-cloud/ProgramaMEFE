@@ -17,7 +17,7 @@ type Props = {
 export function BarraSessao({ sessao, descanso, nomeDoDescanso, aoIrParaDescanso }: Props) {
   const emDescanso = descanso.atual;
   return (
-    <div className="sticky top-[65px] z-30 -mx-4 border-b border-white/10 bg-background/90 px-4 py-2.5 backdrop-blur sm:-mx-6 sm:px-6 lg:hidden">
+    <div className="sticky top-[65px] z-30 -mx-4 border-b border-foreground/10 bg-background/90 px-4 py-2.5 backdrop-blur sm:-mx-6 sm:px-6 lg:hidden">
       <div className="flex items-center gap-3">
         <ProgressRing
           valor={sessao.percentual}
@@ -45,7 +45,7 @@ export function BarraSessao({ sessao, descanso, nomeDoDescanso, aoIrParaDescanso
             variant="outline"
             onClick={sessao.correndo ? sessao.pausar : sessao.iniciar}
             aria-label={sessao.correndo ? "Pausar cronômetro" : "Retomar cronômetro"}
-            className="size-11 rounded-full border-white/20 bg-transparent hover:bg-white/10"
+            className="size-11 rounded-full border-foreground/20 bg-transparent hover:bg-foreground/10"
           >
             {sessao.correndo ? (
               <Pause className="fill-current" aria-hidden />

@@ -9,7 +9,7 @@ import {
   type Pagamento,
 } from "@/lib/pagamentos";
 import { buscarTudo, idDaLinha, MAX_LOTES } from "@/lib/relatorios/carga";
-import { exigirStaff } from "@/lib/staff";
+import { exigirArea } from "@/lib/staff";
 import { ehUuid } from "@/lib/uuid";
 
 export type { MetodoPagamento, Pagamento } from "@/lib/pagamentos";
@@ -38,16 +38,18 @@ export type PagamentoFinanceiro = Pagamento & {
   alunoId: string;
   alunoNome: string;
   plano: string;
+  telefone: string | null;
 };
 
 /** Visão geral do financeiro (staff): todas as mensalidades com aluno e plano. */
 export const listarFinanceiro = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }): Promise<PagamentoFinanceiro[]> => {
-    await exigirStaff(
+    await exigirArea(
       context.supabase,
       context.userId,
-      "Apenas a equipe (staff) pode ver o financeiro.",
+      "financeiro",
+      "Apenas gestão e recepção pode ver o financeiro.",
     );
 
     // O PostgREST devolve no máximo 1000 linhas por resposta: lê tudo em lotes (ordem estável).
@@ -65,7 +67,11 @@ export const listarFinanceiro = createServerFn({ method: "GET" })
       ),
       buscarTudo(
         (de, ate) =>
-          context.supabase.from("alunos").select("id, nome, plano").order("id").range(de, ate),
+          context.supabase
+            .from("alunos")
+            .select("id, nome, plano, telefone")
+            .order("id")
+            .range(de, ate),
         MAX_LOTES,
         idDaLinha,
       ),
@@ -81,6 +87,7 @@ export const listarFinanceiro = createServerFn({ method: "GET" })
         alunoId: p.aluno_id,
         alunoNome: aluno?.nome ?? "Aluno removido",
         plano: aluno?.plano ?? "—",
+        telefone: aluno?.telefone ?? null,
       };
     });
   });
@@ -90,10 +97,11 @@ export const definirPagamento = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: EntradaBaixa) => validarBaixa(input))
   .handler(async ({ data, context }) => {
-    await exigirStaff(
+    await exigirArea(
       context.supabase,
       context.userId,
-      "Apenas a equipe (staff) pode alterar pagamentos.",
+      "financeiro",
+      "Apenas gestão e recepção pode alterar pagamentos.",
     );
     // O dia do pagamento é o de Brasília: o servidor roda em UTC, onde "hoje" vira amanhã às 21h.
     return aplicarBaixa(context.supabase, data, hojeBrasilia());

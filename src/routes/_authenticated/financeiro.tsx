@@ -2,7 +2,15 @@ import { useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { AlertTriangle, ArrowLeft, CircleCheck, Clock, Loader2, Wallet } from "lucide-react";
+import {
+  AlertTriangle,
+  ArrowLeft,
+  CircleCheck,
+  Clock,
+  Loader2,
+  MessageCircle,
+  Wallet,
+} from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -17,6 +25,8 @@ import {
 import { BrandLogo } from "@/components/BrandLogo";
 import { ConfirmarAcao } from "@/components/ConfirmarAcao";
 import { traduzErroServidor } from "@/lib/erros-servidor";
+import { diasDeAtraso, linkDeCobranca } from "@/lib/cobranca";
+import { hojeBrasilia } from "@/lib/datas";
 import { METODOS_PAGAMENTO, type MetodoPagamento } from "@/lib/pagamentos";
 import {
   definirPagamento,
@@ -55,6 +65,46 @@ function dataBR(d: string) {
 }
 
 type FiltroStatus = "Todos" | "Pago" | "Pendente" | "Atrasado";
+
+/** Botão de lembrete no WhatsApp para parcelas em aberto (atrasadas ou a vencer em até 5 dias). */
+function LembreteDeCobranca({ p }: { p: PagamentoFinanceiro }) {
+  const hoje = hojeBrasilia();
+  const atraso = diasDeAtraso(p.vencimento, hoje);
+  if (atraso < -5) return null;
+  const link = linkDeCobranca(
+    {
+      nome: p.alunoNome,
+      referencia: p.referencia,
+      valor: p.valor,
+      vencimento: p.vencimento,
+      telefone: p.telefone,
+    },
+    hoje,
+  );
+  if (!link) {
+    return (
+      <span
+        className="text-xs text-muted-foreground"
+        title="Cadastre o telefone do aluno para cobrar pelo WhatsApp"
+      >
+        sem telefone
+      </span>
+    );
+  }
+  return (
+    <Button asChild size="sm" variant="outline" className="rounded-full text-xs">
+      <a
+        href={link}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label={`Lembrar ${p.alunoNome} pelo WhatsApp`}
+      >
+        <MessageCircle className="size-3.5" aria-hidden /> Lembrar
+        <span className="sr-only"> (abre o WhatsApp em outra aba)</span>
+      </a>
+    </Button>
+  );
+}
 
 function Financeiro() {
   const queryClient = useQueryClient();
@@ -287,6 +337,7 @@ function Financeiro() {
                           </Button>
                         ) : (
                           <div className="flex items-center justify-end gap-1.5">
+                            <LembreteDeCobranca p={p} />
                             <select
                               aria-label={`Forma de pagamento da parcela ${p.parcela}/${p.totalParcelas} de ${p.alunoNome}`}
                               className="h-8 rounded-md border border-input bg-background px-2 text-xs"

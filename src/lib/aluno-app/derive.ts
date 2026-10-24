@@ -118,12 +118,24 @@ export function mapaDeCalor(
   for (const c of checkIns) {
     minutosPorDia.set(c.data, (minutosPorDia.get(c.data) ?? 0) + c.duracaoMin);
   }
+  // Dia só com presença na catraca (0 minuto lançado) aparece com o primeiro nível, não em branco.
+  const diasComPresenca = new Set(checkIns.map((c) => c.data));
   return Array.from({ length: semanas }, (_, s) =>
     Array.from({ length: 7 }, (_, d) => {
       const iso = paraISO(addDays(primeira, s * 7 + d));
       const minutos = minutosPorDia.get(iso) ?? 0;
       const nivel = (
-        minutos === 0 ? 0 : minutos < 30 ? 1 : minutos < 50 ? 2 : minutos < 75 ? 3 : 4
+        minutos === 0
+          ? diasComPresenca.has(iso)
+            ? 1
+            : 0
+          : minutos < 30
+            ? 1
+            : minutos < 50
+              ? 2
+              : minutos < 75
+                ? 3
+                : 4
       ) as 0 | 1 | 2 | 3 | 4;
       return { data: iso, minutos, nivel };
     }),
@@ -143,8 +155,29 @@ export function minutosNoMes(checkIns: CheckIn[], hoje: string = hojeISO()): num
     .reduce((s, c) => s + c.duracaoMin, 0);
 }
 
+/** Treino lançado hoje. A presença na catraca sozinha não conta: ainda pode estar a caminho do treino. */
 export function treinouHoje(checkIns: CheckIn[], hoje: string = hojeISO()): boolean {
-  return checkIns.some((c) => c.data === hoje);
+  return checkIns.some((c) => c.data === hoje && c.origem !== "acesso");
+}
+
+/**
+ * Junta os dias de presença na catraca aos check-ins: cada dia sem treino lançado ganha um registro de
+ * "Presença na academia" (0 min), que conta na sequência e na frequência do mês.
+ */
+export function comPresencas(checkIns: CheckIn[], diasDeAcesso: readonly string[]): CheckIn[] {
+  const comTreino = new Set(checkIns.map((c) => c.data));
+  const extras = [...new Set(diasDeAcesso)]
+    .filter((dia) => !comTreino.has(dia))
+    .map((dia): CheckIn => ({
+      id: `acesso-${dia}`,
+      data: dia,
+      atividade: "Presença na academia",
+      duracaoMin: 0,
+      origem: "acesso",
+    }));
+  return extras.length === 0
+    ? checkIns
+    : [...checkIns, ...extras].sort((a, b) => b.data.localeCompare(a.data));
 }
 
 // ------------------------------------------------------------------ corpo

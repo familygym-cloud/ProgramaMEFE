@@ -35,13 +35,13 @@ export function AlunoTabelaAvaliacoes({
       }
       atraso={150}
     >
-      <div className="break-inside-avoid overflow-hidden rounded-2xl border border-white/10">
+      <div className="break-inside-avoid overflow-hidden rounded-2xl border border-foreground/10">
         <table className="w-full border-collapse text-[0.8125rem] sm:text-sm">
           <caption className="sr-only">
             Avaliações físicas: peso, variação sobre a anterior e IMC
           </caption>
           <thead>
-            <tr className="border-b border-white/10 bg-white/[0.03]">
+            <tr className="border-b border-foreground/10 bg-foreground/[0.03]">
               <th scope="col" className={CABECALHO}>
                 Avaliação
               </th>
@@ -62,7 +62,7 @@ export function AlunoTabelaAvaliacoes({
               return (
                 <tr
                   key={`${linha.referencia}-${indice}`}
-                  className="border-b border-white/5 last:border-b-0"
+                  className="border-b border-foreground/5 last:border-b-0"
                 >
                   <th scope="row" className={`${CELULA} whitespace-nowrap text-left font-medium`}>
                     {formatarData(linha.referencia)}

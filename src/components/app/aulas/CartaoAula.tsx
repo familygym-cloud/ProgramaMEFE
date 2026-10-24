@@ -1,4 +1,4 @@
-import { Check, Info, Radio, UserRound } from "lucide-react";
+import { Info, Radio, UserRound } from "lucide-react";
 import { Selo, Superficie } from "@/components/app/ui";
 import type { AulaAgenda } from "@/lib/aluno-app/types";
 import { cn } from "@/lib/utils";
@@ -31,6 +31,7 @@ export function CartaoAula({
         className={cn(
           "flex h-full flex-col gap-4",
           aula.reservada && "border-brand-yellow/50 bg-brand-yellow/[0.07]",
+          aula.naFila && "border-brand-yellow/30",
         )}
       >
         <div className="flex items-start justify-between gap-3">
@@ -43,9 +44,10 @@ export function CartaoAula({
             </span>
           </p>
           {aula.reservada ? (
-            <Selo tom="atencao">
-              <Check className="size-3" aria-hidden />
-              Reservada
+            <Selo tom="ok">Reservada</Selo>
+          ) : aula.naFila ? (
+            <Selo tom="realce">
+              {aula.posicaoFila ? `Na fila · ${aula.posicaoFila}º` : "Na lista de espera"}
             </Selo>
           ) : emAndamento ? (
             <Selo>

@@ -3,7 +3,7 @@ import { format, parseISO, subDays } from "date-fns";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { hojeBrasilia } from "@/lib/datas";
 import { buscarTudo, idDaLinha, MAX_LOTES } from "@/lib/relatorios/carga";
-import { exigirStaff } from "@/lib/staff";
+import { exigirArea } from "@/lib/staff";
 import {
   gravarTermo,
   gravarTermosEmLote,
@@ -29,12 +29,12 @@ export type TermoAluno = {
   presencas30d: number;
 };
 
-const APENAS_EQUIPE = "Apenas a equipe (staff) pode gerenciar termos.";
+const APENAS_EQUIPE = "Apenas gestão e recepção podem gerenciar termos.";
 
 export const listarTermos = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }): Promise<TermoAluno[]> => {
-    await exigirStaff(context.supabase, context.userId, APENAS_EQUIPE);
+    await exigirArea(context.supabase, context.userId, "termos", APENAS_EQUIPE);
 
     // O PostgREST devolve no máximo 1000 linhas por resposta: lê tudo em lotes (ordem estável).
     const [alunos, checkins] = await Promise.all([
@@ -102,7 +102,7 @@ export const registrarTermo = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: EntradaTermo) => validarTermo(input))
   .handler(async ({ data, context }) => {
-    await exigirStaff(context.supabase, context.userId, APENAS_EQUIPE);
+    await exigirArea(context.supabase, context.userId, "termos", APENAS_EQUIPE);
     return gravarTermo(context.supabase, data);
   });
 
@@ -110,6 +110,6 @@ export const registrarTermosEmLote = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: EntradaTermosEmLote) => validarTermosEmLote(input))
   .handler(async ({ data, context }) => {
-    await exigirStaff(context.supabase, context.userId, APENAS_EQUIPE);
+    await exigirArea(context.supabase, context.userId, "termos", APENAS_EQUIPE);
     return gravarTermosEmLote(context.supabase, data);
   });

@@ -19,7 +19,57 @@ import {
 // Gráficos no padrão visual Family Gym: amarelo da marca sobre fundo escuro, eixos discretos.
 // Os dados vêm como lista de objetos; `chave` é o campo numérico e `eixoX` o campo do rótulo.
 
-const EIXO = { fontSize: 12, fill: "oklch(0.764 0 90)" } as const;
+const EIXO = { fontSize: 12, fill: "var(--muted-foreground)" } as const;
+const GRADE = "var(--border)";
+
+/** Estilo de cada série de linha: além da cor, cada uma tem traço e marcador próprios (sem depender só de cor). */
+const ESTILO_SERIE = [
+  { traco: undefined, marcador: "circulo" },
+  { traco: "7 5", marcador: "losango" },
+] as const;
+
+/** Amostra da série para a legenda: o mesmo traço e o mesmo marcador da linha do gráfico. */
+export function MarcaSerie({ cor, indice }: { cor: string; indice: number }) {
+  const estilo = ESTILO_SERIE[indice % ESTILO_SERIE.length] ?? ESTILO_SERIE[0];
+  return (
+    <svg width="24" height="12" viewBox="0 0 24 12" aria-hidden className="shrink-0">
+      <line
+        x1="0"
+        y1="6"
+        x2="24"
+        y2="6"
+        stroke={cor}
+        strokeWidth="2.5"
+        strokeDasharray={estilo.traco}
+      />
+      {estilo.marcador === "circulo" ? (
+        <circle cx="12" cy="6" r="4" fill={cor} />
+      ) : (
+        <rect x="8" y="2" width="8" height="8" fill={cor} transform="rotate(45 12 6)" />
+      )}
+    </svg>
+  );
+}
+
+type PropsPonto = { cx?: number | undefined; cy?: number | undefined };
+
+function PontoSerie({ cx, cy, cor, marcador }: PropsPonto & { cor: string; marcador: string }) {
+  if (cx === undefined || cy === undefined) return null;
+  return marcador === "circulo" ? (
+    <circle cx={cx} cy={cy} r={4} fill={cor} stroke="var(--card)" strokeWidth={1.5} />
+  ) : (
+    <rect
+      x={cx - 3.5}
+      y={cy - 3.5}
+      width={7}
+      height={7}
+      fill={cor}
+      stroke="var(--card)"
+      strokeWidth={1.5}
+      transform={`rotate(45 ${cx} ${cy})`}
+    />
+  );
+}
 
 export type PontoGrafico = Record<string, string | number | null>;
 
@@ -53,7 +103,7 @@ export function GraficoTendencia({
             <stop offset="100%" stopColor="var(--brand-yellow)" stopOpacity={0} />
           </linearGradient>
         </defs>
-        <CartesianGrid vertical={false} stroke="oklch(1 0 0 / 8%)" />
+        <CartesianGrid vertical={false} stroke={GRADE} />
         <XAxis dataKey={eixoX} tickLine={false} axisLine={false} tick={EIXO} tickMargin={8} />
         <YAxis
           tickLine={false}
@@ -64,7 +114,7 @@ export function GraficoTendencia({
           tickFormatter={(v: number) => v.toLocaleString("pt-BR", { maximumFractionDigits: casas })}
         />
         <ChartTooltip
-          cursor={{ stroke: "oklch(1 0 0 / 20%)" }}
+          cursor={{ stroke: "var(--input)" }}
           content={
             <ChartTooltipContent
               formatter={(valor) => (
@@ -88,7 +138,7 @@ export function GraficoTendencia({
           dot={{
             r: 4,
             fill: "var(--brand-yellow)",
-            stroke: "oklch(0.215 0.003 90)",
+            stroke: "var(--card)",
             strokeWidth: 2,
           }}
           activeDot={{ r: 6 }}
@@ -117,11 +167,11 @@ export function GraficoBarras({
   return (
     <ChartContainer config={config} className="w-full" style={{ height: altura }}>
       <BarChart data={dados} margin={{ top: 12, right: 8, left: -20, bottom: 0 }}>
-        <CartesianGrid vertical={false} stroke="oklch(1 0 0 / 8%)" />
+        <CartesianGrid vertical={false} stroke={GRADE} />
         <XAxis dataKey={eixoX} tickLine={false} axisLine={false} tick={EIXO} tickMargin={8} />
         <YAxis tickLine={false} axisLine={false} tick={EIXO} width={40} allowDecimals={false} />
         <ChartTooltip
-          cursor={{ fill: "oklch(1 0 0 / 6%)" }}
+          cursor={{ fill: "var(--muted)" }}
           content={
             <ChartTooltipContent
               formatter={(valor) => (
@@ -157,21 +207,34 @@ export function GraficoLinhas({
   return (
     <ChartContainer config={config} className="w-full" style={{ height: altura }}>
       <LineChart data={dados} margin={{ top: 12, right: 12, left: -12, bottom: 0 }}>
-        <CartesianGrid vertical={false} stroke="oklch(1 0 0 / 8%)" />
+        <CartesianGrid vertical={false} stroke={GRADE} />
         <XAxis dataKey={eixoX} tickLine={false} axisLine={false} tick={EIXO} tickMargin={8} />
         <YAxis tickLine={false} axisLine={false} tick={EIXO} width={44} domain={["auto", "auto"]} />
         <ChartTooltip content={<ChartTooltipContent />} />
-        {series.map((s) => (
-          <Line
-            key={s.chave}
-            type="monotone"
-            dataKey={s.chave}
-            stroke={s.cor}
-            strokeWidth={3}
-            dot={{ r: 4, fill: s.cor }}
-            connectNulls
-          />
-        ))}
+        {series.map((s, i) => {
+          const estilo = ESTILO_SERIE[i % ESTILO_SERIE.length] ?? ESTILO_SERIE[0];
+          return (
+            <Line
+              key={s.chave}
+              type="monotone"
+              dataKey={s.chave}
+              stroke={s.cor}
+              strokeWidth={3}
+              {...(estilo.traco ? { strokeDasharray: estilo.traco } : {})}
+              dot={(p: PropsPonto & { key?: string }) => (
+                <PontoSerie
+                  key={p.key}
+                  cx={p.cx}
+                  cy={p.cy}
+                  cor={s.cor}
+                  marcador={estilo.marcador}
+                />
+              )}
+              activeDot={{ r: 6 }}
+              connectNulls
+            />
+          );
+        })}
       </LineChart>
     </ChartContainer>
   );

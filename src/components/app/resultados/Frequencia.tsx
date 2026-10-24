@@ -27,6 +27,8 @@ export function Frequencia({ dados }: { dados: AreaAlunoDados }) {
     const hoje = hojeISO();
     const { checkIns } = dados;
     const recentes = checkIns.filter((c) => c.data >= dataHaDias(JANELA_DIAS, hoje));
+    // Médias de duração e atividades usam só treinos lançados (presença na catraca não tem duração).
+    const treinos = recentes.filter((c) => c.origem !== "acesso");
     return {
       hoje,
       mapa: mapaDeCalor(checkIns, SEMANAS_NO_MAPA, hoje),
@@ -34,12 +36,17 @@ export function Frequencia({ dados }: { dados: AreaAlunoDados }) {
       atual: sequenciaDias(checkIns, hoje),
       media: mediaSemanal(checkIns, hoje),
       minutosMes: minutosNoMes(checkIns, hoje),
-      duracaoMedia: recentes.length
-        ? Math.round(recentes.reduce((s, c) => s + c.duracaoMin, 0) / recentes.length)
+      duracaoMedia: treinos.length
+        ? Math.round(treinos.reduce((s, c) => s + c.duracaoMin, 0) / treinos.length)
         : 0,
       porMes: treinosPorMes(checkIns, 6, hoje),
       porDia: treinosPorDiaDaSemana(checkIns, JANELA_DIAS, hoje),
-      atividades: atividadesFrequentes(checkIns, JANELA_DIAS, 5, hoje),
+      atividades: atividadesFrequentes(
+        checkIns.filter((c) => c.origem !== "acesso"),
+        JANELA_DIAS,
+        5,
+        hoje,
+      ),
       totalRecente: recentes.length,
     };
   }, [dados]);
@@ -126,7 +133,7 @@ export function Frequencia({ dados }: { dados: AreaAlunoDados }) {
             </ul>
           )}
           {diaForte && diaForte.treinos > 0 ? (
-            <p className="mt-6 rounded-2xl border border-white/10 bg-white/[0.03] p-4 text-sm text-muted-foreground">
+            <p className="mt-6 rounded-2xl border border-foreground/10 bg-foreground/[0.03] p-4 text-sm text-muted-foreground">
               Seu dia mais forte é{" "}
               <strong className="font-semibold text-foreground">
                 {diaForte.nome.toLowerCase()}

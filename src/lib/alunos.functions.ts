@@ -8,6 +8,7 @@ import {
   montarMembros,
 } from "@/lib/alunos";
 import type { Membro } from "@/lib/familygym-data";
+import { perfilDosPapeis } from "@/lib/relatorios/perfil";
 import { buscarTudo, idDaLinha, MAX_LOTES } from "@/lib/relatorios/carga";
 
 export type PerfilAcesso = "staff" | "aluno" | "sem-perfil";
@@ -32,11 +33,7 @@ export const listarAlunos = createServerFn({ method: "GET" })
       .eq("user_id", userId);
     if (papeisError) throw papeisError;
 
-    const perfil: PerfilAcesso = (papeis ?? []).some((p) => p.role === "staff")
-      ? "staff"
-      : (papeis ?? []).some((p) => p.role === "aluno")
-        ? "aluno"
-        : "sem-perfil";
+    const perfil: PerfilAcesso = perfilDosPapeis(papeis ?? []);
 
     const [alunos, avaliacoes, checkIns] = await Promise.all([
       buscarTudo(

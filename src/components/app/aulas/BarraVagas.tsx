@@ -5,13 +5,13 @@ import { situacaoVagas } from "./agenda";
 const TOM_TEXTO = {
   folga: "text-foreground/85",
   poucas: "text-brand-yellow",
-  lotada: "text-red-300",
+  lotada: "text-destructive",
 } as const;
 
 const TOM_BARRA = {
   folga: "bg-foreground/60",
   poucas: "bg-brand-yellow",
-  lotada: "bg-red-400",
+  lotada: "bg-destructive",
 } as const;
 
 /** Indicador de ocupação da turma: barra + "restam N" / "Lotada". */
@@ -32,7 +32,7 @@ export function BarraVagas({ aula }: { aula: AulaAgenda }) {
         aria-valuemax={100}
         aria-valuenow={s.ocupacao}
         aria-valuetext={`${aula.ocupadas} de ${aula.vagas} vagas ocupadas`}
-        className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-white/10"
+        className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-foreground/10"
       >
         <div
           className={cn(

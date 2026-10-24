@@ -65,7 +65,7 @@ type Props = {
 export function MetaDialog({ aberto, aoMudar, meta, tiposLivres, atuais }: Props) {
   return (
     <Dialog open={aberto} onOpenChange={aoMudar}>
-      <DialogContent className="max-h-[calc(100dvh-2rem)] max-w-[calc(100vw-2rem)] gap-6 overflow-y-auto rounded-3xl border-white/10 p-6 sm:max-w-md sm:rounded-3xl sm:p-7">
+      <DialogContent className="max-h-[calc(100dvh-2rem)] max-w-[calc(100vw-2rem)] gap-6 overflow-y-auto rounded-3xl border-foreground/10 p-6 sm:max-w-md sm:rounded-3xl sm:p-7">
         <DialogHeader className="space-y-2 pr-6 text-left">
           <DialogTitle className="font-display text-2xl font-bold leading-tight">
             {meta ? "Ajustar meta" : "Nova meta"}
@@ -211,7 +211,7 @@ function Formulario({
       </div>
 
       {erro ? (
-        <p role="alert" className="text-sm text-red-300">
+        <p role="alert" className="text-sm text-destructive">
           {erro}
         </p>
       ) : null}

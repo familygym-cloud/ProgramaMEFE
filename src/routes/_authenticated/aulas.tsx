@@ -278,7 +278,7 @@ function Aulas() {
 
           <div className="mt-5">
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <h2 className="flex items-center gap-2 text-sm font-semibold uppercase tracking-widest text-muted-foreground">
+              <h2 className="font-sans flex items-center gap-2 text-sm font-semibold uppercase tracking-widest text-muted-foreground">
                 <Users className="size-4 text-brand-yellow" /> Alunos presentes
               </h2>
               <span className="text-xs text-muted-foreground" aria-live="polite">

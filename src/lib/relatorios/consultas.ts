@@ -2,6 +2,7 @@
 // linhas à agregação pura de `agregar.ts`. Fica fora de `relatorios.functions.ts` para poder ser
 // testado com um cliente falso, sem o runtime do servidor.
 
+import { exigirArea } from "@/lib/staff";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { format, parseISO, startOfMonth, subMonths } from "date-fns";
 import type { Database } from "@/integrations/supabase/types";
@@ -44,20 +45,16 @@ const CONSULTAS_SIMULTANEAS = 3;
 const ALUNOS_POR_CONSULTA = 50;
 
 /**
- * Confirma que o USUÁRIO LOGADO tem o papel staff. A checagem antiga (`select` em user_roles sem
+ * Confirma que o USUÁRIO LOGADO tem perfil de gestão (staff). A checagem antiga (`select` em user_roles sem
  * filtrar o usuário) passava para qualquer um quando a policy deixa a equipe ver todos os papéis.
  */
 export async function garantirStaff(supabase: Cliente, userId: string): Promise<void> {
-  const { data, error } = await supabase
-    .from("user_roles")
-    .select("role")
-    .eq("user_id", userId)
-    .eq("role", "staff")
-    .limit(1);
-  if (error) throw error;
-  if (!data || data.length === 0) {
-    throw new Error("Apenas a equipe (staff) pode ver os relatórios.");
-  }
+  await exigirArea(
+    supabase,
+    userId,
+    "relatorios",
+    "Apenas a equipe de gestão pode ver os relatórios.",
+  );
 }
 
 // ------------------------------------------------------------------ consultas

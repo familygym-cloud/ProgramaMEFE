@@ -3,7 +3,6 @@ import { Link } from "@tanstack/react-router";
 import {
   ArrowRight,
   CalendarDays,
-  Check,
   CreditCard,
   Dumbbell,
   Flame,
@@ -42,8 +41,8 @@ const RECURSOS: { icone: LucideIcon; titulo: string; texto: string }[] = [
   },
   {
     icone: CreditCard,
-    titulo: "Meu plano",
-    texto: "Seu plano, vencimentos e pagamentos num só lugar.",
+    titulo: "Plano e mensalidades",
+    texto: "Seu plano, os valores e os vencimentos, visíveis só para você.",
   },
   {
     icone: ShieldCheck,
@@ -54,6 +53,12 @@ const RECURSOS: { icone: LucideIcon; titulo: string; texto: string }[] = [
 
 // Barras de exemplo: só ilustram o formato do gráfico, não representam dados reais.
 const BARRAS_EXEMPLO = [38, 52, 34, 66, 58, 80, 62, 92];
+
+// Estados ilustrativos, sem nenhum valor em dinheiro.
+const MENSALIDADES_EXEMPLO: { mes: string; situacao: string; emDia: boolean }[] = [
+  { mes: "Mês passado", situacao: "Em dia", emDia: true },
+  { mes: "Este mês", situacao: "A vencer", emDia: false },
+];
 
 const AULAS_EXEMPLO = [
   { hora: "18:00", nome: "Funcional", reservada: true },
@@ -71,7 +76,7 @@ function CartaoMock({
   className?: string;
 }) {
   return (
-    <div className={cn("rounded-2xl border border-white/10 bg-background/60 p-4", className)}>
+    <div className={cn("rounded-2xl border border-foreground/10 bg-background/60 p-4", className)}>
       <p className="text-[0.7rem] font-semibold uppercase tracking-widest text-muted-foreground">
         {titulo}
       </p>
@@ -84,7 +89,7 @@ function MockAreaAluno() {
   return (
     <div
       role="img"
-      aria-label="Exemplo ilustrativo da área do aluno, com anel de progresso semanal, gráfico de frequência e agenda de aulas. Os números são fictícios."
+      aria-label="Exemplo ilustrativo da área do aluno, com anel de progresso semanal, gráfico de frequência, agenda de aulas e situação das mensalidades. Os dados são fictícios."
       className="relative mx-auto w-full max-w-lg"
     >
       <div
@@ -132,7 +137,7 @@ function MockAreaAluno() {
                   className={
                     i === BARRAS_EXEMPLO.length - 1
                       ? "flex-1 rounded-t-md bg-brand-yellow"
-                      : "flex-1 rounded-t-md bg-white/15"
+                      : "flex-1 rounded-t-md bg-foreground/15"
                   }
                 />
               ))}
@@ -144,18 +149,16 @@ function MockAreaAluno() {
               {AULAS_EXEMPLO.map((aula) => (
                 <li
                   key={aula.nome}
-                  className="flex items-center gap-3 rounded-xl bg-white/[0.04] px-3 py-2.5"
+                  className="flex items-center gap-3 rounded-xl bg-foreground/[0.04] px-3 py-2.5"
                 >
                   <span className="font-display text-sm font-semibold tabular-nums text-muted-foreground">
                     {aula.hora}
                   </span>
                   <span className="flex-1 text-sm font-medium">{aula.nome}</span>
                   {aula.reservada ? (
-                    <Selo tom="ok">
-                      <Check className="size-3" /> Reservada
-                    </Selo>
+                    <Selo tom="ok">Reservada</Selo>
                   ) : (
-                    <span className="rounded-full border border-white/15 px-3 py-1 text-xs font-medium text-foreground/80">
+                    <span className="rounded-full border border-foreground/15 px-3 py-1 text-xs font-medium text-foreground/80">
                       Reservar
                     </span>
                   )}
@@ -163,10 +166,24 @@ function MockAreaAluno() {
               ))}
             </ul>
           </CartaoMock>
+
+          <CartaoMock titulo="Mensalidades e vencimentos" className="col-span-2">
+            <ul className="mt-3 grid grid-cols-2 gap-2">
+              {MENSALIDADES_EXEMPLO.map((item) => (
+                <li
+                  key={item.mes}
+                  className="flex flex-col items-start gap-1.5 rounded-xl bg-foreground/[0.04] px-3 py-2.5"
+                >
+                  <span className="text-sm font-medium">{item.mes}</span>
+                  <Selo tom={item.emDia ? "ok" : "atencao"}>{item.situacao}</Selo>
+                </li>
+              ))}
+            </ul>
+          </CartaoMock>
         </div>
       </Superficie>
 
-      <div className="absolute -bottom-7 right-3 flex items-center gap-3 rounded-2xl border border-white/10 bg-card px-4 py-3 shadow-xl sm:-right-4">
+      <div className="absolute -bottom-7 right-3 flex items-center gap-3 rounded-2xl border border-foreground/10 bg-card px-4 py-3 shadow-xl sm:-right-4">
         <span className="grid size-9 place-items-center rounded-xl bg-brand-yellow text-brand-black">
           <Flame className="size-5" />
         </span>
@@ -175,7 +192,7 @@ function MockAreaAluno() {
           <p className="font-display text-base font-bold leading-tight">5 dias seguidos</p>
         </div>
       </div>
-      <div className="absolute -top-4 left-3 hidden items-center gap-2 rounded-full border border-white/10 bg-card px-3.5 py-2 text-xs font-medium shadow-xl sm:-left-4 sm:flex">
+      <div className="absolute -top-4 left-3 hidden items-center gap-2 rounded-full border border-foreground/10 bg-card px-3.5 py-2 text-xs font-medium shadow-xl sm:-left-4 sm:flex">
         <Trophy className="size-4 text-brand-yellow" /> Conquista desbloqueada
       </div>
     </div>
@@ -186,7 +203,7 @@ export function AreaAlunoVitrine() {
   const { logado } = useSessao();
 
   return (
-    <Secao id="area-do-aluno" className="border-y border-white/10 bg-sidebar/50">
+    <Secao id="area-do-aluno" className="border-y border-foreground/10 bg-sidebar/50">
       {/* No celular o exemplo vem logo após o título; no desktop ocupa a coluna da direita. */}
       <div className="grid gap-x-10 gap-y-12 lg:grid-cols-2 lg:grid-rows-[auto_1fr]">
         <CabecalhoSecao
@@ -204,7 +221,7 @@ export function AreaAlunoVitrine() {
           <ul className="grid gap-x-8 gap-y-6 sm:grid-cols-2">
             {RECURSOS.map(({ icone: Icone, titulo, texto }) => (
               <li key={titulo} className="flex gap-4">
-                <span className="grid size-10 shrink-0 place-items-center rounded-xl border border-white/10 bg-white/5 text-brand-yellow">
+                <span className="grid size-10 shrink-0 place-items-center rounded-xl border border-foreground/10 bg-foreground/5 text-brand-yellow">
                   <Icone className="size-5" />
                 </span>
                 <div>

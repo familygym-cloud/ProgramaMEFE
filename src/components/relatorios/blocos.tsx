@@ -1,5 +1,14 @@
 import { useId, useState, type CSSProperties, type ReactNode } from "react";
-import { ArrowDownRight, ArrowUpRight, ChevronDown, Download, Info, Minus } from "lucide-react";
+import {
+  ArrowDownRight,
+  ArrowUpRight,
+  ChevronDown,
+  Download,
+  Info,
+  Minus,
+  OctagonAlert,
+  TriangleAlert,
+} from "lucide-react";
 import { toast } from "sonner";
 import { EstadoVazio, Superficie } from "@/components/app/ui";
 import { Button } from "@/components/ui/button";
@@ -46,7 +55,7 @@ function DicaMetodo({ rotulo, texto }: { rotulo: string; texto: string }) {
           <Info className="size-4" aria-hidden />
         </button>
       </PopoverTrigger>
-      <PopoverContent align="start" className="w-72 space-y-1 rounded-2xl border-white/15 p-4">
+      <PopoverContent align="start" className="w-72 space-y-1 rounded-2xl border-foreground/15 p-4">
         <p className="text-[0.7rem] font-semibold uppercase tracking-[0.2em] text-brand-yellow">
           Como calculamos
         </p>
@@ -57,9 +66,9 @@ function DicaMetodo({ rotulo, texto }: { rotulo: string; texto: string }) {
 }
 
 const TONS_VARIACAO = {
-  bom: "border-emerald-400/30 bg-emerald-400/10 text-emerald-300",
-  ruim: "border-red-400/40 bg-red-400/10 text-red-300",
-  neutro: "border-white/15 bg-white/5 text-foreground/80",
+  bom: "border-foreground/35 bg-foreground/10 text-foreground",
+  ruim: "border-destructive/40 bg-destructive/10 text-destructive",
+  neutro: "border-foreground/15 bg-foreground/5 text-foreground/80",
 } as const;
 
 export type Comparacao = {
@@ -108,7 +117,7 @@ const TONS_KPI = {
   neutro: "",
   ok: "",
   atencao: "border-brand-yellow/40",
-  alerta: "border-red-400/40",
+  alerta: "border-destructive/40",
 } as const;
 
 export function GradeKpis({ rotulo, children }: { rotulo: string; children: ReactNode }) {
@@ -154,6 +163,22 @@ export function KpiRelatorio({
         <div className="flex items-start justify-between gap-2">
           {/* Duas linhas reservadas: os números de cards vizinhos ficam alinhados. */}
           <span className="min-h-7 text-[0.68rem] font-semibold uppercase leading-tight tracking-[0.1em] text-muted-foreground sm:min-h-8 sm:text-xs sm:tracking-[0.14em]">
+            {tom === "atencao" || tom === "alerta" ? (
+              <>
+                {tom === "alerta" ? (
+                  <OctagonAlert
+                    className="-mt-0.5 mr-1 inline size-3.5 text-destructive"
+                    aria-hidden
+                  />
+                ) : (
+                  <TriangleAlert
+                    className="-mt-0.5 mr-1 inline size-3.5 text-primary"
+                    aria-hidden
+                  />
+                )}
+                <span className="sr-only">{tom === "alerta" ? "Alerta: " : "Atenção: "}</span>
+              </>
+            ) : null}
             {rotulo}
           </span>
           <div className="flex shrink-0 items-center gap-3">
@@ -169,7 +194,7 @@ export function KpiRelatorio({
           <p
             className={cn(
               "font-display text-[clamp(1.25rem,6.2vw,1.875rem)] font-bold leading-none tracking-tight tabular-nums sm:text-4xl",
-              tom === "alerta" && "text-red-300",
+              tom === "alerta" && "text-destructive",
             )}
           >
             {valor}
@@ -221,7 +246,7 @@ export function BotaoExportarCsv({
       onClick={exportar}
       disabled={desabilitado}
       aria-label={`Exportar CSV: ${assunto}`}
-      className="size-11 shrink-0 gap-2 rounded-full border-white/20 bg-transparent p-0 hover:bg-white/10 hover:text-foreground sm:h-9 sm:w-auto sm:px-4 print:hidden"
+      className="size-11 shrink-0 gap-2 rounded-full border-foreground/20 bg-transparent p-0 hover:bg-foreground/10 hover:text-foreground sm:h-9 sm:w-auto sm:px-4 print:hidden"
     >
       <Download aria-hidden />
       <span className="hidden sm:inline">Exportar CSV</span>
@@ -338,7 +363,7 @@ export function TabelaRelatorio<T>({
         {visiveis.map((linha) => (
           <li
             key={chaveLinha(linha)}
-            className="rounded-2xl border border-white/10 bg-white/[0.03] p-4"
+            className="rounded-2xl border border-foreground/10 bg-foreground/[0.03] p-4"
           >
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
@@ -370,12 +395,12 @@ export function TabelaRelatorio<T>({
         role="region"
         aria-label={rotulo}
         tabIndex={0}
-        className="hidden overflow-x-auto rounded-2xl border border-white/10 md:block print:block print:overflow-visible"
+        className="hidden overflow-x-auto rounded-2xl border border-foreground/10 md:block print:block print:overflow-visible"
       >
         <table className="w-full min-w-[40rem] border-collapse text-sm print:min-w-0">
           <caption className="sr-only">{rotulo}</caption>
           <thead>
-            <tr className="border-b border-white/10 bg-white/[0.03]">
+            <tr className="border-b border-foreground/10 bg-foreground/[0.03]">
               {colunas.map((c) => (
                 <th
                   key={c.id}
@@ -395,7 +420,7 @@ export function TabelaRelatorio<T>({
               <tr
                 key={chaveLinha(linha)}
                 className={cn(
-                  "border-b border-white/5 transition-colors last:border-b-0 hover:bg-white/[0.03] print:break-inside-avoid",
+                  "border-b border-foreground/5 transition-colors last:border-b-0 hover:bg-foreground/[0.03] print:break-inside-avoid",
                   !expandida && indice >= limiteInicial && "hidden print:table-row",
                 )}
               >
@@ -429,7 +454,7 @@ export function TabelaRelatorio<T>({
             variant="ghost"
             onClick={() => setExpandida((v) => !v)}
             aria-expanded={expandida}
-            className="-ml-3 h-11 gap-2 rounded-full px-3 text-sm text-foreground/90 hover:bg-white/10 hover:text-foreground sm:h-9"
+            className="-ml-3 h-11 gap-2 rounded-full px-3 text-sm text-foreground/90 hover:bg-foreground/10 hover:text-foreground sm:h-9"
           >
             {expandida ? "Mostrar menos" : `Mostrar todos (${linhas.length})`}
             <ChevronDown

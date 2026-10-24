@@ -3,7 +3,8 @@ import { BrandLogo } from "@/components/BrandLogo";
 import { SeloStatus } from "@/components/app/AppShell";
 import { Eyebrow, Superficie } from "@/components/app/ui";
 import type { PerfilAluno } from "@/lib/aluno-app/types";
-import { formatarBRL, type PlanoCatalogo } from "@/lib/planos-catalogo";
+import type { PlanoInfo } from "@/lib/planos-info";
+import { formatarBRL } from "@/lib/planos-precos";
 import type { ContratoAluno } from "./catalogo";
 import { haQuantoTempo, mesEAno } from "./datas";
 
@@ -17,7 +18,7 @@ function Fato({
   detalhe?: string | undefined;
 }) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-3.5">
+    <div className="rounded-2xl border border-foreground/10 bg-foreground/[0.04] p-3.5">
       <dt className="text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
         {rotulo}
       </dt>
@@ -40,7 +41,7 @@ function detalheDoContrato({ parcelas, periodo }: ContratoAluno): string {
 
 type Props = {
   perfil: PerfilAluno;
-  plano: PlanoCatalogo | undefined;
+  plano: PlanoInfo | undefined;
   contrato: ContratoAluno | null;
 };
 

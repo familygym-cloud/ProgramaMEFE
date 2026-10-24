@@ -53,7 +53,7 @@ export function ProgressoDoMes({ treinos, meta, metaPropria, className }: Props)
         <Link
           to="/app/resultados"
           search={{ aba: "metas" }}
-          className="mt-auto inline-flex min-h-11 items-center gap-1.5 rounded-full px-3 text-sm font-semibold hover:bg-white/5"
+          className="mt-auto inline-flex min-h-11 items-center gap-1.5 rounded-full px-3 text-sm font-semibold hover:bg-foreground/5"
         >
           {metaPropria ? "Ajustar minha meta" : "Definir minha meta"}
           <ArrowRight className="size-4" aria-hidden />

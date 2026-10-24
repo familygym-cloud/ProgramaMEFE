@@ -37,8 +37,8 @@ function BotaoIcone({
         inativo
           ? "cursor-not-allowed opacity-30"
           : perigo
-            ? "hover:bg-red-500/15 hover:text-red-300"
-            : "hover:bg-white/10 hover:text-foreground",
+            ? "hover:bg-destructive/15 hover:text-destructive"
+            : "hover:bg-foreground/10 hover:text-foreground",
       )}
     >
       {icone}
@@ -73,7 +73,7 @@ export function EditorExercicio({
   return (
     <li
       aria-label={`Exercício ${numero} de ${total}: ${titulo}`}
-      className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 sm:p-5"
+      className="rounded-2xl border border-foreground/10 bg-foreground/[0.03] p-4 sm:p-5"
     >
       <div className="flex items-center gap-3">
         <span

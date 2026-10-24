@@ -6,7 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import type { ModoRelatorio } from "@/lib/relatorios/abas";
 import { classificarErro } from "@/lib/relatorios/erros";
 
-const BLOCO = "rounded-3xl bg-white/[0.06] motion-reduce:animate-none";
+const BLOCO = "rounded-3xl bg-foreground/[0.06] motion-reduce:animate-none";
 
 /** Esqueleto do relatório individual: mesma estrutura da página pronta (capa e seções). */
 export function CarregandoRelatorioAluno({
@@ -22,8 +22,8 @@ export function CarregandoRelatorioAluno({
       className="mx-auto max-w-4xl space-y-5 sm:space-y-6"
     >
       <div className="flex flex-wrap items-center gap-3">
-        <Skeleton className="h-11 w-44 rounded-full bg-white/[0.06] motion-reduce:animate-none" />
-        <Skeleton className="h-11 w-full rounded-full bg-white/[0.06] motion-reduce:animate-none sm:ml-auto sm:w-64" />
+        <Skeleton className="h-11 w-44 rounded-full bg-foreground/[0.06] motion-reduce:animate-none" />
+        <Skeleton className="h-11 w-full rounded-full bg-foreground/[0.06] motion-reduce:animate-none sm:ml-auto sm:w-64" />
       </div>
       <Skeleton className={`h-60 sm:h-64 ${BLOCO}`} />
       <Skeleton className={`h-72 ${BLOCO}`} />
@@ -66,7 +66,7 @@ export function ErroRelatorioAluno({
               type="button"
               variant="outline"
               onClick={aoSair}
-              className="h-11 gap-2 rounded-full border-white/20 bg-transparent px-5 hover:bg-white/10 hover:text-foreground"
+              className="h-11 gap-2 rounded-full border-foreground/20 bg-transparent px-5 hover:bg-foreground/10 hover:text-foreground"
             >
               <LogOut aria-hidden /> {tipo === "sessao" ? "Entrar de novo" : "Sair"}
             </Button>

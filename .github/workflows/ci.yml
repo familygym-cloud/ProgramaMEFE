@@ -1,7 +1,6 @@
 name: CI
 
-# O push na branch conectada ao Lovable vai direto para produção: sem esta verificação, erro de tipo,
-# de teste ou de build chega lá sem que ninguém veja.
+# Sem esta verificação, erro de tipo, de teste ou de build chega à produção sem que ninguém veja.
 on:
   push:
     branches: [main]

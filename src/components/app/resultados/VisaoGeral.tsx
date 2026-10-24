@@ -100,7 +100,7 @@ export function VisaoGeral({ dados }: { dados: AreaAlunoDados }) {
                 <Button
                   asChild
                   variant="outline"
-                  className="h-11 rounded-full border-white/20 bg-transparent px-5 hover:bg-white/10"
+                  className="h-11 rounded-full border-foreground/20 bg-transparent px-5 hover:bg-foreground/10"
                 >
                   <Link to="/app/avaliacoes">Ver avaliações</Link>
                 </Button>

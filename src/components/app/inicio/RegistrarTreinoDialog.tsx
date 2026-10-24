@@ -46,7 +46,7 @@ const esquema = z.object({
 });
 
 const classeChip =
-  "inline-flex h-11 items-center justify-center rounded-full border border-white/15 px-4 text-sm font-medium transition-colors hover:bg-white/5 data-[state=checked]:border-brand-yellow data-[state=checked]:bg-brand-yellow data-[state=checked]:text-brand-black";
+  "inline-flex h-11 items-center justify-center rounded-full border border-foreground/15 px-4 text-sm font-medium transition-colors hover:bg-foreground/5 data-[state=checked]:border-brand-yellow data-[state=checked]:bg-brand-yellow data-[state=checked]:text-brand-black";
 
 type Props = {
   aberto: boolean;
@@ -58,7 +58,7 @@ type Props = {
 export function RegistrarTreinoDialog({ aberto, aoMudar, sugestaoMin }: Props) {
   return (
     <Dialog open={aberto} onOpenChange={aoMudar}>
-      <DialogContent className="max-h-[calc(100dvh-2rem)] max-w-[calc(100vw-2rem)] gap-6 overflow-y-auto rounded-3xl border-white/10 p-6 sm:max-w-md sm:rounded-3xl sm:p-7">
+      <DialogContent className="max-h-[calc(100dvh-2rem)] max-w-[calc(100vw-2rem)] gap-6 overflow-y-auto rounded-3xl border-foreground/10 p-6 sm:max-w-md sm:rounded-3xl sm:p-7">
         <DialogHeader className="space-y-2 pr-6 text-left">
           <DialogTitle className="font-display text-2xl font-bold leading-tight">
             Registrar treino
@@ -203,8 +203,8 @@ function Formulario({
                 setErro(null);
               }}
               className={cn(
-                "h-11 rounded-full border px-4 text-sm font-medium transition-colors hover:bg-white/5",
-                minutos === d ? "border-white bg-white/10" : "border-white/15",
+                "h-11 rounded-full border px-4 text-sm font-medium transition-colors hover:bg-foreground/5",
+                minutos === d ? "border-foreground bg-foreground/10" : "border-foreground/15",
               )}
             >
               {d} min
@@ -214,7 +214,7 @@ function Formulario({
       </div>
 
       {erro ? (
-        <p role="alert" className="text-sm text-red-300">
+        <p role="alert" className="text-sm text-destructive">
           {erro}
         </p>
       ) : null}

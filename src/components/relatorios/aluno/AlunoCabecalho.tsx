@@ -76,7 +76,7 @@ export function AlunoCabecalho({
 
         <dl
           aria-label="Dados do aluno"
-          className="mt-5 grid grid-cols-2 gap-x-4 gap-y-4 border-t border-white/10 pt-5 sm:grid-cols-3 print:mt-3 print:gap-y-3 print:pt-3"
+          className="mt-5 grid grid-cols-2 gap-x-4 gap-y-4 border-t border-foreground/10 pt-5 sm:grid-cols-3 print:mt-3 print:gap-y-3 print:pt-3"
         >
           <Campo rotulo="Plano" valor={textoOuTraco(aluno.plano)} />
           <Campo rotulo="Turno" valor={textoOuTraco(aluno.turno)} />

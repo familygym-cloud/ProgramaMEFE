@@ -178,9 +178,9 @@ const SELO_DESTAQUE = {
 } as const;
 
 const BORDA_DESTAQUE = {
-  alerta: "border-red-400/40",
+  alerta: "border-destructive/40",
   atencao: "border-brand-yellow/40",
-  ok: "border-emerald-400/30",
+  ok: "border-foreground/30",
 } as const;
 
 function CartaoAtencao({ destaque }: { destaque: DestaqueAcao }) {
@@ -188,7 +188,7 @@ function CartaoAtencao({ destaque }: { destaque: DestaqueAcao }) {
   return (
     <li
       className={cn(
-        "flex min-w-0 flex-col rounded-2xl border bg-white/[0.03] p-4 sm:p-5 print:break-inside-avoid",
+        "flex min-w-0 flex-col rounded-2xl border bg-foreground/[0.03] p-4 sm:p-5 print:break-inside-avoid",
         BORDA_DESTAQUE[destaque.tom],
       )}
     >
@@ -415,7 +415,7 @@ function Turnos({ relatorio, modo }: PropsAba) {
       <div className="space-y-5">
         <BarrasHorizontais itens={itens} />
         {maisMovimentado && maisMovimentado.treinos30d > 0 ? (
-          <p className="border-t border-white/10 pt-4 text-sm text-foreground/90">
+          <p className="border-t border-foreground/10 pt-4 text-sm text-foreground/90">
             {maisMovimentado.turno} concentra{" "}
             {formatarPercentual(percentualDe(maisMovimentado.treinos30d, totalTreinos), 0)} dos
             treinos dos últimos 30 dias.
@@ -489,7 +489,7 @@ function ResumoSaude({ relatorio, modo }: PropsAba) {
       }
     >
       <div className="space-y-6">
-        <dl className="grid grid-cols-3 gap-3 border-b border-white/10 pb-5">
+        <dl className="grid grid-cols-3 gap-3 border-b border-foreground/10 pb-5">
           <NumeroResumo
             rotulo="IMC médio"
             valor={saude.imcMedio === null ? TRACO : formatarNumero(saude.imcMedio, 1)}

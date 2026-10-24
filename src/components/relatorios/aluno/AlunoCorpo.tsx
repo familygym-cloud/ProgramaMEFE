@@ -93,8 +93,8 @@ export function AlunoCorpo({ relatorio }: { relatorio: RelatorioAluno }) {
           ) : null}
 
           {pontos.length >= 2 ? (
-            <div className="space-y-2 break-inside-avoid border-t border-white/10 pt-4 print:pt-3">
-              <h3 className="text-[0.7rem] font-semibold uppercase tracking-[0.2em] text-brand-yellow">
+            <div className="space-y-2 break-inside-avoid border-t border-foreground/10 pt-4 print:pt-3">
+              <h3 className="font-sans text-[0.7rem] font-semibold uppercase tracking-[0.2em] text-brand-yellow">
                 Peso por avaliação (kg)
               </h3>
               <GraficoPesoAluno
@@ -103,7 +103,7 @@ export function AlunoCorpo({ relatorio }: { relatorio: RelatorioAluno }) {
               />
             </div>
           ) : todas.length > 0 ? (
-            <p className="border-t border-white/10 pt-4 text-sm leading-relaxed text-muted-foreground">
+            <p className="border-t border-foreground/10 pt-4 text-sm leading-relaxed text-muted-foreground">
               O gráfico de evolução aparece a partir de duas avaliações com peso registrado.
             </p>
           ) : null}

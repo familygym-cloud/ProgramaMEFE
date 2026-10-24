@@ -1,113 +1,77 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, Check, Users } from "lucide-react";
+import { ArrowRight, Check, Lock } from "lucide-react";
 import { Selo } from "@/components/app/ui";
-import type { PlanoCatalogo } from "@/lib/planos-catalogo";
-import { cn } from "@/lib/utils";
+import { planoInfoPorSlug, type PlanoInfo } from "@/lib/planos-info";
 import { botaoMarca } from "./botoes";
 import { frentesTreino } from "./frentes";
-import { menorOpcao, planoPorSlug, planosDaCategoria, reais } from "./precos";
 import { CabecalhoSecao, Secao } from "./SecaoSite";
 
 const SLUGS_EM_DESTAQUE = ["musculacao", "terrestre", "aquatico-3x"];
 
-/** Pontos do cartão, todos vindos do catálogo: o que está incluído ou as regras do plano. */
-function pontosDoPlano(plano: PlanoCatalogo): string[] {
-  const base =
+/** Pontos do cartão, todos vindos de planos-info.ts: o que está incluído ou as regras do serviço. */
+function pontosDoPlano(plano: PlanoInfo): string[] {
+  return (
     plano.inclui ??
     (plano.modalidades
       ? [
           ...plano.modalidades.filter((m) => m !== "entre outras").slice(0, 5),
           "e outras modalidades",
         ]
-      : (plano.observacoes ?? []));
-  return [...base, `Matrícula de ${reais(plano.matricula)}`];
+      : (plano.observacoes ?? []))
+  );
 }
 
-function CartaoPlano({ plano, indice }: { plano: PlanoCatalogo; indice: number }) {
-  const opcao = menorOpcao([plano]);
-  if (!opcao) return null;
-  const familia = plano.familia;
+function CartaoPlano({ plano, indice }: { plano: PlanoInfo; indice: number }) {
+  const pontos = pontosDoPlano(plano);
 
   return (
-    // Quatro linhas em subgrade: preço, lista e botão alinham entre os cartões vizinhos.
     <li
-      className={cn(
-        "fg-entrada row-span-4 grid grid-rows-subgrid gap-y-0 rounded-3xl border bg-card/70 p-7",
-        familia ? "border-brand-yellow/40" : "border-white/10",
-      )}
+      className="fg-entrada flex flex-col rounded-3xl border border-foreground/10 bg-card/70 p-7"
       style={{ animationDelay: `${indice * 90}ms` }}
     >
-      <div>
-        <div className="flex flex-wrap items-center gap-2">
-          <Selo>{plano.categoria}</Selo>
-          {familia ? <Selo tom="atencao">Valor família</Selo> : null}
-        </div>
-        <h3 className="mt-5 font-display text-2xl font-semibold leading-tight tracking-tight">
-          {plano.nome}
-        </h3>
-        <p className="mt-1 text-sm text-muted-foreground">{plano.resumo}</p>
-      </div>
+      <Selo className="self-start">{plano.categoria}</Selo>
+      <h3 className="mt-5 font-display text-2xl font-semibold leading-tight tracking-tight">
+        {plano.nome}
+      </h3>
+      <p className="mt-1 text-sm text-muted-foreground">{plano.resumo}</p>
 
-      <div className="pt-6">
-        <p className="text-[0.7rem] font-medium uppercase tracking-widest text-muted-foreground">
-          A partir de
-        </p>
-        <p className="font-display text-5xl font-bold leading-none tracking-tight">
-          {reais(opcao.valor)}
-        </p>
-        <p className="mt-2 text-sm text-muted-foreground">
-          {opcao.parcelas > 1
-            ? `por parcela, em ${opcao.parcelas}x (${opcao.label.toLowerCase()})`
-            : "por mês"}
-        </p>
-      </div>
-
-      <div className="mt-6 border-t border-white/10 pt-6">
-        {familia ? (
-          <p className="mb-5 flex items-start gap-2.5 rounded-2xl border border-brand-yellow/30 bg-brand-yellow/10 px-4 py-3 text-sm">
-            <Users className="mt-0.5 size-4 shrink-0 text-brand-yellow" />
-            <span>
-              Em família (2 ou mais pessoas, anual):{" "}
-              <strong className="font-semibold">
-                {familia.parcelas}x de {reais(familia.valor)}
-              </strong>
-            </span>
-          </p>
-        ) : null}
-        <ul className="space-y-2.5 text-sm">
-          {pontosDoPlano(plano).map((ponto) => (
+      {pontos.length ? (
+        <ul className="mt-6 space-y-2.5 border-t border-foreground/10 pt-6 text-sm">
+          {pontos.map((ponto) => (
             <li key={ponto} className="flex items-start gap-2.5 text-foreground/85">
-              <Check className="mt-0.5 size-4 shrink-0 text-brand-yellow" />
+              <Check aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-brand-yellow" />
               {ponto}
             </li>
           ))}
         </ul>
-      </div>
+      ) : null}
 
-      <Link
-        to="/valores"
-        search={{ categoria: plano.categoria }}
-        className={botaoMarca("secundario", "md", "mt-8 w-full self-end")}
-      >
-        Ver detalhes do plano <ArrowRight />
-      </Link>
+      <div className="mt-auto pt-8">
+        <Link
+          to="/valores"
+          search={{ categoria: plano.categoria }}
+          className={botaoMarca("secundario", "md", "w-full")}
+        >
+          Ver detalhes do plano <ArrowRight />
+        </Link>
+      </div>
     </li>
   );
 }
 
 export function PlanosDestaque() {
-  const planos = SLUGS_EM_DESTAQUE.map(planoPorSlug).filter((p): p is PlanoCatalogo => Boolean(p));
+  const planos = SLUGS_EM_DESTAQUE.map(planoInfoPorSlug).filter((p): p is PlanoInfo => Boolean(p));
   const outras = frentesTreino.filter(
     (f) => f.categoria === "Lutas" || f.categoria === "Melhor Idade" || f.categoria === "Kids",
   );
 
   return (
-    <Secao id="planos" className="border-t border-white/10">
+    <Secao id="planos" className="border-t border-foreground/10">
       <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
         <CabecalhoSecao
           eyebrow="Planos em destaque"
-          titulo="Valores claros, sem pegadinha"
-          texto="Planos anuais, semestrais, trimestrais e mensais. Quanto maior o compromisso, menor a parcela."
+          titulo="Um plano para cada rotina"
+          texto="Da musculação à natação, passando pelas aulas coletivas: veja o que cada plano inclui."
         />
         <Link
           to="/valores"
@@ -125,24 +89,24 @@ export function PlanosDestaque() {
 
       <div className="mt-8 flex flex-wrap items-center gap-3">
         <p className="text-sm text-muted-foreground">Também temos:</p>
-        {outras.map((frente) => {
-          const opcao = menorOpcao(planosDaCategoria(frente.categoria));
-          return (
-            <Link
-              key={frente.id}
-              to="/valores"
-              search={{ categoria: frente.categoria }}
-              className="inline-flex min-h-11 items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 text-sm font-medium transition-colors hover:border-white/30 hover:bg-white/10"
-            >
-              <frente.icone className="size-4 text-brand-yellow" />
-              {frente.titulo}
-              {opcao ? (
-                <span className="text-muted-foreground">a partir de {reais(opcao.valor)}</span>
-              ) : null}
-            </Link>
-          );
-        })}
+        {outras.map((frente) => (
+          <Link
+            key={frente.id}
+            to="/valores"
+            search={{ categoria: frente.categoria }}
+            className="inline-flex min-h-11 items-center gap-2 rounded-full border border-foreground/10 bg-foreground/5 px-4 text-sm font-medium transition-colors hover:border-foreground/30 hover:bg-foreground/10"
+          >
+            <frente.icone aria-hidden="true" className="size-4 text-brand-yellow" />
+            {frente.titulo}
+          </Link>
+        ))}
       </div>
+
+      <p className="mt-8 flex items-start gap-2.5 text-sm text-muted-foreground">
+        <Lock aria-hidden="true" className="mt-0.5 size-4 shrink-0" />
+        Os valores dos planos ficam na área do aluno, para quem tem plano ativo. Para se matricular,
+        fale com a recepção.
+      </p>
     </Secao>
   );
 }

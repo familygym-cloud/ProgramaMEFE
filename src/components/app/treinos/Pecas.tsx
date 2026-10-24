@@ -18,7 +18,10 @@ export function NivelSelo({ nivel }: { nivel: NivelTreino }) {
         {[1, 2, 3].map((n) => (
           <span
             key={n}
-            className={cn("w-[3px] rounded-[1px]", n <= ativas ? "bg-foreground" : "bg-white/25")}
+            className={cn(
+              "w-[3px] rounded-[1px]",
+              n <= ativas ? "bg-foreground" : "bg-foreground/25",
+            )}
             style={{ height: `${n * 4}px` }}
           />
         ))}
@@ -31,7 +34,7 @@ export function NivelSelo({ nivel }: { nivel: NivelTreino }) {
 /** Pílula com ícone, usada em resumos ("5 exercícios", "cerca de 40 min"). */
 export function Indicador({ icone, children }: { icone: ReactNode; children: ReactNode }) {
   return (
-    <li className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3.5 py-1.5 text-sm [&_svg]:size-4 [&_svg]:text-brand-yellow">
+    <li className="inline-flex items-center gap-2 rounded-full border border-foreground/10 bg-foreground/5 px-3.5 py-1.5 text-sm [&_svg]:size-4 [&_svg]:text-brand-yellow">
       {icone}
       {children}
     </li>

@@ -1,6 +1,8 @@
-import { useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { HeartPulse, Plus, Scale, Timer, TrendingDown, TrendingUp } from "lucide-react";
+import { AvisosDoAluno } from "@/components/app/inicio/AvisosDoAluno";
+import { montarAvisos } from "@/components/app/inicio/avisos";
 import { CartaoPagamento, FaixaPagamento } from "@/components/app/inicio/AvisoPagamento";
 import { EscalaIMC, MiniBarras, MiniLinha } from "@/components/app/inicio/MiniGraficos";
 import { NivelAluno } from "@/components/app/inicio/NivelAluno";
@@ -34,7 +36,9 @@ import {
   treinoDeHoje,
   treinosNoMes,
 } from "@/lib/aluno-app/derive";
+import { gravarVistas, lerVistas, novasConquistas } from "@/lib/aluno-app/novas-conquistas";
 import { useAlunoApp } from "@/lib/aluno-app/store";
+import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/app/")({
@@ -86,7 +90,7 @@ function Pagina() {
       semana: semanaAtual(checkIns, hoje),
       // O mapa inclui a semana atual na última coluna; aqui interessam só as três anteriores.
       anteriores: mapaDeCalor(checkIns, 4, hoje).slice(0, 3),
-      checkInsHoje: checkIns.filter((c) => c.data === hoje),
+      checkInsHoje: checkIns.filter((c) => c.data === hoje && c.origem !== "acesso"),
       treinosMes: treinosNoMes(checkIns, hoje),
       minutosMes: minutosNoMes(checkIns, hoje),
       totalTreinos: new Set(checkIns.map((c) => c.data)).size,
@@ -99,9 +103,21 @@ function Pagina() {
       aula: proximaAulaReservada(dados.agenda),
       pagamento: resumirPagamento(dados.pagamentos),
       conquistas: conquistas(dados, hoje),
+      avisos: montarAvisos(dados),
       dataLonga: formatarDataLonga(hoje),
     };
   }, [dados]);
+
+  // Comemora conquistas novas uma única vez (a primeira visita só registra as que já existiam).
+  const alunoId = dados.perfil.id;
+  useEffect(() => {
+    if (dados.demo) return;
+    const { novas, vistasAtualizadas } = novasConquistas(resumo.conquistas, lerVistas(alunoId));
+    gravarVistas(alunoId, vistasAtualizadas);
+    for (const conquista of novas) {
+      toast.success(`Nova conquista: ${conquista.titulo}`, { description: conquista.descricao });
+    }
+  }, [alunoId, dados.demo, resumo.conquistas]);
 
   const nome = primeiroNome(dados.perfil.nome);
   const treinouHoje = resumo.checkInsHoje.length > 0;
@@ -127,7 +143,7 @@ function Pagina() {
               type="button"
               variant="outline"
               onClick={() => setRegistrando(true)}
-              className="h-11 rounded-full border-white/20 bg-transparent px-5 hover:bg-white/10"
+              className="h-11 rounded-full border-foreground/20 bg-transparent px-5 hover:bg-foreground/10"
             >
               <Plus aria-hidden />
               Registrar treino
@@ -139,6 +155,12 @@ function Pagina() {
       {pagamentoUrgente ? (
         <Entrada atraso={40}>
           <FaixaPagamento resumo={pagamentoUrgente} />
+        </Entrada>
+      ) : null}
+
+      {resumo.avisos.length > 0 ? (
+        <Entrada atraso={50}>
+          <AvisosDoAluno avisos={resumo.avisos} />
         </Entrada>
       ) : null}
 

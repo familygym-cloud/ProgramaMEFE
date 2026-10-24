@@ -1,5 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
+import { podeAcessar, type Area } from "@/lib/papeis";
 
 type Cliente = SupabaseClient<Database>;
 
@@ -28,15 +29,27 @@ export async function exigirStaff(
   if (!(await usuarioEhStaff(supabase, userId))) throw new Error(mensagem);
 }
 
-/**
- * Telas que só a equipe usa. Quem não é da equipe e digita a URL é levado para fora em vez de ver
- * uma tela de gestão com erro cru do servidor. A segurança de verdade continua no servidor e no
- * RLS; isto é só experiência de uso. `/vinculos` fica de fora de propósito: é onde a conta
- * autorizada ativa o perfil da equipe pela primeira vez.
- */
-const ROTAS_DA_EQUIPE = ["/aulas", "/financeiro", "/termos"] as const;
+/** Papéis do USUÁRIO LOGADO (filtra por `user_id`), sob RLS. */
+export async function papeisDoUsuario(supabase: Cliente, userId: string): Promise<string[]> {
+  const { data, error } = await supabase.from("user_roles").select("role").eq("user_id", userId);
+  if (error) throw error;
+  return (data ?? []).map((p) => p.role);
+}
 
-export function rotaExclusivaDaEquipe(pathname: string): boolean {
-  const limpo = pathname.length > 1 ? pathname.replace(/\/+$/, "") : pathname;
-  return ROTAS_DA_EQUIPE.some((rota) => limpo === rota || limpo.startsWith(`${rota}/`));
+export async function usuarioPodeAcessar(
+  supabase: Cliente,
+  userId: string,
+  area: Area,
+): Promise<boolean> {
+  return podeAcessar(await papeisDoUsuario(supabase, userId), area);
+}
+
+/** Lança `mensagem` (em português, mostrada ao usuário) quando o perfil do usuário não cobre a área. */
+export async function exigirArea(
+  supabase: Cliente,
+  userId: string,
+  area: Area,
+  mensagem: string,
+): Promise<void> {
+  if (!(await usuarioPodeAcessar(supabase, userId, area))) throw new Error(mensagem);
 }

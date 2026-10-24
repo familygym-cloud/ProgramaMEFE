@@ -1,4 +1,4 @@
-import { CalendarCheck, CalendarX, Loader2 } from "lucide-react";
+import { CalendarCheck, CalendarX, Hourglass, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { vagasRestantes } from "@/lib/aluno-app/derive";
 import type { AulaAgenda } from "@/lib/aluno-app/types";
@@ -18,6 +18,31 @@ const BASE = "h-11 rounded-full px-5 text-sm font-semibold";
 export function BotaoReserva({ aula, ocupado, onAlternar, className }: Props) {
   const detalhe = `${aula.modalidade} às ${horarioCurto(aula)}`;
 
+  if (aula.naFila) {
+    return (
+      <Button
+        type="button"
+        variant="outline"
+        disabled={ocupado}
+        aria-busy={ocupado}
+        aria-label={`Sair da lista de espera de ${detalhe}`}
+        onClick={() => onAlternar(aula)}
+        className={cn(
+          BASE,
+          "border-foreground/20 bg-transparent hover:bg-foreground/10 hover:text-foreground",
+          className,
+        )}
+      >
+        {ocupado ? <Loader2 className="animate-spin" aria-hidden /> : <CalendarX aria-hidden />}
+        {ocupado
+          ? "Saindo…"
+          : aula.posicaoFila
+            ? `Sair da fila · ${aula.posicaoFila}º`
+            : "Sair da fila"}
+      </Button>
+    );
+  }
+
   if (aula.reservada) {
     return (
       <Button
@@ -29,7 +54,7 @@ export function BotaoReserva({ aula, ocupado, onAlternar, className }: Props) {
         onClick={() => onAlternar(aula)}
         className={cn(
           BASE,
-          "border-white/20 bg-transparent hover:bg-white/10 hover:text-foreground",
+          "border-foreground/20 bg-transparent hover:bg-foreground/10 hover:text-foreground",
           className,
         )}
       >
@@ -44,11 +69,18 @@ export function BotaoReserva({ aula, ocupado, onAlternar, className }: Props) {
       <Button
         type="button"
         variant="outline"
-        disabled
-        aria-label={`${detalhe}: turma lotada`}
-        className={cn(BASE, "border-white/10 bg-transparent", className)}
+        disabled={ocupado}
+        aria-busy={ocupado}
+        aria-label={`${detalhe}: turma lotada. Entrar na lista de espera`}
+        onClick={() => onAlternar(aula)}
+        className={cn(
+          BASE,
+          "border-brand-yellow/50 bg-transparent hover:bg-brand-yellow/10 hover:text-foreground",
+          className,
+        )}
       >
-        Turma lotada
+        {ocupado ? <Loader2 className="animate-spin" aria-hidden /> : <Hourglass aria-hidden />}
+        {ocupado ? "Entrando…" : "Entrar na lista de espera"}
       </Button>
     );
   }
@@ -60,7 +92,7 @@ export function BotaoReserva({ aula, ocupado, onAlternar, className }: Props) {
       aria-busy={ocupado}
       aria-label={`Reservar vaga em ${detalhe}`}
       onClick={() => onAlternar(aula)}
-      className={cn(BASE, "bg-white text-brand-black hover:bg-white/85", className)}
+      className={cn(BASE, "bg-foreground text-brand-black hover:bg-foreground/85", className)}
     >
       {ocupado ? <Loader2 className="animate-spin" aria-hidden /> : <CalendarCheck aria-hidden />}
       {ocupado ? "Reservando…" : "Reservar vaga"}

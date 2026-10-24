@@ -13,13 +13,22 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as ComeceRouteImport } from './routes/comece'
 import { Route as EquipeDemoRouteImport } from './routes/equipe-demo'
+import { Route as GradeRouteImport } from './routes/grade'
+import { Route as MefeRouteImport } from './routes/mefe'
 import { Route as ModalidadesRouteImport } from './routes/modalidades'
+import { Route as PrivacidadeRouteImport } from './routes/privacidade'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as TermosDeUsoRouteImport } from './routes/termos-de-uso'
 import { Route as ValoresRouteImport } from './routes/valores'
 import { Route as AuthenticatedAulasRouteImport } from './routes/_authenticated/aulas'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedFinanceiroRouteImport } from './routes/_authenticated/financeiro'
+import { Route as AuthenticatedIntegracoesRouteImport } from './routes/_authenticated/integracoes'
+import { Route as AuthenticatedInteressadosRouteImport } from './routes/_authenticated/interessados'
 import { Route as AuthenticatedPlanosRouteImport } from './routes/_authenticated/planos'
 import { Route as AuthenticatedPrescricaoTreinosRouteImport } from './routes/_authenticated/prescricao-treinos'
 import { Route as AuthenticatedRegistrarAvaliacaoRouteImport } from './routes/_authenticated/registrar-avaliacao'
@@ -28,14 +37,26 @@ import { Route as AuthenticatedVinculosRouteImport } from './routes/_authenticat
 import { Route as AppIndexRouteImport } from './routes/app/index'
 import { Route as AppAulasRouteImport } from './routes/app/aulas'
 import { Route as AppAvaliacoesRouteImport } from './routes/app/avaliacoes'
+import { Route as AppGradeRouteImport } from './routes/app/grade'
 import { Route as AppPerfilRouteImport } from './routes/app/perfil'
 import { Route as AppPlanoRouteImport } from './routes/app/plano'
 import { Route as AppResultadosRouteImport } from './routes/app/resultados'
 import { Route as AppSegurancaRouteImport } from './routes/app/seguranca'
+import { Route as AppValoresRouteImport } from './routes/app/valores'
+import { Route as AuthenticatedFormulariosMefeIndexRouteImport } from './routes/_authenticated/formularios-mefe.index'
+import { Route as AuthenticatedFormulariosMefeTipoRouteImport } from './routes/_authenticated/formularios-mefe.$tipo'
 import { Route as AuthenticatedRelatorioAlunoAlunoIdRouteImport } from './routes/_authenticated/relatorio-aluno.$alunoId'
+import { Route as ApiV1AcessosRouteImport } from './routes/api.v1.acessos'
+import { Route as ApiV1AlunosRouteImport } from './routes/api.v1.alunos'
+import { Route as ApiV1AulasRouteImport } from './routes/api.v1.aulas'
+import { Route as ApiV1OpenapiDotjsonRouteImport } from './routes/api.v1.openapi[.]json'
+import { Route as ApiV1SaudeRouteImport } from './routes/api.v1.saude'
 import { Route as AppTreinosIndexRouteImport } from './routes/app/treinos/index'
 import { Route as AppTreinosTreinoIdRouteImport } from './routes/app/treinos/$treinoId'
 import { Route as EquipeDemoAlunoAlunoIdRouteImport } from './routes/equipe-demo_.aluno.$alunoId'
+import { Route as ApiV1AcessosVerificarRouteImport } from './routes/api.v1.acessos.verificar'
+import { Route as ApiV1AlunosIdsExternosRouteImport } from './routes/api.v1.alunos.ids-externos'
+import { Route as ApiV1PagamentosBaixaRouteImport } from './routes/api.v1.pagamentos.baixa'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -56,9 +77,24 @@ const AuthRoute = AuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ComeceRoute = ComeceRouteImport.update({
+  id: '/comece',
+  path: '/comece',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EquipeDemoRoute = EquipeDemoRouteImport.update({
   id: '/equipe-demo',
   path: '/equipe-demo',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GradeRoute = GradeRouteImport.update({
+  id: '/grade',
+  path: '/grade',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MefeRoute = MefeRouteImport.update({
+  id: '/mefe',
+  path: '/mefe',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ModalidadesRoute = ModalidadesRouteImport.update({
@@ -66,9 +102,29 @@ const ModalidadesRoute = ModalidadesRouteImport.update({
   path: '/modalidades',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PrivacidadeRoute = PrivacidadeRouteImport.update({
+  id: '/privacidade',
+  path: '/privacidade',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
+  id: '/robots.txt',
+  path: '/robots.txt',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermosDeUsoRoute = TermosDeUsoRouteImport.update({
+  id: '/termos-de-uso',
+  path: '/termos-de-uso',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ValoresRoute = ValoresRouteImport.update({
@@ -91,6 +147,18 @@ const AuthenticatedFinanceiroRoute = AuthenticatedFinanceiroRouteImport.update({
   path: '/financeiro',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedIntegracoesRoute =
+  AuthenticatedIntegracoesRouteImport.update({
+    id: '/integracoes',
+    path: '/integracoes',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedInteressadosRoute =
+  AuthenticatedInteressadosRouteImport.update({
+    id: '/interessados',
+    path: '/interessados',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedPlanosRoute = AuthenticatedPlanosRouteImport.update({
   id: '/planos',
   path: '/planos',
@@ -133,6 +201,11 @@ const AppAvaliacoesRoute = AppAvaliacoesRouteImport.update({
   path: '/avaliacoes',
   getParentRoute: () => AppRoute,
 } as any)
+const AppGradeRoute = AppGradeRouteImport.update({
+  id: '/grade',
+  path: '/grade',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppPerfilRoute = AppPerfilRouteImport.update({
   id: '/perfil',
   path: '/perfil',
@@ -153,12 +226,54 @@ const AppSegurancaRoute = AppSegurancaRouteImport.update({
   path: '/seguranca',
   getParentRoute: () => AppRoute,
 } as any)
+const AppValoresRoute = AppValoresRouteImport.update({
+  id: '/valores',
+  path: '/valores',
+  getParentRoute: () => AppRoute,
+} as any)
+const AuthenticatedFormulariosMefeIndexRoute =
+  AuthenticatedFormulariosMefeIndexRouteImport.update({
+    id: '/formularios-mefe/',
+    path: '/formularios-mefe/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedFormulariosMefeTipoRoute =
+  AuthenticatedFormulariosMefeTipoRouteImport.update({
+    id: '/formularios-mefe/$tipo',
+    path: '/formularios-mefe/$tipo',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedRelatorioAlunoAlunoIdRoute =
   AuthenticatedRelatorioAlunoAlunoIdRouteImport.update({
     id: '/relatorio-aluno/$alunoId',
     path: '/relatorio-aluno/$alunoId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const ApiV1AcessosRoute = ApiV1AcessosRouteImport.update({
+  id: '/api/v1/acessos',
+  path: '/api/v1/acessos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1AlunosRoute = ApiV1AlunosRouteImport.update({
+  id: '/api/v1/alunos',
+  path: '/api/v1/alunos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1AulasRoute = ApiV1AulasRouteImport.update({
+  id: '/api/v1/aulas',
+  path: '/api/v1/aulas',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1OpenapiDotjsonRoute = ApiV1OpenapiDotjsonRouteImport.update({
+  id: '/api/v1/openapi.json',
+  path: '/api/v1/openapi.json',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1SaudeRoute = ApiV1SaudeRouteImport.update({
+  id: '/api/v1/saude',
+  path: '/api/v1/saude',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AppTreinosIndexRoute = AppTreinosIndexRouteImport.update({
   id: '/treinos/',
   path: '/treinos/',
@@ -174,18 +289,42 @@ const EquipeDemoAlunoAlunoIdRoute = EquipeDemoAlunoAlunoIdRouteImport.update({
   path: '/equipe-demo/aluno/$alunoId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiV1AcessosVerificarRoute = ApiV1AcessosVerificarRouteImport.update({
+  id: '/verificar',
+  path: '/verificar',
+  getParentRoute: () => ApiV1AcessosRoute,
+} as any)
+const ApiV1AlunosIdsExternosRoute = ApiV1AlunosIdsExternosRouteImport.update({
+  id: '/ids-externos',
+  path: '/ids-externos',
+  getParentRoute: () => ApiV1AlunosRoute,
+} as any)
+const ApiV1PagamentosBaixaRoute = ApiV1PagamentosBaixaRouteImport.update({
+  id: '/api/v1/pagamentos/baixa',
+  path: '/api/v1/pagamentos/baixa',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
   '/auth': typeof AuthRoute
+  '/comece': typeof ComeceRoute
   '/equipe-demo': typeof EquipeDemoRoute
+  '/grade': typeof GradeRoute
+  '/mefe': typeof MefeRoute
   '/modalidades': typeof ModalidadesRoute
+  '/privacidade': typeof PrivacidadeRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/robots.txt': typeof RobotsDottxtRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/termos-de-uso': typeof TermosDeUsoRoute
   '/valores': typeof ValoresRoute
   '/aulas': typeof AuthenticatedAulasRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/financeiro': typeof AuthenticatedFinanceiroRoute
+  '/integracoes': typeof AuthenticatedIntegracoesRoute
+  '/interessados': typeof AuthenticatedInteressadosRoute
   '/planos': typeof AuthenticatedPlanosRoute
   '/prescricao-treinos': typeof AuthenticatedPrescricaoTreinosRoute
   '/registrar-avaliacao': typeof AuthenticatedRegistrarAvaliacaoRoute
@@ -193,26 +332,47 @@ export interface FileRoutesByFullPath {
   '/vinculos': typeof AuthenticatedVinculosRoute
   '/app/aulas': typeof AppAulasRoute
   '/app/avaliacoes': typeof AppAvaliacoesRoute
+  '/app/grade': typeof AppGradeRoute
   '/app/perfil': typeof AppPerfilRoute
   '/app/plano': typeof AppPlanoRoute
   '/app/resultados': typeof AppResultadosRoute
   '/app/seguranca': typeof AppSegurancaRoute
+  '/app/valores': typeof AppValoresRoute
   '/app/': typeof AppIndexRoute
+  '/formularios-mefe/$tipo': typeof AuthenticatedFormulariosMefeTipoRoute
   '/relatorio-aluno/$alunoId': typeof AuthenticatedRelatorioAlunoAlunoIdRoute
+  '/api/v1/acessos': typeof ApiV1AcessosRouteWithChildren
+  '/api/v1/alunos': typeof ApiV1AlunosRouteWithChildren
+  '/api/v1/aulas': typeof ApiV1AulasRoute
+  '/api/v1/openapi.json': typeof ApiV1OpenapiDotjsonRoute
+  '/api/v1/saude': typeof ApiV1SaudeRoute
   '/app/treinos/$treinoId': typeof AppTreinosTreinoIdRoute
   '/equipe-demo/aluno/$alunoId': typeof EquipeDemoAlunoAlunoIdRoute
+  '/formularios-mefe/': typeof AuthenticatedFormulariosMefeIndexRoute
   '/app/treinos/': typeof AppTreinosIndexRoute
+  '/api/v1/acessos/verificar': typeof ApiV1AcessosVerificarRoute
+  '/api/v1/alunos/ids-externos': typeof ApiV1AlunosIdsExternosRoute
+  '/api/v1/pagamentos/baixa': typeof ApiV1PagamentosBaixaRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/comece': typeof ComeceRoute
   '/equipe-demo': typeof EquipeDemoRoute
+  '/grade': typeof GradeRoute
+  '/mefe': typeof MefeRoute
   '/modalidades': typeof ModalidadesRoute
+  '/privacidade': typeof PrivacidadeRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/robots.txt': typeof RobotsDottxtRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/termos-de-uso': typeof TermosDeUsoRoute
   '/valores': typeof ValoresRoute
   '/aulas': typeof AuthenticatedAulasRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/financeiro': typeof AuthenticatedFinanceiroRoute
+  '/integracoes': typeof AuthenticatedIntegracoesRoute
+  '/interessados': typeof AuthenticatedInteressadosRoute
   '/planos': typeof AuthenticatedPlanosRoute
   '/prescricao-treinos': typeof AuthenticatedPrescricaoTreinosRoute
   '/registrar-avaliacao': typeof AuthenticatedRegistrarAvaliacaoRoute
@@ -220,15 +380,27 @@ export interface FileRoutesByTo {
   '/vinculos': typeof AuthenticatedVinculosRoute
   '/app/aulas': typeof AppAulasRoute
   '/app/avaliacoes': typeof AppAvaliacoesRoute
+  '/app/grade': typeof AppGradeRoute
   '/app/perfil': typeof AppPerfilRoute
   '/app/plano': typeof AppPlanoRoute
   '/app/resultados': typeof AppResultadosRoute
   '/app/seguranca': typeof AppSegurancaRoute
+  '/app/valores': typeof AppValoresRoute
   '/app': typeof AppIndexRoute
+  '/formularios-mefe/$tipo': typeof AuthenticatedFormulariosMefeTipoRoute
   '/relatorio-aluno/$alunoId': typeof AuthenticatedRelatorioAlunoAlunoIdRoute
+  '/api/v1/acessos': typeof ApiV1AcessosRouteWithChildren
+  '/api/v1/alunos': typeof ApiV1AlunosRouteWithChildren
+  '/api/v1/aulas': typeof ApiV1AulasRoute
+  '/api/v1/openapi.json': typeof ApiV1OpenapiDotjsonRoute
+  '/api/v1/saude': typeof ApiV1SaudeRoute
   '/app/treinos/$treinoId': typeof AppTreinosTreinoIdRoute
   '/equipe-demo/aluno/$alunoId': typeof EquipeDemoAlunoAlunoIdRoute
+  '/formularios-mefe': typeof AuthenticatedFormulariosMefeIndexRoute
   '/app/treinos': typeof AppTreinosIndexRoute
+  '/api/v1/acessos/verificar': typeof ApiV1AcessosVerificarRoute
+  '/api/v1/alunos/ids-externos': typeof ApiV1AlunosIdsExternosRoute
+  '/api/v1/pagamentos/baixa': typeof ApiV1PagamentosBaixaRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -236,13 +408,22 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/app': typeof AppRouteWithChildren
   '/auth': typeof AuthRoute
+  '/comece': typeof ComeceRoute
   '/equipe-demo': typeof EquipeDemoRoute
+  '/grade': typeof GradeRoute
+  '/mefe': typeof MefeRoute
   '/modalidades': typeof ModalidadesRoute
+  '/privacidade': typeof PrivacidadeRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/robots.txt': typeof RobotsDottxtRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/termos-de-uso': typeof TermosDeUsoRoute
   '/valores': typeof ValoresRoute
   '/_authenticated/aulas': typeof AuthenticatedAulasRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/financeiro': typeof AuthenticatedFinanceiroRoute
+  '/_authenticated/integracoes': typeof AuthenticatedIntegracoesRoute
+  '/_authenticated/interessados': typeof AuthenticatedInteressadosRoute
   '/_authenticated/planos': typeof AuthenticatedPlanosRoute
   '/_authenticated/prescricao-treinos': typeof AuthenticatedPrescricaoTreinosRoute
   '/_authenticated/registrar-avaliacao': typeof AuthenticatedRegistrarAvaliacaoRoute
@@ -250,15 +431,27 @@ export interface FileRoutesById {
   '/_authenticated/vinculos': typeof AuthenticatedVinculosRoute
   '/app/aulas': typeof AppAulasRoute
   '/app/avaliacoes': typeof AppAvaliacoesRoute
+  '/app/grade': typeof AppGradeRoute
   '/app/perfil': typeof AppPerfilRoute
   '/app/plano': typeof AppPlanoRoute
   '/app/resultados': typeof AppResultadosRoute
   '/app/seguranca': typeof AppSegurancaRoute
+  '/app/valores': typeof AppValoresRoute
   '/app/': typeof AppIndexRoute
+  '/_authenticated/formularios-mefe/$tipo': typeof AuthenticatedFormulariosMefeTipoRoute
   '/_authenticated/relatorio-aluno/$alunoId': typeof AuthenticatedRelatorioAlunoAlunoIdRoute
+  '/api/v1/acessos': typeof ApiV1AcessosRouteWithChildren
+  '/api/v1/alunos': typeof ApiV1AlunosRouteWithChildren
+  '/api/v1/aulas': typeof ApiV1AulasRoute
+  '/api/v1/openapi.json': typeof ApiV1OpenapiDotjsonRoute
+  '/api/v1/saude': typeof ApiV1SaudeRoute
   '/app/treinos/$treinoId': typeof AppTreinosTreinoIdRoute
   '/equipe-demo_/aluno/$alunoId': typeof EquipeDemoAlunoAlunoIdRoute
+  '/_authenticated/formularios-mefe/': typeof AuthenticatedFormulariosMefeIndexRoute
   '/app/treinos/': typeof AppTreinosIndexRoute
+  '/api/v1/acessos/verificar': typeof ApiV1AcessosVerificarRoute
+  '/api/v1/alunos/ids-externos': typeof ApiV1AlunosIdsExternosRoute
+  '/api/v1/pagamentos/baixa': typeof ApiV1PagamentosBaixaRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -266,13 +459,22 @@ export interface FileRouteTypes {
     | '/'
     | '/app'
     | '/auth'
+    | '/comece'
     | '/equipe-demo'
+    | '/grade'
+    | '/mefe'
     | '/modalidades'
+    | '/privacidade'
     | '/reset-password'
+    | '/robots.txt'
+    | '/sitemap.xml'
+    | '/termos-de-uso'
     | '/valores'
     | '/aulas'
     | '/dashboard'
     | '/financeiro'
+    | '/integracoes'
+    | '/interessados'
     | '/planos'
     | '/prescricao-treinos'
     | '/registrar-avaliacao'
@@ -280,26 +482,47 @@ export interface FileRouteTypes {
     | '/vinculos'
     | '/app/aulas'
     | '/app/avaliacoes'
+    | '/app/grade'
     | '/app/perfil'
     | '/app/plano'
     | '/app/resultados'
     | '/app/seguranca'
+    | '/app/valores'
     | '/app/'
+    | '/formularios-mefe/$tipo'
     | '/relatorio-aluno/$alunoId'
+    | '/api/v1/acessos'
+    | '/api/v1/alunos'
+    | '/api/v1/aulas'
+    | '/api/v1/openapi.json'
+    | '/api/v1/saude'
     | '/app/treinos/$treinoId'
     | '/equipe-demo/aluno/$alunoId'
+    | '/formularios-mefe/'
     | '/app/treinos/'
+    | '/api/v1/acessos/verificar'
+    | '/api/v1/alunos/ids-externos'
+    | '/api/v1/pagamentos/baixa'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
+    | '/comece'
     | '/equipe-demo'
+    | '/grade'
+    | '/mefe'
     | '/modalidades'
+    | '/privacidade'
     | '/reset-password'
+    | '/robots.txt'
+    | '/sitemap.xml'
+    | '/termos-de-uso'
     | '/valores'
     | '/aulas'
     | '/dashboard'
     | '/financeiro'
+    | '/integracoes'
+    | '/interessados'
     | '/planos'
     | '/prescricao-treinos'
     | '/registrar-avaliacao'
@@ -307,28 +530,49 @@ export interface FileRouteTypes {
     | '/vinculos'
     | '/app/aulas'
     | '/app/avaliacoes'
+    | '/app/grade'
     | '/app/perfil'
     | '/app/plano'
     | '/app/resultados'
     | '/app/seguranca'
+    | '/app/valores'
     | '/app'
+    | '/formularios-mefe/$tipo'
     | '/relatorio-aluno/$alunoId'
+    | '/api/v1/acessos'
+    | '/api/v1/alunos'
+    | '/api/v1/aulas'
+    | '/api/v1/openapi.json'
+    | '/api/v1/saude'
     | '/app/treinos/$treinoId'
     | '/equipe-demo/aluno/$alunoId'
+    | '/formularios-mefe'
     | '/app/treinos'
+    | '/api/v1/acessos/verificar'
+    | '/api/v1/alunos/ids-externos'
+    | '/api/v1/pagamentos/baixa'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/app'
     | '/auth'
+    | '/comece'
     | '/equipe-demo'
+    | '/grade'
+    | '/mefe'
     | '/modalidades'
+    | '/privacidade'
     | '/reset-password'
+    | '/robots.txt'
+    | '/sitemap.xml'
+    | '/termos-de-uso'
     | '/valores'
     | '/_authenticated/aulas'
     | '/_authenticated/dashboard'
     | '/_authenticated/financeiro'
+    | '/_authenticated/integracoes'
+    | '/_authenticated/interessados'
     | '/_authenticated/planos'
     | '/_authenticated/prescricao-treinos'
     | '/_authenticated/registrar-avaliacao'
@@ -336,15 +580,27 @@ export interface FileRouteTypes {
     | '/_authenticated/vinculos'
     | '/app/aulas'
     | '/app/avaliacoes'
+    | '/app/grade'
     | '/app/perfil'
     | '/app/plano'
     | '/app/resultados'
     | '/app/seguranca'
+    | '/app/valores'
     | '/app/'
+    | '/_authenticated/formularios-mefe/$tipo'
     | '/_authenticated/relatorio-aluno/$alunoId'
+    | '/api/v1/acessos'
+    | '/api/v1/alunos'
+    | '/api/v1/aulas'
+    | '/api/v1/openapi.json'
+    | '/api/v1/saude'
     | '/app/treinos/$treinoId'
     | '/equipe-demo_/aluno/$alunoId'
+    | '/_authenticated/formularios-mefe/'
     | '/app/treinos/'
+    | '/api/v1/acessos/verificar'
+    | '/api/v1/alunos/ids-externos'
+    | '/api/v1/pagamentos/baixa'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -352,11 +608,24 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AppRoute: typeof AppRouteWithChildren
   AuthRoute: typeof AuthRoute
+  ComeceRoute: typeof ComeceRoute
   EquipeDemoRoute: typeof EquipeDemoRoute
+  GradeRoute: typeof GradeRoute
+  MefeRoute: typeof MefeRoute
   ModalidadesRoute: typeof ModalidadesRoute
+  PrivacidadeRoute: typeof PrivacidadeRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  RobotsDottxtRoute: typeof RobotsDottxtRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  TermosDeUsoRoute: typeof TermosDeUsoRoute
   ValoresRoute: typeof ValoresRoute
+  ApiV1AcessosRoute: typeof ApiV1AcessosRouteWithChildren
+  ApiV1AlunosRoute: typeof ApiV1AlunosRouteWithChildren
+  ApiV1AulasRoute: typeof ApiV1AulasRoute
+  ApiV1OpenapiDotjsonRoute: typeof ApiV1OpenapiDotjsonRoute
+  ApiV1SaudeRoute: typeof ApiV1SaudeRoute
   EquipeDemoAlunoAlunoIdRoute: typeof EquipeDemoAlunoAlunoIdRoute
+  ApiV1PagamentosBaixaRoute: typeof ApiV1PagamentosBaixaRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -389,11 +658,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/comece': {
+      id: '/comece'
+      path: '/comece'
+      fullPath: '/comece'
+      preLoaderRoute: typeof ComeceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/equipe-demo': {
       id: '/equipe-demo'
       path: '/equipe-demo'
       fullPath: '/equipe-demo'
       preLoaderRoute: typeof EquipeDemoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/grade': {
+      id: '/grade'
+      path: '/grade'
+      fullPath: '/grade'
+      preLoaderRoute: typeof GradeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mefe': {
+      id: '/mefe'
+      path: '/mefe'
+      fullPath: '/mefe'
+      preLoaderRoute: typeof MefeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/modalidades': {
@@ -403,11 +693,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ModalidadesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/privacidade': {
+      id: '/privacidade'
+      path: '/privacidade'
+      fullPath: '/privacidade'
+      preLoaderRoute: typeof PrivacidadeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/reset-password': {
       id: '/reset-password'
       path: '/reset-password'
       fullPath: '/reset-password'
       preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/robots.txt': {
+      id: '/robots.txt'
+      path: '/robots.txt'
+      fullPath: '/robots.txt'
+      preLoaderRoute: typeof RobotsDottxtRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/termos-de-uso': {
+      id: '/termos-de-uso'
+      path: '/termos-de-uso'
+      fullPath: '/termos-de-uso'
+      preLoaderRoute: typeof TermosDeUsoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/valores': {
@@ -436,6 +754,20 @@ declare module '@tanstack/react-router' {
       path: '/financeiro'
       fullPath: '/financeiro'
       preLoaderRoute: typeof AuthenticatedFinanceiroRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/integracoes': {
+      id: '/_authenticated/integracoes'
+      path: '/integracoes'
+      fullPath: '/integracoes'
+      preLoaderRoute: typeof AuthenticatedIntegracoesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/interessados': {
+      id: '/_authenticated/interessados'
+      path: '/interessados'
+      fullPath: '/interessados'
+      preLoaderRoute: typeof AuthenticatedInteressadosRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/planos': {
@@ -494,6 +826,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAvaliacoesRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/grade': {
+      id: '/app/grade'
+      path: '/grade'
+      fullPath: '/app/grade'
+      preLoaderRoute: typeof AppGradeRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/perfil': {
       id: '/app/perfil'
       path: '/perfil'
@@ -522,12 +861,68 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppSegurancaRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/valores': {
+      id: '/app/valores'
+      path: '/valores'
+      fullPath: '/app/valores'
+      preLoaderRoute: typeof AppValoresRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_authenticated/formularios-mefe/': {
+      id: '/_authenticated/formularios-mefe/'
+      path: '/formularios-mefe'
+      fullPath: '/formularios-mefe/'
+      preLoaderRoute: typeof AuthenticatedFormulariosMefeIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/formularios-mefe/$tipo': {
+      id: '/_authenticated/formularios-mefe/$tipo'
+      path: '/formularios-mefe/$tipo'
+      fullPath: '/formularios-mefe/$tipo'
+      preLoaderRoute: typeof AuthenticatedFormulariosMefeTipoRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/relatorio-aluno/$alunoId': {
       id: '/_authenticated/relatorio-aluno/$alunoId'
       path: '/relatorio-aluno/$alunoId'
       fullPath: '/relatorio-aluno/$alunoId'
       preLoaderRoute: typeof AuthenticatedRelatorioAlunoAlunoIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/api/v1/acessos': {
+      id: '/api/v1/acessos'
+      path: '/api/v1/acessos'
+      fullPath: '/api/v1/acessos'
+      preLoaderRoute: typeof ApiV1AcessosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/alunos': {
+      id: '/api/v1/alunos'
+      path: '/api/v1/alunos'
+      fullPath: '/api/v1/alunos'
+      preLoaderRoute: typeof ApiV1AlunosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/aulas': {
+      id: '/api/v1/aulas'
+      path: '/api/v1/aulas'
+      fullPath: '/api/v1/aulas'
+      preLoaderRoute: typeof ApiV1AulasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/openapi.json': {
+      id: '/api/v1/openapi.json'
+      path: '/api/v1/openapi.json'
+      fullPath: '/api/v1/openapi.json'
+      preLoaderRoute: typeof ApiV1OpenapiDotjsonRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/saude': {
+      id: '/api/v1/saude'
+      path: '/api/v1/saude'
+      fullPath: '/api/v1/saude'
+      preLoaderRoute: typeof ApiV1SaudeRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/app/treinos/': {
       id: '/app/treinos/'
@@ -550,6 +945,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EquipeDemoAlunoAlunoIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/v1/acessos/verificar': {
+      id: '/api/v1/acessos/verificar'
+      path: '/verificar'
+      fullPath: '/api/v1/acessos/verificar'
+      preLoaderRoute: typeof ApiV1AcessosVerificarRouteImport
+      parentRoute: typeof ApiV1AcessosRoute
+    }
+    '/api/v1/alunos/ids-externos': {
+      id: '/api/v1/alunos/ids-externos'
+      path: '/ids-externos'
+      fullPath: '/api/v1/alunos/ids-externos'
+      preLoaderRoute: typeof ApiV1AlunosIdsExternosRouteImport
+      parentRoute: typeof ApiV1AlunosRoute
+    }
+    '/api/v1/pagamentos/baixa': {
+      id: '/api/v1/pagamentos/baixa'
+      path: '/api/v1/pagamentos/baixa'
+      fullPath: '/api/v1/pagamentos/baixa'
+      preLoaderRoute: typeof ApiV1PagamentosBaixaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -557,25 +973,34 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAulasRoute: typeof AuthenticatedAulasRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedFinanceiroRoute: typeof AuthenticatedFinanceiroRoute
+  AuthenticatedIntegracoesRoute: typeof AuthenticatedIntegracoesRoute
+  AuthenticatedInteressadosRoute: typeof AuthenticatedInteressadosRoute
   AuthenticatedPlanosRoute: typeof AuthenticatedPlanosRoute
   AuthenticatedPrescricaoTreinosRoute: typeof AuthenticatedPrescricaoTreinosRoute
   AuthenticatedRegistrarAvaliacaoRoute: typeof AuthenticatedRegistrarAvaliacaoRoute
   AuthenticatedTermosRoute: typeof AuthenticatedTermosRoute
   AuthenticatedVinculosRoute: typeof AuthenticatedVinculosRoute
+  AuthenticatedFormulariosMefeTipoRoute: typeof AuthenticatedFormulariosMefeTipoRoute
   AuthenticatedRelatorioAlunoAlunoIdRoute: typeof AuthenticatedRelatorioAlunoAlunoIdRoute
+  AuthenticatedFormulariosMefeIndexRoute: typeof AuthenticatedFormulariosMefeIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAulasRoute: AuthenticatedAulasRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedFinanceiroRoute: AuthenticatedFinanceiroRoute,
+  AuthenticatedIntegracoesRoute: AuthenticatedIntegracoesRoute,
+  AuthenticatedInteressadosRoute: AuthenticatedInteressadosRoute,
   AuthenticatedPlanosRoute: AuthenticatedPlanosRoute,
   AuthenticatedPrescricaoTreinosRoute: AuthenticatedPrescricaoTreinosRoute,
   AuthenticatedRegistrarAvaliacaoRoute: AuthenticatedRegistrarAvaliacaoRoute,
   AuthenticatedTermosRoute: AuthenticatedTermosRoute,
   AuthenticatedVinculosRoute: AuthenticatedVinculosRoute,
+  AuthenticatedFormulariosMefeTipoRoute: AuthenticatedFormulariosMefeTipoRoute,
   AuthenticatedRelatorioAlunoAlunoIdRoute:
     AuthenticatedRelatorioAlunoAlunoIdRoute,
+  AuthenticatedFormulariosMefeIndexRoute:
+    AuthenticatedFormulariosMefeIndexRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
@@ -584,10 +1009,12 @@ const AuthenticatedRouteRouteWithChildren =
 interface AppRouteChildren {
   AppAulasRoute: typeof AppAulasRoute
   AppAvaliacoesRoute: typeof AppAvaliacoesRoute
+  AppGradeRoute: typeof AppGradeRoute
   AppPerfilRoute: typeof AppPerfilRoute
   AppPlanoRoute: typeof AppPlanoRoute
   AppResultadosRoute: typeof AppResultadosRoute
   AppSegurancaRoute: typeof AppSegurancaRoute
+  AppValoresRoute: typeof AppValoresRoute
   AppIndexRoute: typeof AppIndexRoute
   AppTreinosTreinoIdRoute: typeof AppTreinosTreinoIdRoute
   AppTreinosIndexRoute: typeof AppTreinosIndexRoute
@@ -596,10 +1023,12 @@ interface AppRouteChildren {
 const AppRouteChildren: AppRouteChildren = {
   AppAulasRoute: AppAulasRoute,
   AppAvaliacoesRoute: AppAvaliacoesRoute,
+  AppGradeRoute: AppGradeRoute,
   AppPerfilRoute: AppPerfilRoute,
   AppPlanoRoute: AppPlanoRoute,
   AppResultadosRoute: AppResultadosRoute,
   AppSegurancaRoute: AppSegurancaRoute,
+  AppValoresRoute: AppValoresRoute,
   AppIndexRoute: AppIndexRoute,
   AppTreinosTreinoIdRoute: AppTreinosTreinoIdRoute,
   AppTreinosIndexRoute: AppTreinosIndexRoute,
@@ -607,16 +1036,53 @@ const AppRouteChildren: AppRouteChildren = {
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 
+interface ApiV1AcessosRouteChildren {
+  ApiV1AcessosVerificarRoute: typeof ApiV1AcessosVerificarRoute
+}
+
+const ApiV1AcessosRouteChildren: ApiV1AcessosRouteChildren = {
+  ApiV1AcessosVerificarRoute: ApiV1AcessosVerificarRoute,
+}
+
+const ApiV1AcessosRouteWithChildren = ApiV1AcessosRoute._addFileChildren(
+  ApiV1AcessosRouteChildren,
+)
+
+interface ApiV1AlunosRouteChildren {
+  ApiV1AlunosIdsExternosRoute: typeof ApiV1AlunosIdsExternosRoute
+}
+
+const ApiV1AlunosRouteChildren: ApiV1AlunosRouteChildren = {
+  ApiV1AlunosIdsExternosRoute: ApiV1AlunosIdsExternosRoute,
+}
+
+const ApiV1AlunosRouteWithChildren = ApiV1AlunosRoute._addFileChildren(
+  ApiV1AlunosRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AppRoute: AppRouteWithChildren,
   AuthRoute: AuthRoute,
+  ComeceRoute: ComeceRoute,
   EquipeDemoRoute: EquipeDemoRoute,
+  GradeRoute: GradeRoute,
+  MefeRoute: MefeRoute,
   ModalidadesRoute: ModalidadesRoute,
+  PrivacidadeRoute: PrivacidadeRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  RobotsDottxtRoute: RobotsDottxtRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
+  TermosDeUsoRoute: TermosDeUsoRoute,
   ValoresRoute: ValoresRoute,
+  ApiV1AcessosRoute: ApiV1AcessosRouteWithChildren,
+  ApiV1AlunosRoute: ApiV1AlunosRouteWithChildren,
+  ApiV1AulasRoute: ApiV1AulasRoute,
+  ApiV1OpenapiDotjsonRoute: ApiV1OpenapiDotjsonRoute,
+  ApiV1SaudeRoute: ApiV1SaudeRoute,
   EquipeDemoAlunoAlunoIdRoute: EquipeDemoAlunoAlunoIdRoute,
+  ApiV1PagamentosBaixaRoute: ApiV1PagamentosBaixaRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

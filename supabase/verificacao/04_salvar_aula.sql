@@ -48,17 +48,17 @@ COMMIT;
 -- 3) validações e falhas: nada muda
 BEGIN;
 SELECT t.login('11111111-1111-1111-1111-111111111111');
-SELECT t.erro(format($q$SELECT public.salvar_aula(date '2026-10-22', 'Yoga', '09:00', '', '', ARRAY[%L, gen_random_uuid()]::uuid[], %L)$q$, current_setting('app.aluno3'), current_setting('app.aula')),
+SELECT t.erro(format($q$SELECT public.salvar_aula(date '2031-05-19', 'Yoga', '09:00', '', '', ARRAY[%L, gen_random_uuid()]::uuid[], %L)$q$, current_setting('app.aluno3'), current_setting('app.aula')),
   'Algum aluno marcado não foi encontrado', 'P0001');
 SELECT t.ok((SELECT count(*) FROM public.aula_presencas WHERE aula_id = current_setting('app.aula')::uuid) = 2, 'falha por aluno inexistente preserva as presenças');
 SELECT t.ok((SELECT horario FROM public.aulas WHERE id = current_setting('app.aula')::uuid) = '08:00', 'falha por aluno inexistente não altera a aula');
-SELECT t.erro(format($q$SELECT public.salvar_aula(date '2026-10-22', 'Yoga', '99:99', '', '', '{}', %L)$q$, current_setting('app.aula')), 'horário válido', 'P0001');
-SELECT t.erro(format($q$SELECT public.salvar_aula(date '2026-10-22', 'Yoga', '24:00', '', '', '{}', %L)$q$, current_setting('app.aula')), 'horário válido', 'P0001');
-SELECT t.erro(format($q$SELECT public.salvar_aula(date '2026-10-22', '   ', '09:00', '', '', '{}', %L)$q$, current_setting('app.aula')), 'Informe a modalidade', 'P0001');
-SELECT t.erro(format($q$SELECT public.salvar_aula(date '2026-10-22', 'Yoga', '09:00', '', '', '{}', %L, 0)$q$, current_setting('app.aula')), 'vagas', 'P0001');
-SELECT t.erro($q$SELECT public.salvar_aula(date '2026-10-22', 'Yoga', '09:00', '', '', '{}', gen_random_uuid())$q$, 'não foi encontrada', 'P0001');
+SELECT t.erro(format($q$SELECT public.salvar_aula(date '2031-05-19', 'Yoga', '99:99', '', '', '{}', %L)$q$, current_setting('app.aula')), 'horário válido', 'P0001');
+SELECT t.erro(format($q$SELECT public.salvar_aula(date '2031-05-19', 'Yoga', '24:00', '', '', '{}', %L)$q$, current_setting('app.aula')), 'horário válido', 'P0001');
+SELECT t.erro(format($q$SELECT public.salvar_aula(date '2031-05-19', '   ', '09:00', '', '', '{}', %L)$q$, current_setting('app.aula')), 'Informe a modalidade', 'P0001');
+SELECT t.erro(format($q$SELECT public.salvar_aula(date '2031-05-19', 'Yoga', '09:00', '', '', '{}', %L, 0)$q$, current_setting('app.aula')), 'vagas', 'P0001');
+SELECT t.erro($q$SELECT public.salvar_aula(date '2031-05-19', 'Yoga', '09:00', '', '', '{}', gen_random_uuid())$q$, 'não foi encontrada', 'P0001');
 SELECT t.erro($q$SELECT public.salvar_aula(NULL, 'Yoga', '09:00', '', '', '{}')$q$, 'Informe a data', 'P0001');
-SELECT t.ok((SELECT count(*) FROM public.aulas WHERE data = date '2026-10-22') = 0, 'edição de aula inexistente ou inválida não cria aula');
+SELECT t.ok((SELECT count(*) FROM public.aulas WHERE data = date '2031-05-19') = 0, 'edição de aula inexistente ou inválida não cria aula');
 COMMIT;
 
 -- 4) atomicidade real: uma falha DEPOIS do DELETE (trigger que quebra o INSERT de presenças)
@@ -80,14 +80,14 @@ COMMIT;
 -- 5) quem não é staff é barrado
 BEGIN;
 SELECT t.login('22222222-2222-2222-2222-222222222222');
-SELECT t.erro($q$SELECT public.salvar_aula(date '2026-10-22', 'Hack', '09:00', '', '', '{}')$q$, 'Apenas a equipe', 'P0001');
-SELECT t.erro(format($q$SELECT public.salvar_aula(date '2026-10-22', 'Yoga', '09:00', '', '', '{}', %L)$q$, current_setting('app.aula')), 'Apenas a equipe', 'P0001');
+SELECT t.erro($q$SELECT public.salvar_aula(date '2031-05-19', 'Hack', '09:00', '', '', '{}')$q$, 'Apenas a equipe', 'P0001');
+SELECT t.erro(format($q$SELECT public.salvar_aula(date '2031-05-19', 'Yoga', '09:00', '', '', '{}', %L)$q$, current_setting('app.aula')), 'Apenas a equipe', 'P0001');
 SELECT t.login('44444444-4444-4444-4444-444444444444');
-SELECT t.erro($q$SELECT public.salvar_aula(date '2026-10-22', 'Hack', '09:00', '', '', '{}')$q$, 'Apenas a equipe', 'P0001');
+SELECT t.erro($q$SELECT public.salvar_aula(date '2031-05-19', 'Hack', '09:00', '', '', '{}')$q$, 'Apenas a equipe', 'P0001');
 -- anon não executa
 RESET ROLE;
 SET ROLE anon;
-SELECT t.erro($q$SELECT public.salvar_aula(date '2026-10-22', 'Hack', '09:00', '', '', '{}')$q$, 'permission denied', '42501');
+SELECT t.erro($q$SELECT public.salvar_aula(date '2031-05-19', 'Hack', '09:00', '', '', '{}')$q$, 'permission denied', '42501');
 RESET ROLE;
 COMMIT;
 -- grants
