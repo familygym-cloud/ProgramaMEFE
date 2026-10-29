@@ -1,10 +1,18 @@
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import {
+  cargaSugerida,
+  lerCargaDigitada,
+  novosRecordes,
+  type NovoRegistroCarga,
+} from "@/lib/aluno-app/cargas";
 import { hojeISO } from "@/lib/aluno-app/derive";
 import { useAlunoApp } from "@/lib/aluno-app/store";
 import type { Exercicio, Treino } from "@/lib/aluno-app/types";
 import { totalDeSeries } from "./formatar";
 import {
   SESSAO_VAZIA,
+  type ResumoConclusao,
   chaveSessao,
   contarSeriesFeitas,
   lerSessao,
@@ -16,7 +24,7 @@ import { useAgora } from "./useRelogio";
 
 /** Sessão guiada de um treino: séries marcadas, cronômetro total e conclusão. */
 export function useSessaoTreino(treino: Treino) {
-  const { acoes } = useAlunoApp();
+  const { acoes, dados } = useAlunoApp();
   // O dia é fixado na abertura: uma sessão que atravessa a meia-noite continua sendo a mesma.
   const [dia] = useState(hojeISO);
   const chave = chaveSessao(treino.id, dia);
@@ -60,6 +68,23 @@ export function useSessaoTreino(treino: Treino) {
     });
   };
 
+  /** Campos de carga e repetições de um exercício: o que foi digitado ou, senão, a última carga usada. */
+  const cargaDe = (exercicio: Exercicio) => {
+    const digitado = estado.cargas[exercicio.id];
+    if (digitado) return digitado;
+    const sugerida = cargaSugerida(dados.cargas, exercicio.nome, exercicio.cargaKg);
+    return { cargaKg: sugerida === null ? "" : String(sugerida).replace(".", ","), repeticoes: "" };
+  };
+
+  const definirCarga = (exercicio: Exercicio, campo: "cargaKg" | "repeticoes", valor: string) =>
+    setEstado((atual) => ({
+      ...atual,
+      cargas: {
+        ...atual.cargas,
+        [exercicio.id]: { ...cargaDe(exercicio), ...atual.cargas[exercicio.id], [campo]: valor },
+      },
+    }));
+
   const iniciar = () => {
     const instante = Date.now();
     setEstado((atual) => (atual.retomadoEm === null ? { ...atual, retomadoEm: instante } : atual));
@@ -87,11 +112,31 @@ export function useSessaoTreino(treino: Treino) {
     setEnviando(true);
     try {
       await acoes.registrarTreino({ atividade: treino.nome, duracaoMin });
+
+      // Cargas: só dos exercícios com série marcada e carga válida. Um problema aqui não desfaz o treino.
+      let recordes: ResumoConclusao["recordes"] = [];
+      if (dados.modulos.cargas) {
+        const registros: NovoRegistroCarga[] = [];
+        for (const e of treino.exercicios) {
+          const marcadas = seriesMarcadas(estado, e.id, e.series).length;
+          const lida = marcadas > 0 ? lerCargaDigitada(cargaDe(e), e.repeticoes) : null;
+          if (lida) registros.push({ exercicio: e.nome, ...lida, series: marcadas });
+        }
+        if (registros.length > 0) {
+          try {
+            await acoes.registrarCargas(registros);
+            recordes = novosRecordes(dados.cargas, registros);
+          } catch {
+            toast.error("O treino foi registrado, mas não foi possível guardar as cargas.");
+          }
+        }
+      }
+
       setEstado((atual) => ({
         ...atual,
         acumuladoMs: duracaoMs,
         retomadoEm: null,
-        concluido: { duracaoMin, seriesFeitas, totalSeries },
+        concluido: { duracaoMin, seriesFeitas, totalSeries, recordes },
       }));
     } catch {
       // O aviso de erro já foi exibido pelo store; a sessão segue aberta para nova tentativa.
@@ -113,6 +158,8 @@ export function useSessaoTreino(treino: Treino) {
     enviando,
     marcadasDe,
     alternarSerie,
+    cargaDe,
+    definirCarga,
     iniciar,
     pausar,
     reiniciar,

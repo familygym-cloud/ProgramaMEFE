@@ -5,6 +5,7 @@ import { PageHeader } from "@/components/app/ui";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ABAS, ehAba, type AbaResultados } from "@/components/app/resultados/abas";
 import { Conquistas } from "@/components/app/resultados/Conquistas";
+import { Cargas } from "@/components/app/resultados/Cargas";
 import { Corpo } from "@/components/app/resultados/Corpo";
 import { Frequencia } from "@/components/app/resultados/Frequencia";
 import { Metas } from "@/components/app/resultados/Metas";
@@ -90,6 +91,9 @@ function Pagina() {
         </TabsContent>
         <TabsContent value="corpo" className="fg-entrada mt-6">
           <Corpo dados={dados} />
+        </TabsContent>
+        <TabsContent value="cargas" className="fg-entrada mt-6">
+          <Cargas dados={dados} />
         </TabsContent>
         <TabsContent value="metas" className="fg-entrada mt-6">
           <Metas dados={dados} />

@@ -4,6 +4,7 @@ import { addDays, parseISO } from "date-fns";
 import { hojeBrasilia } from "@/lib/datas";
 import { comPresencas, paraISO } from "./derive";
 import { perfilDosPapeis } from "@/lib/relatorios/perfil";
+import { type NovoRegistroCarga } from "./cargas";
 import type {
   AreaAlunoDados,
   AulaAgenda,
@@ -98,6 +99,7 @@ export const carregarAreaAluno = createServerFn({ method: "GET" })
       metasRes,
       aulasRes,
       reservasRes,
+      cargasRes,
       acessosRes,
     ] = await Promise.all([
       supabase
@@ -143,6 +145,13 @@ export const carregarAreaAluno = createServerFn({ method: "GET" })
         .from("reservas_aula")
         .select("aula_id, status, promovida_em")
         .eq("aluno_id", aluno.id),
+      // Cargas por exercício (a tabela só existe depois da migration de cargas).
+      supabase
+        .from("registros_carga")
+        .select("id, exercicio, data, carga_kg, repeticoes, series")
+        .eq("aluno_id", aluno.id)
+        .order("data", { ascending: false })
+        .limit(1500),
       // Presenças da catraca dos últimos 400 dias (a tabela só existe depois da migration de integrações).
       supabase
         .from("acessos")
@@ -161,11 +170,13 @@ export const carregarAreaAluno = createServerFn({ method: "GET" })
       medidas: !moduloAusente(medidasRes.error),
       metas: !moduloAusente(metasRes.error),
       reservas: !moduloAusente(reservasRes.error),
+      cargas: !moduloAusente(cargasRes.error),
     };
     if (treinosRes.error && modulos.treinos) throw treinosRes.error;
     if (medidasRes.error && modulos.medidas) throw medidasRes.error;
     if (metasRes.error && modulos.metas) throw metasRes.error;
     if (reservasRes.error && modulos.reservas) throw reservasRes.error;
+    if (cargasRes.error && modulos.cargas) throw cargasRes.error;
     // A agenda precisa da coluna `vagas`; sem a migration, cai para a agenda sem reservas.
     let aulasRows = aulasRes.data ?? [];
     if (aulasRes.error) {
@@ -326,6 +337,16 @@ export const carregarAreaAluno = createServerFn({ method: "GET" })
       agenda,
       pagamentos,
       metas,
+      cargas: (modulos.cargas ? (cargasRes.data ?? []) : [])
+        .map((c) => ({
+          id: c.id,
+          exercicio: c.exercicio,
+          data: c.data,
+          cargaKg: Number(c.carga_kg),
+          repeticoes: c.repeticoes,
+          series: c.series,
+        }))
+        .reverse(),
       modulos,
     };
 
@@ -358,6 +379,69 @@ export const registrarTreinoFeito = createServerFn({ method: "POST" })
       data: data.data,
     });
     if (error) throw error;
+    return { ok: true };
+  });
+
+/**
+ * Guarda a carga usada em cada exercício do treino de hoje. Um registro por exercício e dia: enviar de
+ * novo no mesmo dia substitui o anterior. A permissão final é do banco (o aluno só grava em seu nome).
+ */
+export const registrarCargas = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { registros: NovoRegistroCarga[] }) => {
+    const bruto: unknown = input?.registros;
+    if (!Array.isArray(bruto) || bruto.length === 0 || bruto.length > 40) {
+      throw new Error("Informe de 1 a 40 exercícios.");
+    }
+    const porExercicio = new Map<string, NovoRegistroCarga>();
+    for (const item of bruto as Partial<NovoRegistroCarga>[]) {
+      const exercicio = String(item?.exercicio ?? "")
+        .replace(/\s+/g, " ")
+        .trim()
+        .slice(0, 80);
+      const cargaKg = Math.round(Number(item?.cargaKg) * 100) / 100;
+      const repeticoes = Number(item?.repeticoes);
+      const series = Number(item?.series ?? 1);
+      if (!exercicio) throw new Error("Exercício sem nome.");
+      if (!Number.isFinite(cargaKg) || cargaKg <= 0 || cargaKg > 1000) {
+        throw new Error(`Carga inválida em "${exercicio}".`);
+      }
+      if (!Number.isInteger(repeticoes) || repeticoes < 1 || repeticoes > 100) {
+        throw new Error(`Repetições inválidas em "${exercicio}".`);
+      }
+      if (!Number.isInteger(series) || series < 1 || series > 20) {
+        throw new Error(`Séries inválidas em "${exercicio}".`);
+      }
+      porExercicio.set(exercicio.toLocaleLowerCase("pt-BR"), {
+        exercicio,
+        cargaKg,
+        repeticoes,
+        series,
+      });
+    }
+    return { registros: [...porExercicio.values()] };
+  })
+  .handler(async ({ data, context }) => {
+    const aluno = await buscarAluno(context.supabase, context.userId);
+    if (!aluno) throw new Error("Nenhum cadastro de aluno vinculado a esta conta.");
+    const hoje = hojeISO();
+    const { error } = await context.supabase.from("registros_carga").upsert(
+      data.registros.map((r) => ({
+        aluno_id: aluno.id,
+        exercicio: r.exercicio,
+        data: hoje,
+        carga_kg: r.cargaKg,
+        repeticoes: r.repeticoes,
+        series: r.series,
+      })),
+      { onConflict: "aluno_id,exercicio,data" },
+    );
+    if (error) {
+      if (moduloAusente(error)) {
+        throw new Error("O registro de cargas ainda não foi ativado no sistema. Avise a recepção.");
+      }
+      throw error;
+    }
     return { ok: true };
   });
 

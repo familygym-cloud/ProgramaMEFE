@@ -1,6 +1,6 @@
 import { useEffect, type CSSProperties } from "react";
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, Check, RotateCcw } from "lucide-react";
+import { ArrowRight, Check, RotateCcw, Trophy } from "lucide-react";
 import { BrandLogo } from "@/components/BrandLogo";
 import { Eyebrow, Superficie, useContagem } from "@/components/app/ui";
 import { Button } from "@/components/ui/button";
@@ -119,6 +119,32 @@ export function TreinoConcluido({ treino, resumo, aoRefazer }: Props) {
             unidade={sequencia === 1 ? "dia" : "dias"}
           />
         </dl>
+
+        {resumo.recordes.length > 0 ? (
+          <section
+            aria-label="Recordes pessoais"
+            className="relative w-full max-w-lg space-y-3 rounded-2xl border border-brand-yellow/40 bg-brand-yellow/10 p-4 text-left"
+          >
+            <h2 className="flex items-center gap-2 font-display text-lg font-bold">
+              <Trophy className="size-5 text-brand-yellow" aria-hidden />
+              {resumo.recordes.length === 1 ? "Novo recorde!" : "Novos recordes!"}
+            </h2>
+            <ul className="space-y-1.5 text-sm">
+              {resumo.recordes.map((r) => (
+                <li key={r.exercicio}>
+                  <strong>{r.exercicio}</strong>: {r.cargaKg.toLocaleString("pt-BR")} kg ×{" "}
+                  {r.repeticoes}
+                  {r.anteriorKg !== null ? (
+                    <span className="text-muted-foreground">
+                      {" "}
+                      (antes: {r.anteriorKg.toLocaleString("pt-BR")} kg estimados)
+                    </span>
+                  ) : null}
+                </li>
+              ))}
+            </ul>
+          </section>
+        ) : null}
 
         <div className="relative flex w-full flex-col items-center gap-3 sm:w-auto sm:flex-row">
           <Button

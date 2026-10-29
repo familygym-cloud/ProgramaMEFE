@@ -8,11 +8,26 @@ const esquemaResumo = z.object({
   duracaoMin: z.number(),
   seriesFeitas: z.number(),
   totalSeries: z.number(),
+  /** Recordes batidos nesta sessão (ausente em sessões salvas antes das cargas existirem). */
+  recordes: z
+    .array(
+      z.object({
+        exercicio: z.string(),
+        cargaKg: z.number(),
+        repeticoes: z.number(),
+        anteriorKg: z.number().nullable(),
+      }),
+    )
+    .default([]),
 });
 
 const esquemaSessao = z.object({
   /** Índices (a partir de 0) das séries já marcadas, por exercício. */
   series: z.record(z.string(), z.array(z.number().int().nonnegative())),
+  /** Carga e repetições digitadas por exercício (texto, como o aluno digitou). */
+  cargas: z
+    .record(z.string(), z.object({ cargaKg: z.string(), repeticoes: z.string() }))
+    .default({}),
   /** Tempo de treino já contabilizado enquanto o cronômetro esteve parado. */
   acumuladoMs: z.number().nonnegative(),
   /** Instante em que o cronômetro voltou a correr; null quando parado. */
@@ -25,6 +40,7 @@ export type ResumoConclusao = z.infer<typeof esquemaResumo>;
 
 export const SESSAO_VAZIA: EstadoSessao = {
   series: {},
+  cargas: {},
   acumuladoMs: 0,
   retomadoEm: null,
   concluido: null,
@@ -52,6 +68,7 @@ function estaVazia(e: EstadoSessao): boolean {
     e.acumuladoMs === 0 &&
     e.retomadoEm === null &&
     e.concluido === null &&
+    Object.keys(e.cargas).length === 0 &&
     Object.values(e.series).every((marcadas) => marcadas.length === 0)
   );
 }

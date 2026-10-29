@@ -14,6 +14,7 @@ import {
   atualizarMeuContato,
   cancelarReservaAula,
   carregarAreaAluno,
+  registrarCargas,
   registrarTreinoFeito,
   removerMeta,
   reservarAula,
@@ -23,6 +24,7 @@ import {
 import { salvarTreinosOffline } from "@/lib/pwa";
 import { hojeISO } from "./derive";
 import { criarDadosDemo } from "./fixtures";
+import { chaveDoExercicio, type NovoRegistroCarga } from "./cargas";
 import type { AreaAlunoDados, NovaMeta } from "./types";
 
 const CHAVE_DEMO = "fg-demo";
@@ -48,6 +50,8 @@ export type AcoesAluno = {
   reservarAula: (aulaId: string) => Promise<void>;
   cancelarReserva: (aulaId: string) => Promise<void>;
   registrarTreino: (input: { atividade: string; duracaoMin: number }) => Promise<void>;
+  /** Guarda a carga usada hoje em cada exercício. Não mostra aviso próprio: quem chama decide. */
+  registrarCargas: (registros: NovoRegistroCarga[]) => Promise<void>;
   atualizarContato: (input: { telefone: string; email: string }) => Promise<void>;
   salvarMeta: (meta: NovaMeta) => Promise<void>;
   removerMeta: (id: string) => Promise<void>;
@@ -145,6 +149,10 @@ export function AlunoAppProviderReal({
           recarregar();
         });
       },
+      registrarCargas: async (registros) => {
+        await registrarCargas({ data: { registros } });
+        recarregar();
+      },
       atualizarContato: async (input) => {
         await comToast("Dados de contato atualizados.", async () => {
           await atualizarMeuContato({ data: input });
@@ -223,6 +231,25 @@ export function AlunoAppProviderDemo({ children }: { children: ReactNode }) {
           ],
         }));
         toast.success("Treino registrado. Bom trabalho! (demonstração)");
+      },
+      registrarCargas: async (registros) => {
+        setDados((d) => {
+          const hoje = hojeISO();
+          const chaves = new Set(registros.map((r) => chaveDoExercicio(r.exercicio)));
+          return {
+            ...d,
+            cargas: [
+              ...d.cargas.filter(
+                (c) => !(c.data === hoje && chaves.has(chaveDoExercicio(c.exercicio))),
+              ),
+              ...registros.map((r, i) => ({
+                id: `demo-carga-${Date.now()}-${i}`,
+                data: hoje,
+                ...r,
+              })),
+            ],
+          };
+        });
       },
       atualizarContato: async ({ telefone, email }) => {
         setDados((d) => ({

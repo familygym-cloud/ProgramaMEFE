@@ -238,6 +238,29 @@ export function criarDadosDemo(agora: Date = new Date()): AreaAlunoDados {
       },
       { id: "demo-meta-2", tipo: "frequencia", alvo: 12, prazo: null, concluida: false },
     ],
-    modulos: { treinos: true, reservas: true, metas: true, medidas: true },
+    cargas: [
+      // Supino: evolução de 6 semanas; agachamento e remada com poucas marcas.
+      ...[
+        [-42, "Supino reto com barra", 30, 10],
+        [-35, "Supino reto com barra", 32.5, 10],
+        [-28, "Supino reto com barra", 35, 10],
+        [-21, "Supino reto com barra", 35, 12],
+        [-14, "Supino reto com barra", 37.5, 10],
+        [-7, "Supino reto com barra", 40, 10],
+        [-28, "Agachamento livre", 50, 10],
+        [-14, "Agachamento livre", 55, 10],
+        [-8, "Agachamento livre", 60, 8],
+        [-21, "Remada curvada", 30, 12],
+        [-10, "Remada curvada", 32.5, 12],
+      ].map(([dias, exercicio, cargaKg, repeticoes], i) => ({
+        id: `demo-carga-${i}`,
+        exercicio: String(exercicio),
+        data: paraISO(addDays(hoje, Number(dias))),
+        cargaKg: Number(cargaKg),
+        repeticoes: Number(repeticoes),
+        series: 3,
+      })),
+    ].sort((a, b) => a.data.localeCompare(b.data)),
+    modulos: { treinos: true, reservas: true, metas: true, medidas: true, cargas: true },
   };
 }

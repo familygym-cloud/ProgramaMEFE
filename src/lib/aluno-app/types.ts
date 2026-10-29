@@ -1,6 +1,8 @@
 // Contrato de dados da área do aluno. Todas as páginas de /app consomem estes tipos,
 // tanto com dados reais (Supabase, via server functions) quanto no modo demonstração.
 
+import type { RegistroCarga } from "./cargas";
+
 export type StatusAluno = "Ativo" | "Pendente" | "Inativo" | string;
 
 export type PerfilAluno = {
@@ -132,6 +134,7 @@ export type ModulosDisponiveis = {
   reservas: boolean;
   metas: boolean;
   medidas: boolean;
+  cargas: boolean;
 };
 
 export type AreaAlunoDados = {
@@ -143,6 +146,8 @@ export type AreaAlunoDados = {
   agenda: AulaAgenda[];
   pagamentos: PagamentoAluno[];
   metas: MetaAluno[];
+  /** Cargas usadas em cada exercício, do mais antigo ao mais recente. */
+  cargas: RegistroCarga[];
   modulos: ModulosDisponiveis;
   /** Dados fictícios, só para demonstração. */
   demo: boolean;
