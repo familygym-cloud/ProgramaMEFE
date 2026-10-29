@@ -565,6 +565,33 @@ export type Database = {
           },
         ]
       }
+      lgpd_registros: {
+        Row: {
+          acao: string
+          aluno_id: string
+          criado_em: string
+          executado_por: string | null
+          id: number
+          resumo: Json
+        }
+        Insert: {
+          acao: string
+          aluno_id: string
+          criado_em?: string
+          executado_por?: string | null
+          id?: number
+          resumo?: Json
+        }
+        Update: {
+          acao?: string
+          aluno_id?: string
+          criado_em?: string
+          executado_por?: string | null
+          id?: number
+          resumo?: Json
+        }
+        Relationships: []
+      }
       metas_aluno: {
         Row: {
           aluno_id: string
@@ -596,6 +623,47 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "metas_aluno_aluno_id_fkey"
+            columns: ["aluno_id"]
+            isOneToOne: false
+            referencedRelation: "alunos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      registros_carga: {
+        Row: {
+          aluno_id: string
+          carga_kg: number
+          created_at: string
+          data: string
+          exercicio: string
+          id: string
+          repeticoes: number
+          series: number
+        }
+        Insert: {
+          aluno_id: string
+          carga_kg: number
+          created_at?: string
+          data: string
+          exercicio: string
+          id?: string
+          repeticoes: number
+          series?: number
+        }
+        Update: {
+          aluno_id?: string
+          carga_kg?: number
+          created_at?: string
+          data?: string
+          exercicio?: string
+          id?: string
+          repeticoes?: number
+          series?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "registros_carga_aluno_id_fkey"
             columns: ["aluno_id"]
             isOneToOne: false
             referencedRelation: "alunos"

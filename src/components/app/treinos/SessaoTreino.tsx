@@ -2,6 +2,8 @@ import { Dumbbell } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { EstadoVazio, Superficie } from "@/components/app/ui";
 import { Button } from "@/components/ui/button";
+import { resumirExercicios } from "@/lib/aluno-app/cargas";
+import { useAlunoApp } from "@/lib/aluno-app/store";
 import type { Exercicio, Treino } from "@/lib/aluno-app/types";
 import { BotaoConcluir, BotaoReiniciar } from "./AcoesDaSessao";
 import { BarraSessao } from "./BarraSessao";
@@ -17,6 +19,8 @@ import { useSessaoTreino } from "./useSessaoTreino";
 export function SessaoTreino({ treino, ehHoje }: { treino: Treino; ehHoje: boolean }) {
   const exercicios = exerciciosEmOrdem(treino);
   const sessao = useSessaoTreino(treino);
+  const { dados } = useAlunoApp();
+  const resumos = resumirExercicios(dados.cargas);
   const descanso = useDescanso();
 
   if (sessao.concluido) {
@@ -114,6 +118,19 @@ export function SessaoTreino({ treino, ehHoje }: { treino: Treino; ehHoje: boole
                 atual={exercicio.id === proximo?.id}
                 descanso={descanso}
                 aoAlternarSerie={(indice) => alternarSerie(exercicio, indice)}
+                {...(dados.modulos.cargas
+                  ? {
+                      carga: {
+                        ...sessao.cargaDe(exercicio),
+                        aoAlterar: (campo: "cargaKg" | "repeticoes", valor: string) =>
+                          sessao.definirCarga(exercicio, campo, valor),
+                        recordeKg:
+                          resumos.find(
+                            (r) => r.exercicio.toLowerCase() === exercicio.nome.toLowerCase(),
+                          )?.recorde.cargaKg ?? null,
+                      },
+                    }
+                  : {})}
               />
             ))}
           </ol>

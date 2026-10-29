@@ -4,11 +4,16 @@ import { FlaskConical, RefreshCw, UsersRound } from "lucide-react";
 import { EstadoVazio, Selo } from "@/components/app/ui";
 import { BrandLogo } from "@/components/BrandLogo";
 import { Alunos } from "@/components/relatorios/Alunos";
+import { Aulas } from "@/components/relatorios/Aulas";
+import { Captacao } from "@/components/relatorios/Captacao";
+import { Catraca } from "@/components/relatorios/Catraca";
 import { Financeiro } from "@/components/relatorios/Financeiro";
 import { Frequencia } from "@/components/relatorios/Frequencia";
 import { MenuImprimir, type EscopoImpressao } from "@/components/relatorios/MenuImprimir";
 import { Saude } from "@/components/relatorios/Saude";
+import { Seguranca } from "@/components/relatorios/Seguranca";
 import { Termos } from "@/components/relatorios/Termos";
+import { Treinos } from "@/components/relatorios/Treinos";
 import type { PropsAba } from "@/components/relatorios/tipos";
 import { useImpressao } from "@/components/relatorios/useImpressao";
 import { VisaoGeral } from "@/components/relatorios/VisaoGeral";
@@ -46,6 +51,16 @@ function ConteudoDaAba({ aba, relatorio, modo }: PropsAba & { aba: AbaRelatorio 
       return <Termos relatorio={relatorio} modo={modo} />;
     case "alunos":
       return <Alunos relatorio={relatorio} modo={modo} />;
+    case "aulas":
+      return <Aulas relatorio={relatorio} modo={modo} />;
+    case "treinos":
+      return <Treinos relatorio={relatorio} modo={modo} />;
+    case "captacao":
+      return <Captacao relatorio={relatorio} modo={modo} />;
+    case "catraca":
+      return <Catraca relatorio={relatorio} modo={modo} />;
+    case "seguranca":
+      return <Seguranca relatorio={relatorio} modo={modo} />;
   }
 }
 

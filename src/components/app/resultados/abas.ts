@@ -2,6 +2,7 @@ export const ABAS = [
   { valor: "geral", rotulo: "Visão geral" },
   { valor: "frequencia", rotulo: "Frequência" },
   { valor: "corpo", rotulo: "Corpo" },
+  { valor: "cargas", rotulo: "Cargas" },
   { valor: "metas", rotulo: "Metas" },
   { valor: "conquistas", rotulo: "Conquistas" },
 ] as const;

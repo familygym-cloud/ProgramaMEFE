@@ -17,6 +17,14 @@ type Props = {
   atual: boolean;
   descanso: Descanso;
   aoAlternarSerie: (indice: number) => void;
+  /** Quando o registro de cargas está ativo: o que mostrar nos campos e como alterá-los. */
+  carga?: {
+    cargaKg: string;
+    repeticoes: string;
+    aoAlterar: (campo: "cargaKg" | "repeticoes", valor: string) => void;
+    /** Melhor carga já usada neste exercício, se houver. */
+    recordeKg: number | null;
+  };
 };
 
 const TILE = "rounded-2xl border border-foreground/10 bg-foreground/[0.03] p-2.5 sm:p-4";
@@ -63,6 +71,7 @@ export function CartaoExercicio({
   atual,
   descanso,
   aoAlternarSerie,
+  carga,
 }: Props) {
   const completo = marcadas.length >= exercicio.series;
   const emFoco = atual && !completo;
@@ -158,6 +167,45 @@ export function CartaoExercicio({
             ))}
           </div>
         </div>
+
+        {carga ? (
+          <div className="space-y-2 rounded-2xl border border-foreground/10 bg-foreground/[0.03] p-3 sm:p-4">
+            <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+              Carga que você usou hoje
+              {carga.recordeKg !== null ? (
+                <span className="ml-2 normal-case tracking-normal">
+                  · recorde {carga.recordeKg.toLocaleString("pt-BR")} kg
+                </span>
+              ) : null}
+            </p>
+            <div className="grid grid-cols-2 gap-3">
+              <label className="space-y-1 text-sm">
+                <span className="text-muted-foreground">Carga (kg)</span>
+                <input
+                  type="text"
+                  inputMode="decimal"
+                  autoComplete="off"
+                  value={carga.cargaKg}
+                  onChange={(e) => carga.aoAlterar("cargaKg", e.target.value)}
+                  placeholder="0"
+                  className="h-12 w-full rounded-xl border border-input bg-background px-3 text-base tabular-nums"
+                />
+              </label>
+              <label className="space-y-1 text-sm">
+                <span className="text-muted-foreground">Repetições</span>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  autoComplete="off"
+                  value={carga.repeticoes}
+                  onChange={(e) => carga.aoAlterar("repeticoes", e.target.value.replace(/\D/g, ""))}
+                  placeholder={exercicio.repeticoes}
+                  className="h-12 w-full rounded-xl border border-input bg-background px-3 text-base tabular-nums"
+                />
+              </label>
+            </div>
+          </div>
+        ) : null}
 
         <DescansoDoExercicio exercicio={exercicio} descanso={descanso} />
       </Superficie>

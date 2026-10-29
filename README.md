@@ -4,7 +4,7 @@ Aplicação web da Academia Family Gym, com três frentes no mesmo projeto:
 
 - **Site público**: início, modalidades e valores (`/`, `/modalidades`, `/valores`).
 - **Área do aluno** (`/app`): treinos, aulas e reservas, avaliações, resultados, plano e mensalidades, perfil e segurança (verificação em duas etapas).
-- **Painel da equipe** (perfil `staff`): Central de Relatórios com dados reais (visão geral, financeiro, frequência, saúde, termos e alunos, com exportação CSV e impressão/PDF, mais o relatório individual do aluno), vínculos com contas de acesso, planos, aulas e presenças, financeiro, prescrição de treinos e registro de avaliações.
+- **Painel da equipe** (perfil `staff`): Central de Relatórios com dados reais (visão geral com panorama da operação, financeiro, frequência, saúde, termos, alunos, aulas, treinos e cargas, captação de interessados, catraca e API, equipe e LGPD, com exportação CSV e impressão/PDF, mais o relatório individual do aluno), vínculos com contas de acesso, planos, aulas e presenças, financeiro, prescrição de treinos e registro de avaliações.
 
 O site roda no **Cloudflare Workers**; banco de dados e login ficam no **Supabase** (projeto próprio da academia). Este repositório é a fonte do código.
 
