@@ -25,6 +25,7 @@ import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as TermosDeUsoRouteImport } from './routes/termos-de-uso'
 import { Route as ValoresRouteImport } from './routes/valores'
 import { Route as AuthenticatedAulasRouteImport } from './routes/_authenticated/aulas'
+import { Route as AuthenticatedDadosPessoaisRouteImport } from './routes/_authenticated/dados-pessoais'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedFinanceiroRouteImport } from './routes/_authenticated/financeiro'
 import { Route as AuthenticatedIntegracoesRouteImport } from './routes/_authenticated/integracoes'
@@ -137,6 +138,12 @@ const AuthenticatedAulasRoute = AuthenticatedAulasRouteImport.update({
   path: '/aulas',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedDadosPessoaisRoute =
+  AuthenticatedDadosPessoaisRouteImport.update({
+    id: '/dados-pessoais',
+    path: '/dados-pessoais',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -321,6 +328,7 @@ export interface FileRoutesByFullPath {
   '/termos-de-uso': typeof TermosDeUsoRoute
   '/valores': typeof ValoresRoute
   '/aulas': typeof AuthenticatedAulasRoute
+  '/dados-pessoais': typeof AuthenticatedDadosPessoaisRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/financeiro': typeof AuthenticatedFinanceiroRoute
   '/integracoes': typeof AuthenticatedIntegracoesRoute
@@ -369,6 +377,7 @@ export interface FileRoutesByTo {
   '/termos-de-uso': typeof TermosDeUsoRoute
   '/valores': typeof ValoresRoute
   '/aulas': typeof AuthenticatedAulasRoute
+  '/dados-pessoais': typeof AuthenticatedDadosPessoaisRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/financeiro': typeof AuthenticatedFinanceiroRoute
   '/integracoes': typeof AuthenticatedIntegracoesRoute
@@ -420,6 +429,7 @@ export interface FileRoutesById {
   '/termos-de-uso': typeof TermosDeUsoRoute
   '/valores': typeof ValoresRoute
   '/_authenticated/aulas': typeof AuthenticatedAulasRoute
+  '/_authenticated/dados-pessoais': typeof AuthenticatedDadosPessoaisRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/financeiro': typeof AuthenticatedFinanceiroRoute
   '/_authenticated/integracoes': typeof AuthenticatedIntegracoesRoute
@@ -471,6 +481,7 @@ export interface FileRouteTypes {
     | '/termos-de-uso'
     | '/valores'
     | '/aulas'
+    | '/dados-pessoais'
     | '/dashboard'
     | '/financeiro'
     | '/integracoes'
@@ -519,6 +530,7 @@ export interface FileRouteTypes {
     | '/termos-de-uso'
     | '/valores'
     | '/aulas'
+    | '/dados-pessoais'
     | '/dashboard'
     | '/financeiro'
     | '/integracoes'
@@ -569,6 +581,7 @@ export interface FileRouteTypes {
     | '/termos-de-uso'
     | '/valores'
     | '/_authenticated/aulas'
+    | '/_authenticated/dados-pessoais'
     | '/_authenticated/dashboard'
     | '/_authenticated/financeiro'
     | '/_authenticated/integracoes'
@@ -740,6 +753,13 @@ declare module '@tanstack/react-router' {
       path: '/aulas'
       fullPath: '/aulas'
       preLoaderRoute: typeof AuthenticatedAulasRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dados-pessoais': {
+      id: '/_authenticated/dados-pessoais'
+      path: '/dados-pessoais'
+      fullPath: '/dados-pessoais'
+      preLoaderRoute: typeof AuthenticatedDadosPessoaisRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/dashboard': {
@@ -971,6 +991,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAulasRoute: typeof AuthenticatedAulasRoute
+  AuthenticatedDadosPessoaisRoute: typeof AuthenticatedDadosPessoaisRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedFinanceiroRoute: typeof AuthenticatedFinanceiroRoute
   AuthenticatedIntegracoesRoute: typeof AuthenticatedIntegracoesRoute
@@ -987,6 +1008,7 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAulasRoute: AuthenticatedAulasRoute,
+  AuthenticatedDadosPessoaisRoute: AuthenticatedDadosPessoaisRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedFinanceiroRoute: AuthenticatedFinanceiroRoute,
   AuthenticatedIntegracoesRoute: AuthenticatedIntegracoesRoute,

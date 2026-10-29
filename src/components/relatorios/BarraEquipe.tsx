@@ -4,6 +4,7 @@ import {
   CalendarCheck,
   ClipboardList,
   Dumbbell,
+  FileLock2,
   Inbox,
   Link2,
   LogIn,
@@ -34,6 +35,7 @@ const FERRAMENTAS = [
   { to: "/vinculos", rotulo: "Vínculos", Icone: Link2, area: "vinculos" },
   { to: "/interessados", rotulo: "Interessados", Icone: Inbox, area: "interessados" },
   { to: "/integracoes", rotulo: "Integrações", Icone: Plug, area: "vinculos" },
+  { to: "/dados-pessoais", rotulo: "Dados (LGPD)", Icone: FileLock2, area: "relatorios" },
   { to: "/prescricao-treinos", rotulo: "Treinos", Icone: Dumbbell, area: "treinos" },
   { to: "/registrar-avaliacao", rotulo: "Avaliação", Icone: Ruler, area: "avaliacoes" },
   {

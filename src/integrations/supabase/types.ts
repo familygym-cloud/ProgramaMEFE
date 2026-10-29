@@ -855,6 +855,14 @@ export type Database = {
         Args: { _user_id: string }
         Returns: string
       }
+      exportar_dados_aluno: {
+        Args: { _aluno: string; _executado_por: string }
+        Returns: Json
+      }
+      apagar_dados_aluno: {
+        Args: { _aluno: string; _modo: string; _executado_por: string }
+        Returns: Json
+      }
       definir_vinculos: {
         Args: { _itens: Json }
         Returns: number
