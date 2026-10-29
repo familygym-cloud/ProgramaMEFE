@@ -1,5 +1,6 @@
 import { createStart, createCsrfMiddleware, createMiddleware } from "@tanstack/react-start";
 
+import { comCabecalhosDeSeguranca } from "./lib/cabecalhos-seguranca";
 import { renderErrorPage } from "./lib/error-page";
 import { attachSupabaseAuth } from "@/integrations/supabase/auth-attacher";
 
@@ -18,6 +19,12 @@ const errorMiddleware = createMiddleware().server(async ({ next }) => {
   }
 });
 
+// Cabeçalhos de segurança em toda resposta (clickjacking, sniffing, referrer, HTTPS).
+const cabecalhosMiddleware = createMiddleware().server(async ({ next }) => {
+  const resultado = await next();
+  return { ...resultado, response: comCabecalhosDeSeguranca(resultado.response) };
+});
+
 // Start installs this automatically when src/start.ts is absent; defining the
 // file opts out, so re-add it explicitly to keep server functions protected
 // from cross-site requests.
@@ -27,5 +34,5 @@ const csrfMiddleware = createCsrfMiddleware({
 
 export const startInstance = createStart(() => ({
   functionMiddleware: [attachSupabaseAuth],
-  requestMiddleware: [errorMiddleware, csrfMiddleware],
+  requestMiddleware: [cabecalhosMiddleware, errorMiddleware, csrfMiddleware],
 }));

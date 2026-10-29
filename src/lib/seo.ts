@@ -50,6 +50,7 @@ const BLOQUEADAS = [
   "/formularios-mefe",
   "/integracoes",
   "/interessados",
+  "/dados-pessoais",
   "/equipe-demo",
   "/relatorio-aluno",
   "/api/",
