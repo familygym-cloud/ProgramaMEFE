@@ -7,6 +7,11 @@ export const ABAS_RELATORIO = [
   "saude",
   "termos",
   "alunos",
+  "aulas",
+  "treinos",
+  "captacao",
+  "catraca",
+  "seguranca",
 ] as const;
 
 export type AbaRelatorio = (typeof ABAS_RELATORIO)[number];
@@ -20,6 +25,11 @@ export const ROTULO_ABA: Record<AbaRelatorio, string> = {
   saude: "Saúde",
   termos: "Termos",
   alunos: "Alunos",
+  aulas: "Aulas",
+  treinos: "Treinos",
+  captacao: "Captação",
+  catraca: "Catraca e API",
+  seguranca: "Equipe e LGPD",
 };
 
 /** "real" = dados do banco; "demo" = dados fictícios gerados no navegador. */

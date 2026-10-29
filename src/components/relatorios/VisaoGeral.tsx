@@ -26,6 +26,7 @@ import {
   LegendaGrafico,
   type ItemBarraHorizontal,
 } from "@/components/relatorios/graficos";
+import { PanoramaOperacao } from "@/components/relatorios/operacao/PanoramaOperacao";
 import type { PropsAba } from "@/components/relatorios/tipos";
 import { buscaDaAba } from "@/lib/relatorios/abas";
 import { DIAS_SEM_TREINO_RISCO } from "@/lib/relatorios/agregar";
@@ -533,6 +534,7 @@ export function VisaoGeral({ relatorio, modo }: PropsAba) {
       <Entrada atraso={120}>
         <AtencaoHoje relatorio={relatorio} />
       </Entrada>
+      <PanoramaOperacao relatorio={relatorio} modo={modo} />
       <Entrada atraso={160} className="grid gap-4 sm:gap-6 lg:grid-cols-3">
         <Receita relatorio={relatorio} modo={modo} />
         <Cadastros relatorio={relatorio} modo={modo} />

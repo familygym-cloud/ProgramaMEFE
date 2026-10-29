@@ -10,7 +10,7 @@ import {
 } from "./abas";
 
 describe("abas da Central", () => {
-  it("lista as seis abas, com a visão geral primeiro, e todas têm rótulo", () => {
+  it("lista as onze abas, com a visão geral primeiro, e todas têm rótulo", () => {
     expect(ABAS_RELATORIO).toEqual([
       "visao-geral",
       "financeiro",
@@ -18,6 +18,11 @@ describe("abas da Central", () => {
       "saude",
       "termos",
       "alunos",
+      "aulas",
+      "treinos",
+      "captacao",
+      "catraca",
+      "seguranca",
     ]);
     expect(ABA_PADRAO).toBe("visao-geral");
     for (const aba of ABAS_RELATORIO) expect(ROTULO_ABA[aba]).not.toBe("");

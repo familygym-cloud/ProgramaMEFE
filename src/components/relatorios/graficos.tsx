@@ -371,12 +371,15 @@ export function GraficoBarrasRelatorio({
   resumo,
   legenda,
   colunaValor,
+  colunaRotulo = "Dia",
   altura = 220,
 }: {
   dados: readonly PontoBarra[];
   resumo: string;
   legenda: string;
   colunaValor: string;
+  /** Título da primeira coluna da tabela de leitores de tela (padrão "Dia"). */
+  colunaRotulo?: string;
   altura?: number;
 }) {
   const animar = useAnimar();
@@ -389,7 +392,7 @@ export function GraficoBarrasRelatorio({
       tabela={
         <TabelaAcessivel
           legenda={legenda}
-          colunas={["Dia", colunaValor]}
+          colunas={[colunaRotulo, colunaValor]}
           linhas={dados.map((d) => [d.nome, formatarNumero(d.valor)])}
         />
       }

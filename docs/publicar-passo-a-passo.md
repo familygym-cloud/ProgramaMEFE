@@ -27,6 +27,11 @@ Cloudflare (suficiente para testar). Você só precisa de e-mail e navegador.
 6. **Authentication > Sign In / Providers > Multi-Factor**: confirme que TOTP está ligado.
 7. Deixe **Authentication > URL Configuration** para o passo 3 (precisa do endereço do site).
 
+> **Já publicou antes e saiu uma novidade no banco?** Não rode as partes 1 e 2 de novo. Abra a pasta
+> `supabase/publicar/atualizacoes/`, cole no SQL Editor só o arquivo novo (um por novidade; todos podem
+> rodar mais de uma vez sem estragar nada) e clique em **Run**. Hoje há um: `20261011000700_registros_carga.sql`
+> (carga por exercício e recordes do aluno). Sem ele o site funciona, mas essa parte aparece como "ainda não ativada".
+
 > Se preferir usar a Supabase CLI: `supabase link` e `supabase db push` aplicam as migrations na ordem
 > certa e dispensam os passos 3 e 4.
 

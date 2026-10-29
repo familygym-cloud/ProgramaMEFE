@@ -107,3 +107,22 @@ da migration `20261011000500_interessados.sql`.
   Cloudflare para `/api/*` e `/comece`.
 - **Dados pessoais (LGPD)**: a tela `/dados-pessoais` (só gestão) exporta, anonimiza ou exclui os dados de
   um aluno e remove a conta de login. Cada ação fica registrada sem dado pessoal.
+
+## 10. Relatórios da operação e cargas por exercício
+
+- **Central de relatórios** (`/dashboard`, só gestão): além de Visão geral, Financeiro, Frequência, Saúde, Termos
+  e Alunos, há cinco abas novas, todas com exportação CSV e impressão:
+  - **Aulas**: ocupação, presença, cancelamentos, lista de espera, desempenho por modalidade, horário e professor,
+    e a lotação das próximas aulas;
+  - **Treinos**: alunos com e sem ficha, exercícios e grupos musculares mais prescritos, cargas registradas e recordes;
+  - **Captação**: funil dos pedidos do formulário do site, conversão em matrícula e pedidos sem resposta;
+  - **Catraca e API**: acessos por hora e dia da semana, alunos que passaram na catraca, uso da API, taxa de erro e chaves paradas;
+  - **Equipe e LGPD**: pessoas por perfil e pedidos de dados pessoais atendidos.
+    A **Visão geral** traz o "Panorama da operação" com um número de cada área e atalhos.
+- As abas novas buscam os dados quando abertas (`carregarRelatorioOperacao`, só gestão, com a chave de serviço).
+  Uma parte cuja atualização do banco ainda não foi aplicada aparece como "ainda não ativada", sem derrubar o resto.
+- A demonstração pública `/equipe-demo` mostra todas as abas com dados fictícios.
+- **Cargas por exercício** (migration `20261011000700_registros_carga.sql`): ao concluir o treino o aluno informa a
+  carga e as repetições usadas; o app calcula o recorde pela carga estimada para 1 repetição (fórmula de Epley) e
+  mostra a evolução em **Resultados > Cargas**. Professores e gestão leem os registros; recepção não. A exportação e a
+  anonimização/exclusão da LGPD já incluem as cargas.
