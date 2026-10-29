@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { enderecoDe, LimiteDeUso } from "@/lib/limite-de-uso";
 import { exigirArea } from "@/lib/staff";
 import {
   STATUS_DO_INTERESSADO,
@@ -22,6 +23,9 @@ export type InteressadoListado = {
   criadoEm: string;
 };
 
+// 5 pedidos a cada 10 minutos por endereço: o suficiente para uma família enviar, pouco para um robô.
+const limiteDeEnvio = new LimiteDeUso(5, 10 * 60_000);
+
 export type RespostaEnvio =
   | { ok: true; resultado: "registrado" | "duplicado"; telefone: string }
   | { ok: false; erros: Record<string, string> };
@@ -37,6 +41,12 @@ export const enviarInteresse = createServerFn({ method: "POST" })
     const verificacao = validarPedido(data);
     if (!verificacao.ok) return { ok: false, erros: verificacao.erros as Record<string, string> };
     const pedido: PedidoValido = verificacao.pedido;
+
+    const { getRequest } = await import("@tanstack/react-start/server");
+    const liberado = limiteDeEnvio.usar(enderecoDe(getRequest().headers));
+    if (!liberado.permitido) {
+      throw new Error("Você enviou vários pedidos seguidos. Tente de novo em alguns minutos.");
+    }
 
     if (typeof data["site"] === "string" && data["site"].trim() !== "") {
       return { ok: true, resultado: "registrado", telefone: pedido.telefone };

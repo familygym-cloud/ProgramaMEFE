@@ -94,3 +94,16 @@ da migration `20261011000500_interessados.sql`.
 - Proteções: campo-isca contra robôs e limite de 300 pedidos por hora. Para reforçar, ative o Cloudflare
   Turnstile no formulário (próxima etapa).
 - Dado pessoal: apague os pedidos antigos conforme a política de retenção da academia.
+
+## 9. Segurança das respostas e limites
+
+- **Cabeçalhos de segurança** em todas as respostas (`src/lib/cabecalhos-seguranca.ts`): bloqueio de frames
+  de terceiros, `nosniff`, HTTPS obrigatório (HSTS), política de referrer e permissões do navegador.
+  A política de scripts (CSP completa) ficou de fora porque o servidor injeta scripts em linha; ativar
+  exigiria nonces e testes em todas as telas.
+- **Limite de uso** na memória do servidor (`src/lib/limite-de-uso.ts`): 5 pedidos a cada 10 minutos por
+  endereço no formulário `/comece`; 120 chamadas por minuto por chave e 40 por endereço na API. É
+  proteção básica: para um teto global, crie uma regra em _Security > WAF > Rate limiting rules_ na
+  Cloudflare para `/api/*` e `/comece`.
+- **Dados pessoais (LGPD)**: a tela `/dados-pessoais` (só gestão) exporta, anonimiza ou exclui os dados de
+  um aluno e remove a conta de login. Cada ação fica registrada sem dado pessoal.
