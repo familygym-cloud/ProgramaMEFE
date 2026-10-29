@@ -88,6 +88,8 @@ Enquanto isso, a API já funciona com qualquer catraca ou sistema que consiga ch
 
 ## 5. Segurança e limites
 
+- **Limite de uso:** 120 chamadas por minuto por chave e 40 por minuto por endereço. Passou disso, a API responde `429 muitas_chamadas` com o cabeçalho `Retry-After` (segundos para esperar). O limite é por instância do servidor; para um teto global, use também a regra de Rate limiting da Cloudflare abaixo.
+
 - Uma chave por sistema, com o mínimo de permissões; revogue as que não usa mais.
 - O site não limita a quantidade de chamadas por chave. Em produção, ative na Cloudflare uma regra de
   limite de requisições (Security > WAF > Rate limiting rules) para `/api/*`.

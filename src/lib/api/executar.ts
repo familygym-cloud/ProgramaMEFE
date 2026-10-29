@@ -2,6 +2,7 @@
 // esconde falhas internas e registra no histórico as escritas e as chamadas que falharam.
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
+import { enderecoDe, LimiteDeUso } from "@/lib/limite-de-uso";
 import { extrairChave, formatoDeChaveValido, hashChave, type Escopo } from "./chaves";
 import { erro, ErroDeEntrada } from "./respostas";
 
@@ -13,6 +14,17 @@ export type ContextoApi = {
   url: URL;
   chaveId: string | null;
 };
+
+// 120 chamadas por minuto por chave; 40 por minuto por endereço antes de a chave ser reconhecida
+// (barra quem fica testando chaves ao acaso).
+const limitePorChave = new LimiteDeUso(120, 60_000);
+const limitePorEndereco = new LimiteDeUso(40, 60_000);
+
+function muitasChamadas(esperarSegundos: number): Response {
+  const r = erro(429, "muitas_chamadas", `Muitas chamadas. Tente de novo em ${esperarSegundos}s.`);
+  r.headers.set("retry-after", String(esperarSegundos));
+  return r;
+}
 
 type Opcoes = { rota: string; escopo: Escopo | null };
 
@@ -50,6 +62,9 @@ export async function executarRota(
     return erro(503, "indisponivel", "Serviço indisponível no momento.");
   }
 
+  const porEndereco = limitePorEndereco.usar(enderecoDe(request.headers));
+  if (!porEndereco.permitido) return muitasChamadas(porEndereco.esperarSegundos);
+
   let chaveId: string | null = null;
   if (escopo) {
     const chave = extrairChave(request.headers);
@@ -71,6 +86,8 @@ export async function executarRota(
     }
     if (!data || !data.ativa) return erro(401, "chave_invalida", "Chave inválida ou revogada.");
     chaveId = data.id;
+    const porChave = limitePorChave.usar(data.id);
+    if (!porChave.permitido) return muitasChamadas(porChave.esperarSegundos);
     if (!data.escopos.includes(escopo)) {
       await anotar(admin, chaveId, rota, 403, `sem a permissão ${escopo}`);
       return erro(403, "sem_permissao", `Esta chave não tem a permissão "${escopo}".`);
