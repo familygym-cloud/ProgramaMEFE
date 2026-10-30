@@ -161,3 +161,29 @@ da migration `20261011000500_interessados.sql`.
   última parcela do aluno. Quem nunca foi cobrado recebe a primeira cobrança por **Lançar mensalidade**.
 - Primeira vez: faça um lançamento de teste com um aluno de teste (1 parcela de R$ 1,00), confira na lista e em **Meu
   plano** do aluno e dê baixa; depois use **Gerar mensalidades do mês** com o mês seguinte para ver a prévia.
+
+## 13. Registro de erros do servidor (logs da Cloudflare)
+
+- O build já liga os **Workers Logs** (`observability` no Worker `familygym`). Toda falha de uma função do servidor
+  deixa **uma linha** nesses logs, que a tela do usuário não mostra (ela só diz "Não foi possível concluir"):
+
+  ```
+  [servidor] falha em função do servidor {
+    funcao: 'listarVinculos',
+    nome: 'Error',
+    mensagem: 'Configuração do Supabase incompleta: faltam as variáveis SUPABASE_SERVICE_ROLE_KEY. ...',
+    pilha: 'at createSupabaseAdminClient (...) | ...'
+  }
+  ```
+
+- **Como ver**: no painel da Cloudflare, abra **Workers & Pages > familygym** e a área de **Logs** (ou
+  **Observability**) do Worker; busque por `[servidor]`. `falha` (nível _error_) é algo a corrigir: configuração,
+  chave recusada, tabela que falta aplicar, defeito no código. `recusa` (nível _warn_) é o sistema dizendo ao
+  usuário que confira um campo (dado inválido, limite de uso, parcela já paga) e normalmente não precisa de ação.
+- Quando alguém reportar "deu erro", peça o **horário** e a **tela**: a linha do log traz o nome da função e o motivo.
+- **O que nunca vai para o log**: e-mails, CPF, telefones, tokens de sessão e chaves (`sb_secret_...`, `fgk_...`)
+  são trocados por marcadores como `[e-mail]` e `[chave]`, e os campos `details` e `hint` do banco (que podem
+  trazer dados de pessoas) não são copiados. Sessão expirada e redirecionamentos não são registrados (acontecem o
+  dia todo e só fariam barulho).
+- Código: `src/lib/registro-de-erros.ts` (puro, testado) e o middleware em `src/start.ts`. O teste de ponta a ponta
+  (`bun run e2e`) confere que a falha aparece no log do Worker e que a linha não vaza chave nem e-mail.

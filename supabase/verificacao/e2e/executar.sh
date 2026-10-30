@@ -31,6 +31,18 @@ echo "== construindo o site (aponta para o Supabase de mentira)"
 VITE_SUPABASE_URL=http://127.0.0.1:54321 VITE_SUPABASE_PUBLISHABLE_KEY=sb_publishable_teste \
   VITE_SITE_URL=$SITE bun run build >/tmp/e2e-build.log 2>&1 || { tail -20 /tmp/e2e-build.log; exit 1; }
 
+conferir_log() { # o erro do servidor tem de deixar uma linha nos logs, sem chave nem e-mail
+  local trecho
+  trecho=$(grep -A14 "\[servidor\]" /tmp/e2e-worker.log)
+  if ! echo "$trecho" | grep -q "falha em função do servidor"; then
+    echo "FALHA o erro do servidor não apareceu nos logs"; FALHAS=$((FALHAS + 1)); return
+  fi
+  if echo "$trecho" | grep -q -E "sb_secret_teste|sb_publishable_teste|gestor@exemplo.com"; then
+    echo "FALHA o log do servidor vazou chave ou e-mail"; FALHAS=$((FALHAS + 1)); return
+  fi
+  echo "ok    a falha ficou nos logs ($(echo "$trecho" | grep -o -m1 "funcao: '[A-Za-z]*'")), sem chave nem e-mail"
+}
+
 subir() { # $1 = variáveis do Supabase falso, $2 = variáveis do servidor
   parar; sleep 2
   env $1 node $FALSO >/tmp/e2e-falso.log 2>&1 &
@@ -83,6 +95,7 @@ if quero diagnostico; then
     --espera "SUPABASE_SERVICE_ROLE_KEY não está definida"
   verificar "sem a chave secreta: vínculos explica o motivo" --sem-aal2 --rotas "/vinculos" \
     --espera "Abra /diagnostico para ver o que falta"
+  conferir_log
 
   subir "CHAVE_SECRETA=sb_secret_teste" "--var SUPABASE_SERVICE_ROLE_KEY:sb_publishable_teste --var STAFF_BOOTSTRAP_EMAIL:gestor@exemplo.com"
   verificar "chave pública colada no lugar da secreta" --sem-aal2 --rotas "/diagnostico" \
