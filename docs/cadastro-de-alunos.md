@@ -9,6 +9,9 @@ direto no banco; sem alunos, os relatórios, as mensalidades e os treinos ficam 
   ainda **não tem conta de acesso**.
 - **Novo aluno** e **Editar**: só o nome e o plano são obrigatórios. Altura e peso geram o IMC sozinhos; o que ficar em
   branco (idade, altura, peso) aparece como "sem dado" nos relatórios até a primeira avaliação.
+- **Cobrar**: botão em cada aluno (menos nos inativos) que abre o **Financeiro** já no lançamento de mensalidade
+  daquele aluno. Ao **cadastrar um aluno novo**, o aviso de sucesso também oferece **Lançar mensalidade** (fica uns
+  segundos na tela), então a primeira cobrança é um clique depois do cadastro.
 - **Inativar / Reativar** sem abrir a ficha. Quem é inativado deixa de contar como aluno ativo nos relatórios.
 - **Importar planilha** (CSV) com a prévia do que entra, do que já existe e do que tem erro.
 - **Cadastrar como aluno**, na tela **Interessados**: abre o formulário já preenchido com os dados do pedido e, ao

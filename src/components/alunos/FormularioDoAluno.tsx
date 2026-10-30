@@ -113,6 +113,7 @@ export function FormularioDoAluno({
   inicial,
   interessadoId,
   aoSalvar,
+  depoisDeCriar,
 }: {
   aberto: boolean;
   aoMudarAberto: (aberto: boolean) => void;
@@ -123,6 +124,8 @@ export function FormularioDoAluno({
   /** Pedido do site que vira "matriculado" quando o aluno é cadastrado. */
   interessadoId?: string | undefined;
   aoSalvar: () => void;
+  /** Atalho oferecido no aviso de sucesso quando uma ficha NOVA é criada (por exemplo, lançar a primeira mensalidade). */
+  depoisDeCriar?: { rotulo: string; aoClicar: (alunoId: string) => void };
 }) {
   const salvar = useServerFn(salvarAluno);
   const [valores, setValores] = useState<Valores>(() => valoresDe(aluno, inicial));
@@ -151,7 +154,15 @@ export function FormularioDoAluno({
         toast.error("Confira os campos destacados.");
         return;
       }
-      toast.success(r.criado ? "Aluno cadastrado." : "Ficha atualizada.");
+      if (r.criado && depoisDeCriar) {
+        // O aviso fica um pouco mais tempo na tela: é o atalho para a cobrança do aluno que acabou de entrar.
+        toast.success("Aluno cadastrado.", {
+          duration: 12_000,
+          action: { label: depoisDeCriar.rotulo, onClick: () => depoisDeCriar.aoClicar(r.id) },
+        });
+      } else {
+        toast.success(r.criado ? "Aluno cadastrado." : "Ficha atualizada.");
+      }
       aoMudarAberto(false);
       aoSalvar();
     },

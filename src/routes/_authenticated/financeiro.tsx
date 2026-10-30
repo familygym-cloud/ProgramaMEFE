@@ -46,6 +46,7 @@ import { hojeBrasilia } from "@/lib/datas";
 import { MAX_PARCELAS_POR_EXCLUSAO } from "@/lib/mensalidades";
 import { excluirParcelas, listarAlunosParaCobranca } from "@/lib/mensalidades.functions";
 import { METODOS_PAGAMENTO, type MetodoPagamento } from "@/lib/pagamentos";
+import { ehUuid } from "@/lib/uuid";
 import {
   definirPagamento,
   listarFinanceiro,
@@ -53,6 +54,10 @@ import {
 } from "@/lib/pagamentos.functions";
 
 export const Route = createFileRoute("/_authenticated/financeiro")({
+  // Atalho da lista de alunos: ?aluno=<id> abre o lançamento de mensalidade já com esse aluno.
+  validateSearch: (busca: Record<string, unknown>): { aluno?: string | undefined } => ({
+    aluno: ehUuid(busca["aluno"]) ? busca["aluno"].toLowerCase() : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "Financeiro | Academia Family Gym" },
@@ -142,6 +147,8 @@ function LembreteDeCobranca({ p }: { p: PagamentoFinanceiro }) {
 
 function Financeiro() {
   const queryClient = useQueryClient();
+  const { aluno: alunoDaUrl } = Route.useSearch();
+  const navigate = Route.useNavigate();
   const buscar = useServerFn(listarFinanceiro);
   const marcar = useServerFn(definirPagamento);
   const remover = useServerFn(excluirParcelas);
@@ -151,7 +158,7 @@ function Financeiro() {
   // Forma de pagamento escolhida em cada linha (Pix quando não escolhida) e parcela a reabrir.
   const [metodos, setMetodos] = useState<Record<string, MetodoPagamento>>({});
   const [parcelaParaReabrir, setParcelaParaReabrir] = useState<PagamentoFinanceiro | null>(null);
-  const [lancando, setLancando] = useState(false);
+  const [lancando, setLancando] = useState(Boolean(alunoDaUrl));
   const [gerando, setGerando] = useState(false);
   const [parcelaParaEditar, setParcelaParaEditar] = useState<PagamentoFinanceiro | null>(null);
   const [paraExcluir, setParaExcluir] = useState<PagamentoFinanceiro[] | null>(null);
@@ -163,6 +170,15 @@ function Financeiro() {
     enabled: lancando,
     staleTime: 60_000,
   });
+  const alunoInicial = useMemo(
+    () => (alunoDaUrl ? (alunosDaCobranca.data?.find((a) => a.id === alunoDaUrl) ?? null) : null),
+    [alunoDaUrl, alunosDaCobranca.data],
+  );
+  function mudarLancando(aberto: boolean) {
+    setLancando(aberto);
+    // Fechado o diálogo, o atalho some do endereço: recarregar a página não reabre o lançamento.
+    if (!aberto && alunoDaUrl) void navigate({ search: {}, replace: true });
+  }
   const recarregarFinanceiro = () => {
     void queryClient.invalidateQueries({ queryKey: ["financeiro"] });
     void queryClient.invalidateQueries({ queryKey: ["pagamentos"] });
@@ -623,8 +639,9 @@ function Financeiro() {
 
       <LancarMensalidade
         aberto={lancando}
-        aoMudarAberto={setLancando}
+        aoMudarAberto={mudarLancando}
         alunos={alunosDaCobranca.data ?? []}
+        alunoInicial={alunoInicial}
         aoLancar={recarregarFinanceiro}
       />
       <GerarMensalidades
