@@ -46,6 +46,11 @@ subir "CHAVE_SECRETA=sb_secret_teste PAPEIS=recepcao" "$CHAVES"
 echo "== recepção: cadastro de alunos (cadastrar, importar, inativar, buscar)"
 node supabase/verificacao/e2e/fluxo-alunos.mjs || FALHAS=$((FALHAS + 1))
 
+DADOS_FINANCEIRO=$(node supabase/verificacao/e2e/dados-financeiro.mjs)
+subir "CHAVE_SECRETA=sb_secret_teste PAPEIS=recepcao DADOS=$DADOS_FINANCEIRO" "$CHAVES"
+echo "== recepção: financeiro (gerar mensalidades do mês, lançar parcelas, recusar repetição)"
+node supabase/verificacao/e2e/fluxo-financeiro.mjs || FALHAS=$((FALHAS + 1))
+
 subir "CHAVE_SECRETA=sb_secret_teste" "$CHAVES"
 verificar "primeira gestão: diagnóstico tudo certo e vínculos com o botão de ativar" --sem-aal2 \
   --rotas "/diagnostico" --espera "Tudo certo com a configuração"

@@ -9,7 +9,9 @@ import {
   Clock,
   Loader2,
   MessageCircle,
+  Plus,
   Wallet,
+  WandSparkles,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -24,9 +26,12 @@ import {
 } from "@/components/ui/table";
 import { BrandLogo } from "@/components/BrandLogo";
 import { ConfirmarAcao } from "@/components/ConfirmarAcao";
+import { GerarMensalidades } from "@/components/financeiro/GerarMensalidades";
+import { LancarMensalidade } from "@/components/financeiro/LancarMensalidade";
 import { traduzErroServidor } from "@/lib/erros-servidor";
 import { diasDeAtraso, linkDeCobranca } from "@/lib/cobranca";
 import { hojeBrasilia } from "@/lib/datas";
+import { listarAlunosParaCobranca } from "@/lib/mensalidades.functions";
 import { METODOS_PAGAMENTO, type MetodoPagamento } from "@/lib/pagamentos";
 import {
   definirPagamento,
@@ -116,6 +121,19 @@ function Financeiro() {
   // Forma de pagamento escolhida em cada linha (Pix quando não escolhida) e parcela a reabrir.
   const [metodos, setMetodos] = useState<Record<string, MetodoPagamento>>({});
   const [parcelaParaReabrir, setParcelaParaReabrir] = useState<PagamentoFinanceiro | null>(null);
+  const [lancando, setLancando] = useState(false);
+  const [gerando, setGerando] = useState(false);
+  const buscarAlunos = useServerFn(listarAlunosParaCobranca);
+  const alunosDaCobranca = useQuery({
+    queryKey: ["alunos-para-cobranca"],
+    queryFn: () => buscarAlunos(),
+    enabled: lancando,
+    staleTime: 60_000,
+  });
+  const recarregarFinanceiro = () => {
+    void queryClient.invalidateQueries({ queryKey: ["financeiro"] });
+    void queryClient.invalidateQueries({ queryKey: ["pagamentos"] });
+  };
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["financeiro"],
@@ -198,6 +216,24 @@ function Financeiro() {
           </div>
         ) : null}
 
+        <div className="flex flex-wrap gap-2">
+          <Button
+            type="button"
+            onClick={() => setLancando(true)}
+            className="min-h-11 gap-2 rounded-full"
+          >
+            <Plus className="size-4" aria-hidden /> Lançar mensalidade
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => setGerando(true)}
+            className="min-h-11 gap-2 rounded-full"
+          >
+            <WandSparkles className="size-4" aria-hidden /> Gerar mensalidades do mês
+          </Button>
+        </div>
+
         <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <div className="rounded-2xl border border-border bg-card p-4">
             <p className="flex items-center gap-2 text-xs uppercase tracking-widest text-muted-foreground">
@@ -273,6 +309,15 @@ function Financeiro() {
             <p className="mt-4 flex items-center gap-2 text-sm text-muted-foreground">
               <Loader2 className="size-4 animate-spin" /> Carregando mensalidades...
             </p>
+          ) : pagamentos.length === 0 ? (
+            <div className="mt-4 space-y-2 rounded-2xl border border-dashed border-foreground/15 p-6 text-center">
+              <p className="font-medium">Nenhuma mensalidade lançada ainda</p>
+              <p className="mx-auto max-w-md text-sm text-muted-foreground">
+                Use “Lançar mensalidade” para criar a primeira cobrança de cada aluno (pode ser em
+                várias parcelas). Nos meses seguintes, “Gerar mensalidades do mês” repete tudo de
+                uma vez.
+              </p>
+            </div>
           ) : filtrados.length === 0 ? (
             <p className="mt-4 text-sm text-muted-foreground">
               Nenhuma parcela encontrada com esses filtros.
@@ -381,6 +426,18 @@ function Financeiro() {
           )}
         </section>
       </main>
+
+      <LancarMensalidade
+        aberto={lancando}
+        aoMudarAberto={setLancando}
+        alunos={alunosDaCobranca.data ?? []}
+        aoLancar={recarregarFinanceiro}
+      />
+      <GerarMensalidades
+        aberto={gerando}
+        aoMudarAberto={setGerando}
+        aoGerar={recarregarFinanceiro}
+      />
 
       <ConfirmarAcao
         aberto={parcelaParaReabrir !== null}
