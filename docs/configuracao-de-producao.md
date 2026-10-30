@@ -143,3 +143,15 @@ da migration `20261011000500_interessados.sql`.
   telas da equipe e o diagnóstico em cenários de configuração errada (sem chave secreta, chave pública colada no
   lugar da secreta, tabelas faltando, e-mail da gestão diferente). Precisa do Playwright (`npm i -g playwright`) e não
   toca em nenhum serviço real. Leva alguns minutos.
+
+## 12. Financeiro: lançar e gerar mensalidades
+
+- **/financeiro** (gestão e recepção): além da lista, da baixa, da reabertura e do lembrete por WhatsApp, a equipe
+  **lança mensalidades** (uma ou várias parcelas para um aluno, ou uma cobrança avulsa como matrícula) e **gera as
+  mensalidades do mês** para todos os alunos ativos, repetindo valor, forma de pagamento e dia do vencimento da última
+  parcela de cada um. O guia completo, com as regras e os cuidados, está em `docs/financeiro.md`.
+- **Não precisa de atualização de banco**: usa a tabela `pagamentos` e a política que já dá acesso à gestão e à recepção.
+- Os valores nunca vêm do site público nem da tabela de preços dos planos: são digitados pela equipe ou copiados da
+  última parcela do aluno. Quem nunca foi cobrado recebe a primeira cobrança por **Lançar mensalidade**.
+- Primeira vez: faça um lançamento de teste com um aluno de teste (1 parcela de R$ 1,00), confira na lista e em **Meu
+  plano** do aluno e dê baixa; depois use **Gerar mensalidades do mês** com o mês seguinte para ver a prévia.

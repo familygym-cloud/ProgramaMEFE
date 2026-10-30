@@ -140,6 +140,8 @@ Marque cada item. Anote o que falhar (com captura de tela) e me envie.
 - [ ] Professor: vê treinos e avaliações, e **não** vê financeiro.
 - [ ] Gestão: abre relatórios, perfis da equipe e **Integrações**.
 - [ ] Financeiro: botão **Lembrar** abre o WhatsApp com a cobrança pronta.
+- [ ] Financeiro: **Lançar mensalidade** cria a parcela de um aluno de teste (a repetição do mesmo mês é recusada) e
+      **Gerar mensalidades do mês** mostra a prévia dos alunos ativos já cobrados antes (`docs/financeiro.md`).
 
 **Integração (catraca)**
 

@@ -96,12 +96,12 @@ describe("montarCatalogo", () => {
 describe("formatação", () => {
   it("formata em reais e descreve parcelas", () => {
     expect(formatarBRL(1234.5).replace(/\s/g, " ")).toBe("R$ 1.234,50");
-    expect(descreverOpcao({ label: "Anual", valor: 150, parcelas: 12 }).replace(/\s/g, " ")).toBe(
-      "12x de R$ 150,00",
-    );
-    expect(descreverOpcao({ label: "Mensal", valor: 200, parcelas: 1 }).replace(/\s/g, " ")).toBe(
-      "R$ 200,00 por mês",
-    );
+    expect(
+      descreverOpcao({ label: "Anual", valor: 123.45, parcelas: 12 }).replace(/\s/g, " "),
+    ).toBe("12x de R$ 123,45");
+    expect(
+      descreverOpcao({ label: "Mensal", valor: 234.56, parcelas: 1 }).replace(/\s/g, " "),
+    ).toBe("R$ 234,56 por mês");
   });
 });
 
