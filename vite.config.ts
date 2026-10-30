@@ -55,6 +55,16 @@ export default defineConfig(({ command, mode }) => {
         ? [
             nitro({
               preset: "cloudflare-module",
+              // Cabeçalhos dos arquivos estáticos que não têm hash no nome (/assets/* já é imutável).
+              // O service worker (/sw.js) fica de fora de propósito: precisa revalidar sempre.
+              routeRules: {
+                "/fonts/**": { headers: { "cache-control": "public, max-age=2592000" } },
+                "/icon-*.png": { headers: { "cache-control": "public, max-age=604800" } },
+                "/apple-touch-icon.png": { headers: { "cache-control": "public, max-age=604800" } },
+                "/favicon.*": { headers: { "cache-control": "public, max-age=604800" } },
+                "/og-image.png": { headers: { "cache-control": "public, max-age=604800" } },
+                "/manifest.webmanifest": { headers: { "cache-control": "public, max-age=86400" } },
+              },
               cloudflare: {
                 nodeCompat: true,
                 deployConfig: true,

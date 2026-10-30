@@ -359,7 +359,7 @@ export function TabelaRelatorio<T>({
   return (
     <div className="space-y-3">
       {/* Celular: um cartão por linha. */}
-      <ul aria-label={rotulo} className="grid gap-3 md:hidden print:hidden">
+      <ul aria-label={`Lista: ${rotulo}`} className="grid gap-3 md:hidden print:hidden">
         {visiveis.map((linha) => (
           <li
             key={chaveLinha(linha)}
@@ -393,7 +393,7 @@ export function TabelaRelatorio<T>({
       {/* Telas maiores e papel: tabela com rolagem interna. */}
       <div
         role="region"
-        aria-label={rotulo}
+        aria-label={`Tabela: ${rotulo}`}
         tabIndex={0}
         className="hidden overflow-x-auto rounded-2xl border border-foreground/10 md:block print:block print:overflow-visible"
       >

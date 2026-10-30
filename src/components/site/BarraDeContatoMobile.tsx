@@ -18,8 +18,7 @@ export function BarraDeContatoMobile() {
   if (!temContato) return null;
 
   return (
-    <div
-      role="group"
+    <aside
       aria-label="Contato rápido"
       className="sticky bottom-0 z-40 border-t border-foreground/10 bg-background/90 px-4 pt-2 backdrop-blur pb-seguro md:hidden print:hidden"
     >
@@ -27,6 +26,6 @@ export function BarraDeContatoMobile() {
         <ComoChegar variante="secundario" tamanho="md" className="flex-1 px-3" />
         <FaleConosco variante="primario" tamanho="md" className="flex-1 px-3" />
       </div>
-    </div>
+    </aside>
   );
 }
