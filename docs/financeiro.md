@@ -18,6 +18,8 @@ Botão **Lançar mensalidade**. Procure o aluno, escolha o tipo e preencha:
   Cartão ou Boleto). Os vencimentos seguintes caem no mesmo dia dos meses seguintes; dia 29, 30 ou 31 vira o último
   dia dos meses mais curtos e volta ao dia original nos meses que o têm (31/01, 28/02, 31/03).
 - Uma **prévia** lista cada parcela e o total antes de confirmar.
+- **Atalho**: em **Alunos**, o botão **Cobrar** (e o aviso de "Aluno cadastrado") abre esta janela já com o aluno
+  escolhido (`/financeiro?aluno=<id>`). Fechando a janela, o atalho sai do endereço.
 - O sistema **recusa** uma mensalidade para um mês em que o aluno já tem mensalidade (evita cobrar duas vezes).
   Parcelas canceladas não contam.
 

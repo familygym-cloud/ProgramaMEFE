@@ -62,6 +62,18 @@ await passo("cadastra um aluno e calcula o IMC", async () => {
   await ver("Maria Teste");
 });
 
+await passo("o aviso de aluno novo leva ao lançamento já com o aluno escolhido", async () => {
+  await p.getByRole("button", { name: "Lançar mensalidade" }).click();
+  await p.waitForURL(/\/financeiro\?aluno=/, { timeout: 8000 });
+  const dialogo = p.getByRole("dialog");
+  await dialogo.getByText("Maria Teste").waitFor({ timeout: 8000 });
+  await dialogo.getByRole("button", { name: "Cancelar" }).click();
+  // Fechado o diálogo, o atalho sai do endereço: recarregar não reabre o lançamento.
+  await p.waitForURL(/\/financeiro$/, { timeout: 8000 });
+  await p.goto(`${SITE}/alunos`);
+  await ver("Maria Teste");
+});
+
 await passo("recusa outro aluno com o mesmo e-mail", async () => {
   await p.getByRole("button", { name: "Novo aluno" }).click();
   await p.locator("#aluno-nome").fill("Outra Maria");
@@ -97,6 +109,21 @@ await passo("inativa um aluno e o filtro de inativos mostra só ele", async () =
   if ((await p.getByText("Maria Teste").count()) > 0)
     throw new Error("Maria não deveria aparecer em Inativos");
   await p.getByRole("button", { name: /^Todos/ }).click();
+});
+
+await passo("cada aluno tem o botão Cobrar, menos os inativos", async () => {
+  const cobrar = p.getByRole("link", { name: "Cobrar Maria Teste" });
+  await cobrar.waitFor({ timeout: 8000 });
+  if ((await p.getByRole("link", { name: "Cobrar João Novo" }).count()) > 0) {
+    throw new Error("aluno inativo não devia ter o botão Cobrar");
+  }
+  await cobrar.click();
+  await p.waitForURL(/\/financeiro\?aluno=/, { timeout: 8000 });
+  const dialogo = p.getByRole("dialog");
+  await dialogo.getByText("Maria Teste").waitFor({ timeout: 8000 });
+  await dialogo.getByRole("button", { name: "Cancelar" }).click();
+  await p.goto(`${SITE}/alunos`);
+  await ver("João Novo");
 });
 
 await passo("a busca acha por nome e por e-mail", async () => {

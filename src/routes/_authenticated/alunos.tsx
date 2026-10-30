@@ -2,7 +2,16 @@ import { useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { ArrowLeft, FileUp, Loader2, MessageCircle, Pencil, Search, UserPlus } from "lucide-react";
+import {
+  ArrowLeft,
+  FileUp,
+  Loader2,
+  MessageCircle,
+  Pencil,
+  Search,
+  UserPlus,
+  Wallet,
+} from "lucide-react";
 import { toast } from "sonner";
 import { Selo } from "@/components/app/ui";
 import { FormularioDoAluno } from "@/components/alunos/FormularioDoAluno";
@@ -358,6 +367,19 @@ function Alunos() {
                       <Pencil className="size-3.5" aria-hidden /> Editar
                       <span className="sr-only"> {a.nome}</span>
                     </Button>
+                    {a.status === "Inativo" ? null : (
+                      <Button
+                        asChild
+                        size="sm"
+                        variant="outline"
+                        className="min-h-11 gap-1.5 rounded-full"
+                      >
+                        <Link to="/financeiro" search={{ aluno: a.id }}>
+                          <Wallet className="size-3.5" aria-hidden /> Cobrar
+                          <span className="sr-only"> {a.nome}</span>
+                        </Link>
+                      </Button>
+                    )}
                     {a.status === "Inativo" ? (
                       <Button
                         type="button"
@@ -396,6 +418,10 @@ function Alunos() {
         inicial={editando ? undefined : inicial}
         interessadoId={editando ? undefined : busca.interessado}
         aoSalvar={recarregar}
+        depoisDeCriar={{
+          rotulo: "Lançar mensalidade",
+          aoClicar: (alunoId) => void navigate({ to: "/financeiro", search: { aluno: alunoId } }),
+        }}
       />
       <ImportarAlunos
         aberto={importAberto}

@@ -83,6 +83,11 @@ export function LancarMensalidade({
       setValores(INICIAL());
       setErros({});
     }
+  }, [aberto]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // A lista de alunos chega depois de abrir pelo atalho (?aluno=): escolhe o aluno sem apagar o que já foi digitado.
+  useEffect(() => {
+    if (aberto && alunoInicial) setAluno((atual) => atual ?? alunoInicial);
   }, [aberto, alunoInicial]);
 
   const entrada = { ...valores, alunoId: aluno?.id ?? "" };
