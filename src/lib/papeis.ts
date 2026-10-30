@@ -13,6 +13,7 @@ export const ROTULO_PAPEL: Record<PapelEquipe, string> = {
 
 export const AREAS = [
   "relatorios",
+  "alunos",
   "vinculos",
   "financeiro",
   "termos",
@@ -33,6 +34,7 @@ export type Area = (typeof AREAS)[number];
  */
 export const PAPEIS_POR_AREA: Record<Area, readonly PapelEquipe[]> = {
   relatorios: ["staff"],
+  alunos: ["staff", "recepcao"],
   vinculos: ["staff", "recepcao"],
   financeiro: ["staff", "recepcao"],
   termos: ["staff", "recepcao"],
@@ -60,6 +62,7 @@ export function podeAcessar(papeis: readonly string[], area: Area): boolean {
 /** Rotas protegidas por área. `/vinculos` aparece aqui, mas a ativação do primeiro staff é tratada à parte. */
 const AREA_DA_ROTA: readonly (readonly [string, Area])[] = [
   ["/dashboard", "relatorios"],
+  ["/alunos", "alunos"],
   ["/relatorio-aluno", "relatorios"],
   ["/aulas", "aulas"],
   ["/financeiro", "financeiro"],
@@ -81,11 +84,11 @@ export function areaDaRota(pathname: string): Area | null {
 }
 
 /** Primeira tela de cada perfil depois do login. */
-export type DestinoDaEquipe = "/dashboard" | "/vinculos" | "/prescricao-treinos" | "/aulas";
+export type DestinoDaEquipe = "/dashboard" | "/alunos" | "/prescricao-treinos" | "/aulas";
 
 export function destinoDaEquipe(papeis: readonly string[]): DestinoDaEquipe {
   if (podeAcessar(papeis, "relatorios")) return "/dashboard";
-  if (podeAcessar(papeis, "vinculos")) return "/vinculos";
+  if (podeAcessar(papeis, "alunos")) return "/alunos";
   if (podeAcessar(papeis, "treinos")) return "/prescricao-treinos";
   return "/aulas";
 }

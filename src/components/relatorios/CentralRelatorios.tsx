@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { flushSync } from "react-dom";
+import { Link } from "@tanstack/react-router";
 import { FlaskConical, RefreshCw, UsersRound } from "lucide-react";
 import { EstadoVazio, Selo } from "@/components/app/ui";
 import { BrandLogo } from "@/components/BrandLogo";
@@ -48,12 +49,19 @@ const ABAS_DE_ALUNOS: readonly AbaRelatorio[] = [
   "alunos",
 ];
 
-function SemAlunos() {
+function SemAlunos({ modo }: { modo: ModoRelatorio }) {
   return (
     <EstadoVazio
       icone={<UsersRound />}
       titulo="Nenhum aluno cadastrado ainda"
       texto="Assim que houver alunos, pagamentos e treinos registrados, esta seção aparece aqui. As seções de aulas, captação, catraca e equipe já funcionam."
+      acao={
+        modo === "real" ? (
+          <Button asChild className="mt-2 h-11 rounded-full px-6 font-semibold">
+            <Link to="/alunos">Cadastrar ou importar alunos</Link>
+          </Button>
+        ) : undefined
+      }
     />
   );
 }
@@ -62,11 +70,11 @@ function ConteudoDaAba({ aba, relatorio, modo }: PropsAba & { aba: AbaRelatorio 
   if (relatorio.kpis.alunosTotal === 0 && ABAS_DE_ALUNOS.includes(aba)) {
     return aba === "visao-geral" ? (
       <div className="space-y-4 sm:space-y-6">
-        <SemAlunos />
+        <SemAlunos modo={modo} />
         <PanoramaOperacao relatorio={relatorio} modo={modo} />
       </div>
     ) : (
-      <SemAlunos />
+      <SemAlunos modo={modo} />
     );
   }
   switch (aba) {

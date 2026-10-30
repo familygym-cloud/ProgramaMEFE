@@ -7,6 +7,7 @@
 //   PAPEIS=staff,aluno   TABELAS_AUSENTES=registros_carga,lgpd_registros   DADOS=/caminho/dados.json
 // DADOS é um JSON { "tabela": [ {linhas...} ] }. Tabelas fora dele voltam vazias.
 import { createServer } from "node:http";
+import { randomUUID } from "node:crypto";
 import { readFileSync } from "node:fs";
 
 const porta = Number(process.env.PORTA ?? 54321);
@@ -52,6 +53,18 @@ function json(res, status, corpo, extra = {}) {
   res.end(corpo === undefined ? "" : JSON.stringify(corpo));
 }
 
+// ilike do PostgREST: % e _ são curingas; \\% e \\_ são o próprio caractere.
+function padraoParaRegex(padrao) {
+  const re = padrao
+    .replace(/\\([%_])/g, (_, c) => (c === "%" ? "\u0000P" : "\u0000U"))
+    .replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+    .replace(/%/g, ".*")
+    .replace(/_/g, ".")
+    .replace(/\u0000P/g, "%")
+    .replace(/\u0000U/g, "_");
+  return new RegExp(`^${re}$`, "i");
+}
+
 function filtrar(linhas, params) {
   let r = linhas;
   for (const [coluna, bruto] of params) {
@@ -74,6 +87,7 @@ function filtrar(linhas, params) {
           .map((s) => s.replace(/^"|"$/g, ""))
           .includes(String(v));
       if (op === "is") return valor === "null" ? v == null : String(v) === valor;
+      if (op === "ilike") return padraoParaRegex(valor).test(String(v ?? ""));
       return true;
     });
   }
@@ -159,7 +173,40 @@ const servidor = createServer((req, res) => {
           : json(res, 406, { code: "PGRST116", message: "no rows" });
       return json(res, 200, pagina, cabecalho);
     }
-    return json(res, 201, []); // escritas: aceitas e ignoradas
+    // Escritas: ficam só na memória deste processo (somem quando o falso reinicia).
+    let corpo = "";
+    req.on("data", (c) => (corpo += c));
+    req.on("end", () => {
+      const quer = String(req.headers["prefer"] ?? "").includes("return=representation");
+      const unico = String(req.headers["accept"] ?? "").includes("vnd.pgrst.object");
+      const responder = (status, linhas) =>
+        json(res, status, quer ? (unico ? linhas[0] : linhas) : undefined);
+      const tabela2 = url.pathname.split("/").pop();
+      dados[tabela2] ??= [];
+      if (req.method === "POST") {
+        const entrada = JSON.parse(corpo || "[]");
+        const criadas = (Array.isArray(entrada) ? entrada : [entrada]).map((l) => ({
+          id: randomUUID(),
+          created_at: new Date().toISOString(),
+          ...l,
+        }));
+        dados[tabela2].push(...criadas);
+        return responder(201, criadas);
+      }
+      if (req.method === "PATCH") {
+        const alvo = filtrar(dados[tabela2], url.searchParams);
+        const mudanca = JSON.parse(corpo || "{}");
+        for (const l of alvo) Object.assign(l, mudanca);
+        return responder(200, alvo);
+      }
+      if (req.method === "DELETE") {
+        const alvo = new Set(filtrar(dados[tabela2], url.searchParams));
+        dados[tabela2] = dados[tabela2].filter((l) => !alvo.has(l));
+        return responder(200, [...alvo]);
+      }
+      return json(res, 405, { message: "método não simulado" });
+    });
+    return;
   }
   return json(res, 404, { message: "não simulado" });
 });
