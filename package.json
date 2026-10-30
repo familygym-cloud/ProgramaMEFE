@@ -15,7 +15,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "e2e": "bash supabase/verificacao/e2e/executar.sh"
+    "e2e": "bash supabase/verificacao/e2e/executar.sh",
+    "segredos": "bun scripts/verificar-segredos.ts"
   },
   "engines": {
     "node": ">=22.12.0"
