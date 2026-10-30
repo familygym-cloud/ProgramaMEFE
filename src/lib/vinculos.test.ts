@@ -290,8 +290,29 @@ describe("erroDoRpc", () => {
       { code: "XX000", message: 'relation "auth.users" is broken' },
       "salvar os vínculos",
     );
-    expect(e.message).toBe("Não foi possível salvar os vínculos. Tente novamente em instantes.");
+    expect(e.message).toBe(
+      "Não foi possível salvar os vínculos. Tente novamente em instantes. Se continuar, informe o código XX000.",
+    );
+    expect(e.message).not.toMatch(/auth\.users/);
     expect(log).toHaveBeenCalled();
+  });
+
+  it("sem código do banco, mantém a mensagem curta", () => {
+    expect(erroDoRpc({ message: "boom" }, "salvar").message).toBe(
+      "Não foi possível salvar. Tente novamente em instantes.",
+    );
+  });
+
+  it("reconhece chave recusada e manda abrir o diagnóstico", () => {
+    for (const erro of [
+      { code: "42501", message: "permission denied for function bootstrap_primeiro_staff" },
+      { message: "Invalid API key" },
+      { code: "PGRST301", message: "JWT expired" },
+    ]) {
+      const msg = erroDoRpc(erro, "ativar").message;
+      expect(msg).toMatch(/SUPABASE_SERVICE_ROLE_KEY/);
+      expect(msg).toMatch(/\/diagnostico/);
+    }
   });
 
   it("traduz a violação do índice único para uma mensagem útil", () => {

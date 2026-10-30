@@ -61,3 +61,28 @@ describe("traduzErroServidor", () => {
     expect(traduzErroServidor({})).toBe(MSG_ERRO_GENERICO);
   });
 });
+
+describe("traduzErroServidor: formatos de erro menos comuns", () => {
+  it("entende o objeto simples { message } e a resposta HTTP recusada", () => {
+    expect(traduzErroServidor({ message: "Apenas a gestão pode ver isto." })).toBe(
+      "Apenas a gestão pode ver isto.",
+    );
+    expect(traduzErroServidor({ message: "Failed to fetch" })).toBe(MSG_SEM_CONEXAO);
+    expect(traduzErroServidor(new Response(null, { status: 401 }))).toBe(MSG_SESSAO_EXPIRADA);
+    expect(traduzErroServidor(new Response(null, { status: 403 }))).toMatch(/não permite/);
+    expect(traduzErroServidor(new Response(null, { status: 500 }))).toBe(MSG_ERRO_GENERICO);
+    expect(traduzErroServidor({ code: 1 })).toBe(MSG_ERRO_GENERICO);
+  });
+
+  it("explica chave recusada e tabela ausente e aponta o diagnóstico", () => {
+    for (const m of ["Invalid API key", "User not allowed", "not_admin"]) {
+      expect(traduzErroServidor(new Error(m))).toMatch(/chave secreta.*\/diagnostico/);
+    }
+    for (const m of [
+      "Could not find the table 'public.registros_carga' in the schema cache",
+      'relation "public.interessados" does not exist',
+    ]) {
+      expect(traduzErroServidor(new Error(m))).toMatch(/atualização do banco.*\/diagnostico/);
+    }
+  });
+});

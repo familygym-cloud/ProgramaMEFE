@@ -14,7 +14,8 @@
     "format:check": "prettier --check .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "e2e": "bash supabase/verificacao/e2e/executar.sh"
   },
   "engines": {
     "node": ">=22.12.0"
