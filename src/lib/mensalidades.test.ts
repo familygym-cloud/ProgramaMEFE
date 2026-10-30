@@ -1,11 +1,14 @@
 import { describe, expect, it } from "vitest";
 import {
   lerValorEmReais,
+  MAX_PARCELAS_POR_EXCLUSAO,
   mensalidadesDoMes,
   mesDe,
   mesValido,
   montarLancamento,
   referenciaDoMes,
+  validarEdicaoDeParcela,
+  validarIdsDeParcelas,
   vencimentoNoMes,
   type ParcelaConhecida,
 } from "./mensalidades";
@@ -120,6 +123,69 @@ describe("montarLancamento", () => {
 
   it("aceita registrar o passado (até cinco anos)", () => {
     expect(montarLancamento({ ...base, primeiroVencimento: "2025-03-10" }, HOJE).ok).toBe(true);
+  });
+});
+
+describe("validarEdicaoDeParcela", () => {
+  const base = { valor: "123,45", vencimento: "2026-11-05", metodo: "Boleto" };
+
+  it("aceita e normaliza valor, vencimento e forma de pagamento", () => {
+    expect(validarEdicaoDeParcela(base, HOJE)).toEqual({
+      ok: true,
+      campos: { valor: 123.45, vencimento: "2026-11-05", metodo: "Boleto" },
+    });
+    const milhar = validarEdicaoDeParcela({ ...base, valor: "R$ 1.234,50" }, HOJE);
+    expect(milhar.ok && milhar.campos.valor).toBe(1234.5);
+    // corrigir uma cobrança antiga é legítimo: o passado dentro do limite de cinco anos vale
+    expect(validarEdicaoDeParcela({ ...base, vencimento: "2025-03-10" }, HOJE).ok).toBe(true);
+  });
+
+  it("recusa o que não faz sentido, com uma mensagem por campo", () => {
+    const r = validarEdicaoDeParcela(
+      { valor: "0", vencimento: "2026-02-31", metodo: "Cheque" },
+      HOJE,
+    );
+    expect(r.ok).toBe(false);
+    if (!r.ok) expect(Object.keys(r.erros).sort()).toEqual(["metodo", "valor", "vencimento"]);
+    expect(validarEdicaoDeParcela({ ...base, valor: "" }, HOJE).ok).toBe(false);
+    expect(validarEdicaoDeParcela({ ...base, valor: "100000,01" }, HOJE).ok).toBe(false);
+    expect(validarEdicaoDeParcela({ ...base, vencimento: "2036-01-01" }, HOJE).ok).toBe(false);
+    expect(validarEdicaoDeParcela({ ...base, vencimento: undefined }, HOJE).ok).toBe(false);
+    expect(validarEdicaoDeParcela({}, HOJE).ok).toBe(false);
+  });
+
+  it("fala de uma parcela só (não de cada parcela)", () => {
+    const r = validarEdicaoDeParcela({ ...base, valor: "abc", vencimento: "" }, HOJE);
+    expect(!r.ok && r.erros.valor).toMatch(/valor da parcela/);
+    expect(!r.ok && r.erros.vencimento).toBe("Informe a data do vencimento.");
+  });
+});
+
+describe("validarIdsDeParcelas", () => {
+  const A = "11111111-1111-4111-8111-111111111111";
+  const B = "22222222-2222-4222-8222-222222222222";
+
+  it("devolve ids em minúsculas e sem repetição, na ordem em que apareceram", () => {
+    expect(validarIdsDeParcelas([B, A.toUpperCase(), A, B])).toEqual([B, A]);
+  });
+
+  it("aceita de 1 a 100 parcelas por vez", () => {
+    const muitos = Array.from(
+      { length: MAX_PARCELAS_POR_EXCLUSAO },
+      (_, i) => `00000000-0000-4000-8000-${String(i).padStart(12, "0")}`,
+    );
+    expect(validarIdsDeParcelas(muitos)).toHaveLength(MAX_PARCELAS_POR_EXCLUSAO);
+    expect(() => validarIdsDeParcelas([...muitos, A])).toThrow(/até 100 parcelas/);
+  });
+
+  it("recusa lista vazia, outro tipo de dado e id que não é UUID", () => {
+    expect(() => validarIdsDeParcelas([])).toThrow(/ao menos uma/);
+    for (const ruim of [undefined, null, A, { 0: A }, "", 7]) {
+      expect(() => validarIdsDeParcelas(ruim)).toThrow(/ao menos uma/);
+    }
+    for (const ruim of [["abc"], [A, "nao-e-uuid"], [A, 5], [A, null], ["' or 1=1 --"]]) {
+      expect(() => validarIdsDeParcelas(ruim)).toThrow(/inválida/);
+    }
   });
 });
 

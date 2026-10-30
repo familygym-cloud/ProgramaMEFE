@@ -142,6 +142,8 @@ Marque cada item. Anote o que falhar (com captura de tela) e me envie.
 - [ ] Financeiro: botão **Lembrar** abre o WhatsApp com a cobrança pronta.
 - [ ] Financeiro: **Lançar mensalidade** cria a parcela de um aluno de teste (a repetição do mesmo mês é recusada) e
       **Gerar mensalidades do mês** mostra a prévia dos alunos ativos já cobrados antes (`docs/financeiro.md`).
+- [ ] Financeiro: no menu **⋯** de uma parcela em aberto, **Editar parcela** muda o valor e **Excluir parcela** apaga a
+      de teste (parcelas pagas não têm esse menu).
 
 **Integração (catraca)**
 

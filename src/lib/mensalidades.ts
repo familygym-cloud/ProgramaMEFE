@@ -6,6 +6,7 @@
 import { estaAtivo } from "@/lib/relatorios/agregar";
 import { dataExiste, diasEntre, somarMeses } from "@/lib/datas";
 import { METODOS_PAGAMENTO, type MetodoPagamento } from "@/lib/pagamentos";
+import { ehUuid } from "@/lib/uuid";
 
 export const LIMITES_LANCAMENTO = {
   valorMaximo: 100_000,
@@ -60,8 +61,6 @@ export type ResultadoDoLancamento =
   | { ok: true; linhas: LinhaDeParcela[] }
   | { ok: false; erros: Partial<Record<CampoDoLancamento, string>> };
 
-const RE_UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-
 /** "123", "123,45", "1.234,00" e "R$ 123,4" viram número com 2 casas; texto sem número vira NaN. */
 export function lerValorEmReais(valor: unknown): number {
   if (typeof valor === "number") return Math.round(valor * 100) / 100;
@@ -76,6 +75,29 @@ export function lerValorEmReais(valor: unknown): number {
   return Number.isFinite(n) ? Math.round(n * 100) / 100 : Number.NaN;
 }
 
+// ---- validações de campo, as mesmas para lançar e para editar uma parcela
+
+/** `de` completa a frase da mensagem: "de cada parcela", "da parcela". */
+function erroDoValor(valor: number, de: string): string | null {
+  if (Number.isFinite(valor) && valor > 0 && valor <= LIMITES_LANCAMENTO.valorMaximo) return null;
+  return `Informe o valor ${de}, entre R$ 0,01 e R$ ${LIMITES_LANCAMENTO.valorMaximo.toLocaleString("pt-BR")}.`;
+}
+
+/** `de` completa a frase: "do primeiro vencimento", "do vencimento". */
+function erroDoVencimento(data: string, hoje: string, de: string): string | null {
+  if (!dataExiste(data)) return `Informe a data ${de}.`;
+  if (Math.abs(diasEntre(hoje, data)) > LIMITES_LANCAMENTO.diasDeFolga) {
+    return "Essa data está longe demais de hoje. Confira o ano.";
+  }
+  return null;
+}
+
+function lerMetodo(metodo: unknown): MetodoPagamento | null {
+  return (METODOS_PAGAMENTO as readonly string[]).includes(String(metodo))
+    ? (metodo as MetodoPagamento)
+    : null;
+}
+
 /**
  * Valida o formulário "Lançar mensalidade" e devolve as linhas a gravar: `parcelas` linhas de mesmo
  * valor, com vencimentos mensais a partir do primeiro (dia 31 vira o último dia dos meses curtos).
@@ -88,7 +110,7 @@ export function montarLancamento(
   const tipo: TipoDeLancamento = entrada["tipo"] === "outro" ? "outro" : "mensalidade";
 
   const alunoId = typeof entrada["alunoId"] === "string" ? entrada["alunoId"] : "";
-  if (!RE_UUID.test(alunoId)) erros.alunoId = "Escolha o aluno.";
+  if (!ehUuid(alunoId)) erros.alunoId = "Escolha o aluno.";
 
   const descricao = String(entrada["descricao"] ?? "")
     .replace(/\s+/g, " ")
@@ -101,16 +123,13 @@ export function montarLancamento(
   }
 
   const valor = lerValorEmReais(entrada["valor"]);
-  if (!Number.isFinite(valor) || valor <= 0 || valor > LIMITES_LANCAMENTO.valorMaximo) {
-    erros.valor = `Informe o valor de cada parcela, entre R$ 0,01 e R$ ${LIMITES_LANCAMENTO.valorMaximo.toLocaleString("pt-BR")}.`;
-  }
+  const erroValor = erroDoValor(valor, "de cada parcela");
+  if (erroValor) erros.valor = erroValor;
 
   const primeiro =
     typeof entrada["primeiroVencimento"] === "string" ? entrada["primeiroVencimento"] : "";
-  if (!dataExiste(primeiro)) erros.primeiroVencimento = "Informe a data do primeiro vencimento.";
-  else if (Math.abs(diasEntre(hoje, primeiro)) > LIMITES_LANCAMENTO.diasDeFolga) {
-    erros.primeiroVencimento = "Essa data está longe demais de hoje. Confira o ano.";
-  }
+  const erroVencimento = erroDoVencimento(primeiro, hoje, "do primeiro vencimento");
+  if (erroVencimento) erros.primeiroVencimento = erroVencimento;
 
   const parcelas = Number(entrada["parcelas"]);
   if (
@@ -121,9 +140,7 @@ export function montarLancamento(
     erros.parcelas = `Informe de 1 a ${LIMITES_LANCAMENTO.parcelasMaximas} parcelas.`;
   }
 
-  const metodo = (METODOS_PAGAMENTO as readonly string[]).includes(String(entrada["metodo"]))
-    ? (entrada["metodo"] as MetodoPagamento)
-    : null;
+  const metodo = lerMetodo(entrada["metodo"]);
   if (metodo === null) erros.metodo = "Escolha a forma de pagamento.";
 
   if (Object.keys(erros).length > 0 || metodo === null) return { ok: false, erros };
@@ -142,6 +159,57 @@ export function montarLancamento(
     };
   });
   return { ok: true, linhas };
+}
+
+// ------------------------------------------------------------------ correções (editar e excluir)
+
+export type CampoDaEdicao = "valor" | "vencimento" | "metodo";
+
+export type CamposEditados = { valor: number; vencimento: string; metodo: MetodoPagamento };
+
+export type ResultadoDaEdicao =
+  | { ok: true; campos: CamposEditados }
+  | { ok: false; erros: Partial<Record<CampoDaEdicao, string>> };
+
+/**
+ * Valida a edição de uma parcela em aberto: valor, vencimento e forma de pagamento, com os mesmos
+ * limites do lançamento. A referência (o mês a que a cobrança se refere) não muda por aqui.
+ */
+export function validarEdicaoDeParcela(
+  entrada: Record<string, unknown>,
+  hoje: string,
+): ResultadoDaEdicao {
+  const erros: Partial<Record<CampoDaEdicao, string>> = {};
+
+  const valor = lerValorEmReais(entrada["valor"]);
+  const erroValor = erroDoValor(valor, "da parcela");
+  if (erroValor) erros.valor = erroValor;
+
+  const vencimento = typeof entrada["vencimento"] === "string" ? entrada["vencimento"] : "";
+  const erroVencimento = erroDoVencimento(vencimento, hoje, "do vencimento");
+  if (erroVencimento) erros.vencimento = erroVencimento;
+
+  const metodo = lerMetodo(entrada["metodo"]);
+  if (metodo === null) erros.metodo = "Escolha a forma de pagamento.";
+
+  if (Object.keys(erros).length > 0 || metodo === null) return { ok: false, erros };
+  return { ok: true, campos: { valor, vencimento, metodo } };
+}
+
+/**
+ * A lista de parcelas vai na URL da consulta ao banco (filtro `in`), e o gateway do Supabase recusa
+ * endereços grandes: 100 UUIDs (cerca de 4 KB) ficam bem abaixo do limite. A tela divide em lotes.
+ */
+export const MAX_PARCELAS_POR_EXCLUSAO = 100;
+
+/** 1 a 100 ids de parcela, sem repetição e em minúsculas. Lança `Error` em português se algo estiver errado. */
+export function validarIdsDeParcelas(ids: unknown): string[] {
+  if (!Array.isArray(ids) || ids.length === 0) throw new Error("Escolha ao menos uma parcela.");
+  if (ids.length > MAX_PARCELAS_POR_EXCLUSAO) {
+    throw new Error(`Escolha até ${MAX_PARCELAS_POR_EXCLUSAO} parcelas por vez.`);
+  }
+  if (!ids.every(ehUuid)) throw new Error("Parcela inválida.");
+  return [...new Set((ids as string[]).map((i) => i.toLowerCase()))];
 }
 
 // ------------------------------------------------------------------ geração do mês

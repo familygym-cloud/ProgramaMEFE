@@ -4,6 +4,7 @@
 # e abre as telas da equipe e o diagnóstico em vários cenários de configuração errada.
 #
 #   supabase/verificacao/e2e/executar.sh
+#   E2E_SO=financeiro supabase/verificacao/e2e/executar.sh   # só esse cenário (telas, alunos, financeiro, diagnostico)
 #
 # Precisa do Playwright (npm i -g playwright). Não toca em nenhum banco nem serviço real.
 set -uo pipefail
@@ -15,6 +16,9 @@ FALHAS=0
 
 parar() { for porta in 54321 8787; do kill $(lsof -ti:$porta) 2>/dev/null; done; }
 trap parar EXIT
+
+# Sem E2E_SO roda tudo; com E2E_SO=alunos,financeiro roda só esses cenários (útil ao mexer numa tela).
+quero() { [ -z "${E2E_SO:-}" ] || [[ ",${E2E_SO}," == *",$1,"* ]]; }
 
 echo "== construindo o site (aponta para o Supabase de mentira)"
 VITE_SUPABASE_URL=http://127.0.0.1:54321 VITE_SUPABASE_PUBLISHABLE_KEY=sb_publishable_teste \
@@ -39,42 +43,52 @@ verificar() { # $1 = título, resto = argumentos de fumaca.mjs
 CHAVES="--var SUPABASE_SERVICE_ROLE_KEY:sb_secret_teste --var STAFF_BOOTSTRAP_EMAIL:gestor@exemplo.com"
 TELAS="/dashboard,/dashboard?aba=aulas,/dashboard?aba=treinos,/dashboard?aba=captacao,/dashboard?aba=catraca,/dashboard?aba=seguranca,/vinculos,/dados-pessoais,/interessados,/integracoes,/financeiro,/aulas,/termos,/planos,/prescricao-treinos,/registrar-avaliacao,/formularios-mefe,/diagnostico,/alunos"
 
-subir "CHAVE_SECRETA=sb_secret_teste PAPEIS=staff" "$CHAVES"
-verificar "equipe (gestão): todas as telas carregam" --rotas "$TELAS"
+if quero telas; then
+  subir "CHAVE_SECRETA=sb_secret_teste PAPEIS=staff" "$CHAVES"
+  verificar "equipe (gestão): todas as telas carregam" --rotas "$TELAS"
+fi
 
-subir "CHAVE_SECRETA=sb_secret_teste PAPEIS=recepcao" "$CHAVES"
-echo "== recepção: cadastro de alunos (cadastrar, importar, inativar, buscar)"
-node supabase/verificacao/e2e/fluxo-alunos.mjs || FALHAS=$((FALHAS + 1))
+if quero alunos; then
+  subir "CHAVE_SECRETA=sb_secret_teste PAPEIS=recepcao" "$CHAVES"
+  echo "== recepção: cadastro de alunos (cadastrar, importar, inativar, buscar)"
+  node supabase/verificacao/e2e/fluxo-alunos.mjs || FALHAS=$((FALHAS + 1))
+fi
 
-DADOS_FINANCEIRO=$(node supabase/verificacao/e2e/dados-financeiro.mjs)
-subir "CHAVE_SECRETA=sb_secret_teste PAPEIS=recepcao DADOS=$DADOS_FINANCEIRO" "$CHAVES"
-echo "== recepção: financeiro (gerar mensalidades do mês, lançar parcelas, recusar repetição)"
-node supabase/verificacao/e2e/fluxo-financeiro.mjs || FALHAS=$((FALHAS + 1))
+if quero financeiro; then
+  DADOS_FINANCEIRO=$(node supabase/verificacao/e2e/dados-financeiro.mjs)
+  subir "CHAVE_SECRETA=sb_secret_teste PAPEIS=recepcao DADOS=$DADOS_FINANCEIRO" "$CHAVES"
+  echo "== recepção: financeiro (gerar mensalidades do mês, lançar parcelas, recusar repetição)"
+  node supabase/verificacao/e2e/fluxo-financeiro.mjs || FALHAS=$((FALHAS + 1))
+  echo "== recepção: financeiro (editar e excluir parcelas, em lote, sem tocar nas pagas)"
+  node supabase/verificacao/e2e/fluxo-correcoes.mjs || FALHAS=$((FALHAS + 1))
+fi
 
-subir "CHAVE_SECRETA=sb_secret_teste" "$CHAVES"
-verificar "primeira gestão: diagnóstico tudo certo e vínculos com o botão de ativar" --sem-aal2 \
-  --rotas "/diagnostico" --espera "Tudo certo com a configuração"
-verificar "primeira gestão: botão de ativar" --sem-aal2 --rotas "/vinculos" --espera "Ativar perfil da equipe"
+if quero diagnostico; then
+  subir "CHAVE_SECRETA=sb_secret_teste" "$CHAVES"
+  verificar "primeira gestão: diagnóstico tudo certo e vínculos com o botão de ativar" --sem-aal2 \
+    --rotas "/diagnostico" --espera "Tudo certo com a configuração"
+  verificar "primeira gestão: botão de ativar" --sem-aal2 --rotas "/vinculos" --espera "Ativar perfil da equipe"
 
-subir "CHAVE_SECRETA=sb_secret_teste" "--var STAFF_BOOTSTRAP_EMAIL:gestor@exemplo.com"
-verificar "sem a chave secreta no servidor" --sem-aal2 --rotas "/diagnostico" \
-  --espera "SUPABASE_SERVICE_ROLE_KEY não está definida"
-verificar "sem a chave secreta: vínculos explica o motivo" --sem-aal2 --rotas "/vinculos" \
-  --espera "Abra /diagnostico para ver o que falta"
+  subir "CHAVE_SECRETA=sb_secret_teste" "--var STAFF_BOOTSTRAP_EMAIL:gestor@exemplo.com"
+  verificar "sem a chave secreta no servidor" --sem-aal2 --rotas "/diagnostico" \
+    --espera "SUPABASE_SERVICE_ROLE_KEY não está definida"
+  verificar "sem a chave secreta: vínculos explica o motivo" --sem-aal2 --rotas "/vinculos" \
+    --espera "Abra /diagnostico para ver o que falta"
 
-subir "CHAVE_SECRETA=sb_secret_teste" "--var SUPABASE_SERVICE_ROLE_KEY:sb_publishable_teste --var STAFF_BOOTSTRAP_EMAIL:gestor@exemplo.com"
-verificar "chave pública colada no lugar da secreta" --sem-aal2 --rotas "/diagnostico" \
-  --espera "contém a chave PÚBLICA;O Supabase recusou a chave"
+  subir "CHAVE_SECRETA=sb_secret_teste" "--var SUPABASE_SERVICE_ROLE_KEY:sb_publishable_teste --var STAFF_BOOTSTRAP_EMAIL:gestor@exemplo.com"
+  verificar "chave pública colada no lugar da secreta" --sem-aal2 --rotas "/diagnostico" \
+    --espera "contém a chave PÚBLICA;O Supabase recusou a chave"
 
-subir "CHAVE_SECRETA=sb_secret_teste TABELAS_AUSENTES=registros_carga,lgpd_registros" "$CHAVES"
-verificar "atualizações do banco faltando" --sem-aal2 --rotas "/diagnostico" \
-  --espera "Faltam 2 tabela(s): lgpd_registros, registros_carga"
+  subir "CHAVE_SECRETA=sb_secret_teste TABELAS_AUSENTES=registros_carga,lgpd_registros" "$CHAVES"
+  verificar "atualizações do banco faltando" --sem-aal2 --rotas "/diagnostico" \
+    --espera "Faltam 2 tabela(s): lgpd_registros, registros_carga"
 
-subir "CHAVE_SECRETA=sb_secret_teste" "--var SUPABASE_SERVICE_ROLE_KEY:sb_secret_teste"
-verificar "sem STAFF_BOOTSTRAP_EMAIL" --sem-aal2 --rotas "/diagnostico" --espera "STAFF_BOOTSTRAP_EMAIL não está definida"
+  subir "CHAVE_SECRETA=sb_secret_teste" "--var SUPABASE_SERVICE_ROLE_KEY:sb_secret_teste"
+  verificar "sem STAFF_BOOTSTRAP_EMAIL" --sem-aal2 --rotas "/diagnostico" --espera "STAFF_BOOTSTRAP_EMAIL não está definida"
 
-subir "CHAVE_SECRETA=sb_secret_teste" "--var SUPABASE_SERVICE_ROLE_KEY:sb_secret_teste --var STAFF_BOOTSTRAP_EMAIL:outra@pessoa.com"
-verificar "e-mail autorizado diferente do da conta" --sem-aal2 --rotas "/diagnostico" --espera "é diferente do e-mail desta conta"
+  subir "CHAVE_SECRETA=sb_secret_teste" "--var SUPABASE_SERVICE_ROLE_KEY:sb_secret_teste --var STAFF_BOOTSTRAP_EMAIL:outra@pessoa.com"
+  verificar "e-mail autorizado diferente do da conta" --sem-aal2 --rotas "/diagnostico" --espera "é diferente do e-mail desta conta"
+fi
 
 echo
 if [ "$FALHAS" -eq 0 ]; then echo "E2E: TUDO CERTO"; else echo "E2E: $FALHAS verificação(ões) com falha"; exit 1; fi

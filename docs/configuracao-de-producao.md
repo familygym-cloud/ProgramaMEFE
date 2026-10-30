@@ -150,6 +150,9 @@ da migration `20261011000500_interessados.sql`.
   **lança mensalidades** (uma ou várias parcelas para um aluno, ou uma cobrança avulsa como matrícula) e **gera as
   mensalidades do mês** para todos os alunos ativos, repetindo valor, forma de pagamento e dia do vencimento da última
   parcela de cada um. O guia completo, com as regras e os cuidados, está em `docs/financeiro.md`.
+- **Correções**: parcelas em aberto podem ser editadas e excluídas (uma ou várias de uma vez, útil quando se gera o mês
+  errado); parcela paga nunca é apagada, nem se alguém der baixa durante a exclusão. Não há "desfazer" nem histórico de
+  exclusões no banco: o Worker registra no log só quem excluiu e quantas parcelas, sem dado pessoal.
 - **Não precisa de atualização de banco**: usa a tabela `pagamentos` e a política que já dá acesso à gestão e à recepção.
 - Os valores nunca vêm do site público nem da tabela de preços dos planos: são digitados pela equipe ou copiados da
   última parcela do aluno. Quem nunca foi cobrado recebe a primeira cobrança por **Lançar mensalidade**.
