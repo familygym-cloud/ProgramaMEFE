@@ -104,5 +104,9 @@ continua separada.
 - Teste de ponta a ponta (lançar 3 parcelas, repetição recusada, gerar o mês sem duplicar, aluno inativo fora, editar,
   excluir uma e várias, parcela paga no meio do caminho preservada, exclusão de 230 parcelas em lotes): `bun run e2e`
   (ou `E2E_SO=financeiro bun run e2e` para rodar só este cenário).
+- Permissões no banco de verdade: `supabase/verificacao/12_financeiro.sql` (roda em
+  `supabase/verificacao/executar.sh`, num Postgres descartável) confere que recepção e gestão criam, editam e
+  excluem só parcelas em aberto, que o professor não vê nem mexe, que o aluno lê só a parcela e a ficha dele (o que o
+  recibo precisa) e não grava, e que visitante sem login não acessa nada.
 - Integração por API: a baixa de parcelas por sistemas externos continua em `/api/v1/pagamentos/baixa`
   (veja `docs/api-integracao.md`).
