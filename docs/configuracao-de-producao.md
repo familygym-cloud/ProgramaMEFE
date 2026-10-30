@@ -153,6 +153,9 @@ da migration `20261011000500_interessados.sql`.
 - **Correções**: parcelas em aberto podem ser editadas e excluídas (uma ou várias de uma vez, útil quando se gera o mês
   errado); parcela paga nunca é apagada, nem se alguém der baixa durante a exclusão. Não há "desfazer" nem histórico de
   exclusões no banco: o Worker registra no log só quem excluiu e quantas parcelas, sem dado pessoal.
+- **Recibo** (`/recibo/<parcela>`): toda parcela paga tem recibo imprimível, com valor por extenso, CNPJ e endereço da
+  academia (os mesmos do site; `VITE_CONTATO_ENDERECO` e `VITE_CONTATO_WHATSAPP` valem aqui também). O aluno abre os
+  dele em **Meu plano**; a equipe do financeiro, no botão **Recibo** da lista. Não é nota fiscal.
 - **Não precisa de atualização de banco**: usa a tabela `pagamentos` e a política que já dá acesso à gestão e à recepção.
 - Os valores nunca vêm do site público nem da tabela de preços dos planos: são digitados pela equipe ou copiados da
   última parcela do aluno. Quem nunca foi cobrado recebe a primeira cobrança por **Lançar mensalidade**.

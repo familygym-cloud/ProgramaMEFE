@@ -12,6 +12,7 @@ import {
   MoreHorizontal,
   Pencil,
   Plus,
+  Receipt,
   Trash2,
   Wallet,
   WandSparkles,
@@ -521,15 +522,31 @@ function Financeiro() {
                       </TableCell>
                       <TableCell className="text-right">
                         {p.status === "Pago" ? (
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="rounded-full text-xs"
-                            disabled={alternar.isPending}
-                            onClick={() => setParcelaParaReabrir(p)}
-                          >
-                            Reabrir
-                          </Button>
+                          <div className="flex items-center justify-end gap-1.5">
+                            <Button
+                              asChild
+                              size="sm"
+                              variant="outline"
+                              className="rounded-full text-xs"
+                            >
+                              <Link
+                                to="/recibo/$pagamentoId"
+                                params={{ pagamentoId: p.id }}
+                                aria-label={`Recibo da parcela ${p.parcela}/${p.totalParcelas} de ${p.alunoNome}`}
+                              >
+                                <Receipt className="size-3.5" aria-hidden /> Recibo
+                              </Link>
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="rounded-full text-xs"
+                              disabled={alternar.isPending}
+                              onClick={() => setParcelaParaReabrir(p)}
+                            >
+                              Reabrir
+                            </Button>
+                          </div>
                         ) : (
                           <div className="flex items-center justify-end gap-1.5">
                             <LembreteDeCobranca p={p} />

@@ -1,9 +1,11 @@
 import { useId, useState } from "react";
-import { Check, ChevronDown, Clock, TriangleAlert, type LucideIcon } from "lucide-react";
+import { Link } from "@tanstack/react-router";
+import { Check, ChevronDown, Clock, Receipt, TriangleAlert, type LucideIcon } from "lucide-react";
 import { BarraProgresso, Eyebrow, Selo, Superficie } from "@/components/app/ui";
 import type { PagamentoAluno } from "@/lib/aluno-app/types";
 import { formatarBRL } from "@/lib/planos-precos";
 import { cn } from "@/lib/utils";
+import { ehUuid } from "@/lib/uuid";
 import { dataCurta, plural } from "./datas";
 import { situacaoParcela, type ResumoMensalidades, type SituacaoParcela } from "./mensalidades";
 
@@ -81,6 +83,17 @@ function Parcela({
               : `Mensalidade ${p.referencia}`}
           </p>
           <p className="text-xs text-muted-foreground">{detalheDaParcela(p, situacao)}</p>
+          {/* Na demonstração os ids não são reais: não há recibo para abrir. */}
+          {situacao === "pago" && ehUuid(p.id) ? (
+            <Link
+              to="/recibo/$pagamentoId"
+              params={{ pagamentoId: p.id }}
+              aria-label={`Recibo da ${p.totalParcelas > 1 ? `parcela ${p.parcela} de ${p.totalParcelas}` : `mensalidade ${p.referencia}`}`}
+              className="mt-1 inline-flex min-h-9 items-center gap-1 text-xs font-medium underline underline-offset-4 hover:text-foreground"
+            >
+              <Receipt aria-hidden className="size-3.5" /> Recibo
+            </Link>
+          ) : null}
         </div>
         <div className="flex shrink-0 flex-col items-end gap-1.5 sm:flex-row sm:items-center sm:gap-4">
           <span className="font-display text-lg font-semibold tabular-nums">
