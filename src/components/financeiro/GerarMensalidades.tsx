@@ -82,7 +82,9 @@ export function GerarMensalidades({
       );
       if (r.ignoradas > 0) {
         toast.info(
-          `${r.ignoradas} ficaram de fora: já tinham parcela no mês ou deixaram de estar ativos.`,
+          r.ignoradas === 1
+            ? "1 ficou de fora: já tinha parcela no mês ou deixou de estar ativo."
+            : `${r.ignoradas} ficaram de fora: já tinham parcela no mês ou deixaram de estar ativos.`,
         );
       }
       aoMudarAberto(false);

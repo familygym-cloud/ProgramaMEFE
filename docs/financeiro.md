@@ -36,6 +36,24 @@ Ficam de fora, de propósito:
 O servidor **refaz a conta** na hora de gravar: se alguém recebeu parcela, ou deixou de ser ativo, entre a prévia e o
 clique, essa pessoa não entra (a tela avisa quantas ficaram de fora).
 
+## Corrigir uma cobrança
+
+Só as parcelas **em aberto** (a vencer ou em atraso) podem ser corrigidas. Parcela **paga** nunca é editada nem
+excluída: se precisar mexer nela, use **Reabrir** antes.
+
+- **Editar**: menu **⋯** da parcela > _Editar parcela_. Muda o valor, o vencimento e a forma de pagamento, com os
+  mesmos limites do lançamento. A **referência** (o mês da cobrança) não muda; se ela estiver errada, exclua a parcela
+  e lance de novo.
+- **Excluir uma**: menu **⋯** > _Excluir parcela_, com confirmação.
+- **Excluir várias de uma vez** (por exemplo, o mês gerado errado): marque as caixas das parcelas (a caixa do
+  cabeçalho marca todas as em aberto da lista) e use **Excluir selecionadas**. Os filtros de plano e situação ajudam a
+  chegar só no que deve sair: a seleção vale apenas para o que está na tela, e trocar um filtro limpa a seleção. A
+  confirmação mostra a quantidade, o total e quantos alunos são afetados.
+- Se alguém der baixa numa parcela depois de ela ser selecionada, o servidor **não a exclui** e avisa quantas ficaram
+  de fora.
+- **Não há "desfazer"**: a parcela excluída é apagada de vez. Para gerar de novo, use **Lançar** ou **Gerar mensalidades
+  do mês**.
+
 ## Preços
 
 O site público nunca mostra preços, e esta tela também não consulta a tabela de valores dos planos: **o valor é
@@ -46,8 +64,6 @@ continua separada.
 
 - Clique **uma vez** em Lançar/Gerar e espere a mensagem: dois cliques simultâneos podem criar parcelas em duplicidade
   (o botão fica desabilitado enquanto grava, e o servidor limita a 20 gravações por minuto por conta).
-- Lançou errado? A parcela aparece na lista; pelo banco (SQL Editor) ela pode ser corrigida ou apagada. Parcelas
-  pagas podem ser **reabertas** pela própria tela.
 - Aluno **sem e-mail/conta** também recebe cobrança: a parcela é da ficha, não da conta de acesso.
 
 ## Para quem cuida do sistema
@@ -59,7 +75,12 @@ continua separada.
 - Código: regras puras e testadas em `src/lib/mensalidades.ts`; funções do servidor em
   `src/lib/mensalidades.functions.ts` (`lancarMensalidades`, `previaMensalidadesDoMes`, `gerarMensalidadesDoMes`);
   telas em `src/routes/_authenticated/financeiro.tsx` e `src/components/financeiro/`.
-- Teste de ponta a ponta (lançar 3 parcelas, repetição recusada, gerar o mês sem duplicar, aluno inativo fora, recepção
-  consegue): `bun run e2e`.
+- Correções: `editarParcela` e `excluirParcelas` (mesmo arquivo), com a trava `status = Pendente` no próprio `UPDATE`
+  e `DELETE` (parcela paga no meio do caminho fica intacta), até 100 parcelas por exclusão (a lista vai na URL da
+  consulta; a tela divide em lotes) e limite de 60 correções por minuto por conta. Não existe histórico das exclusões
+  no banco: o Worker registra no log, sem dado pessoal, só quem excluiu e quantas parcelas.
+- Teste de ponta a ponta (lançar 3 parcelas, repetição recusada, gerar o mês sem duplicar, aluno inativo fora, editar,
+  excluir uma e várias, parcela paga no meio do caminho preservada, exclusão de 230 parcelas em lotes): `bun run e2e`
+  (ou `E2E_SO=financeiro bun run e2e` para rodar só este cenário).
 - Integração por API: a baixa de parcelas por sistemas externos continua em `/api/v1/pagamentos/baixa`
   (veja `docs/api-integracao.md`).

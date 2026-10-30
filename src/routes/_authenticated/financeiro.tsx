@@ -9,13 +9,23 @@ import {
   Clock,
   Loader2,
   MessageCircle,
+  MoreHorizontal,
+  Pencil,
   Plus,
+  Trash2,
   Wallet,
   WandSparkles,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   Table,
   TableBody,
@@ -26,12 +36,14 @@ import {
 } from "@/components/ui/table";
 import { BrandLogo } from "@/components/BrandLogo";
 import { ConfirmarAcao } from "@/components/ConfirmarAcao";
+import { EditarParcela } from "@/components/financeiro/EditarParcela";
 import { GerarMensalidades } from "@/components/financeiro/GerarMensalidades";
 import { LancarMensalidade } from "@/components/financeiro/LancarMensalidade";
 import { traduzErroServidor } from "@/lib/erros-servidor";
 import { diasDeAtraso, linkDeCobranca } from "@/lib/cobranca";
 import { hojeBrasilia } from "@/lib/datas";
-import { listarAlunosParaCobranca } from "@/lib/mensalidades.functions";
+import { MAX_PARCELAS_POR_EXCLUSAO } from "@/lib/mensalidades";
+import { excluirParcelas, listarAlunosParaCobranca } from "@/lib/mensalidades.functions";
 import { METODOS_PAGAMENTO, type MetodoPagamento } from "@/lib/pagamentos";
 import {
   definirPagamento,
@@ -70,6 +82,22 @@ function dataBR(d: string) {
 }
 
 type FiltroStatus = "Todos" | "Pago" | "Pendente" | "Atrasado";
+
+function descricaoDaExclusao(parcelas: readonly PagamentoFinanceiro[]) {
+  const [unica] = parcelas;
+  if (parcelas.length === 1 && unica) {
+    return (
+      `Parcela ${unica.parcela}/${unica.totalParcelas} de ${unica.alunoNome} (${moeda(unica.valor)}), ` +
+      `vencimento em ${dataBR(unica.vencimento)}. A cobrança será apagada e isso não pode ser desfeito.`
+    );
+  }
+  const alunos = new Set(parcelas.map((p) => p.alunoId)).size;
+  const total = parcelas.reduce((soma, p) => soma + p.valor, 0);
+  return (
+    `${parcelas.length} parcelas em aberto de ${alunos} aluno(s), no total de ${moeda(total)}. ` +
+    "As cobranças serão apagadas e isso não pode ser desfeito. Parcelas já pagas nunca são excluídas."
+  );
+}
 
 /** Botão de lembrete no WhatsApp para parcelas em aberto (atrasadas ou a vencer em até 5 dias). */
 function LembreteDeCobranca({ p }: { p: PagamentoFinanceiro }) {
@@ -115,6 +143,7 @@ function Financeiro() {
   const queryClient = useQueryClient();
   const buscar = useServerFn(listarFinanceiro);
   const marcar = useServerFn(definirPagamento);
+  const remover = useServerFn(excluirParcelas);
 
   const [plano, setPlano] = useState("Todos");
   const [status, setStatus] = useState<FiltroStatus>("Todos");
@@ -123,6 +152,9 @@ function Financeiro() {
   const [parcelaParaReabrir, setParcelaParaReabrir] = useState<PagamentoFinanceiro | null>(null);
   const [lancando, setLancando] = useState(false);
   const [gerando, setGerando] = useState(false);
+  const [parcelaParaEditar, setParcelaParaEditar] = useState<PagamentoFinanceiro | null>(null);
+  const [paraExcluir, setParaExcluir] = useState<PagamentoFinanceiro[] | null>(null);
+  const [selecionadas, setSelecionadas] = useState<ReadonlySet<string>>(new Set());
   const buscarAlunos = useServerFn(listarAlunosParaCobranca);
   const alunosDaCobranca = useQuery({
     queryKey: ["alunos-para-cobranca"],
@@ -156,6 +188,30 @@ function Financeiro() {
     [pagamentos, plano, status],
   );
 
+  // Só parcelas em aberto podem ser selecionadas, e só as que estão na lista filtrada contam.
+  const emAbertoFiltradas = useMemo(
+    () => filtrados.filter((p) => p.status !== "Pago"),
+    [filtrados],
+  );
+  const selecionadasNaLista = useMemo(
+    () => emAbertoFiltradas.filter((p) => selecionadas.has(p.id)),
+    [emAbertoFiltradas, selecionadas],
+  );
+  const todasMarcadas =
+    emAbertoFiltradas.length > 0 && selecionadasNaLista.length === emAbertoFiltradas.length;
+
+  function marcarTodas(marcar: boolean) {
+    setSelecionadas(marcar ? new Set(emAbertoFiltradas.map((p) => p.id)) : new Set());
+  }
+  function marcarUma(id: string, marcar: boolean) {
+    setSelecionadas((atual) => {
+      const novo = new Set(atual);
+      if (marcar) novo.add(id);
+      else novo.delete(id);
+      return novo;
+    });
+  }
+
   const totais = useMemo(() => {
     const soma = (lista: typeof filtrados) => lista.reduce((t, p) => t + p.valor, 0);
     const pagos = filtrados.filter((p) => p.status === "Pago");
@@ -188,14 +244,46 @@ function Financeiro() {
     },
   });
 
+  const excluir = useMutation({
+    mutationFn: async (ids: string[]) => {
+      let excluidas = 0;
+      let ignoradas = 0;
+      for (let i = 0; i < ids.length; i += MAX_PARCELAS_POR_EXCLUSAO) {
+        const r = await remover({ data: { ids: ids.slice(i, i + MAX_PARCELAS_POR_EXCLUSAO) } });
+        excluidas += r.excluidas;
+        ignoradas += r.ignoradas;
+      }
+      return { excluidas, ignoradas };
+    },
+    onSuccess: (r) => {
+      setSelecionadas(new Set());
+      toast.success(
+        r.excluidas === 1 ? "1 parcela excluída." : `${r.excluidas} parcelas excluídas.`,
+      );
+      if (r.ignoradas > 0) {
+        toast.info(
+          r.ignoradas === 1
+            ? "1 ficou de fora: já estava paga ou não existia mais."
+            : `${r.ignoradas} ficaram de fora: já estavam pagas ou não existiam mais.`,
+        );
+      }
+      recarregarFinanceiro();
+    },
+    onError: (e: Error) => {
+      toast.error(traduzErroServidor(e));
+      // Se um lote já tinha sido apagado antes do erro, a lista precisa refletir isso.
+      recarregarFinanceiro();
+    },
+  });
+
   return (
     <div className="min-h-screen bg-background">
       <header className="sticky top-0 z-30 flex items-center justify-between gap-3 border-b border-brand-yellow/20 bg-brand-black/90 px-4 py-3 backdrop-blur">
         <div className="flex items-center gap-3">
           <BrandLogo className="h-8 w-auto" />
-          <span className="text-[0.65rem] font-bold uppercase tracking-[0.3em] text-brand-yellow">
+          <h1 className="font-sans text-[0.65rem] font-bold uppercase tracking-[0.3em] text-brand-yellow">
             Financeiro
-          </span>
+          </h1>
         </div>
         <Button
           asChild
@@ -263,9 +351,7 @@ function Financeiro() {
               <AlertTriangle className="size-4" /> Em atraso
             </p>
             <p className="mt-2 text-2xl font-bold text-destructive">{moeda(totais.atrasoValor)}</p>
-            <p className="text-xs text-destructive/80">
-              {totais.alunosEmAtraso} aluno(s) com atraso
-            </p>
+            <p className="text-xs text-destructive">{totais.alunosEmAtraso} aluno(s) com atraso</p>
           </div>
         </section>
 
@@ -280,7 +366,10 @@ function Financeiro() {
                     size="sm"
                     variant={plano === p ? "default" : "outline"}
                     className="rounded-full text-xs"
-                    onClick={() => setPlano(p)}
+                    onClick={() => {
+                      setPlano(p);
+                      setSelecionadas(new Set());
+                    }}
                   >
                     {p}
                   </Button>
@@ -296,7 +385,10 @@ function Financeiro() {
                     size="sm"
                     variant={status === s ? "default" : "outline"}
                     className="rounded-full text-xs"
-                    onClick={() => setStatus(s)}
+                    onClick={() => {
+                      setStatus(s);
+                      setSelecionadas(new Set());
+                    }}
                   >
                     {s === "Pendente" ? "A vencer" : s}
                   </Button>
@@ -304,6 +396,41 @@ function Financeiro() {
               </div>
             </div>
           </div>
+
+          {selecionadasNaLista.length > 0 ? (
+            <div
+              role="region"
+              aria-label="Parcelas selecionadas"
+              className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-brand-yellow/40 bg-brand-yellow/10 p-3 text-sm"
+            >
+              <p aria-live="polite">
+                <strong>{selecionadasNaLista.length}</strong>{" "}
+                {selecionadasNaLista.length === 1 ? "parcela selecionada" : "parcelas selecionadas"}{" "}
+                · {moeda(selecionadasNaLista.reduce((soma, p) => soma + p.valor, 0))}
+              </p>
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  className="rounded-full"
+                  onClick={() => setSelecionadas(new Set())}
+                >
+                  Limpar seleção
+                </Button>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="destructive"
+                  className="gap-1.5 rounded-full"
+                  disabled={excluir.isPending}
+                  onClick={() => setParaExcluir(selecionadasNaLista)}
+                >
+                  <Trash2 className="size-3.5" aria-hidden /> Excluir selecionadas
+                </Button>
+              </div>
+            </div>
+          ) : null}
 
           {isLoading ? (
             <p className="mt-4 flex items-center gap-2 text-sm text-muted-foreground">
@@ -327,6 +454,20 @@ function Financeiro() {
               <Table>
                 <TableHeader>
                   <TableRow>
+                    <TableHead className="w-10">
+                      <Checkbox
+                        aria-label="Selecionar todas as parcelas em aberto desta lista"
+                        checked={
+                          todasMarcadas
+                            ? true
+                            : selecionadasNaLista.length > 0
+                              ? "indeterminate"
+                              : false
+                        }
+                        disabled={emAbertoFiltradas.length === 0}
+                        onCheckedChange={(v) => marcarTodas(v === true)}
+                      />
+                    </TableHead>
                     <TableHead>Aluno</TableHead>
                     <TableHead>Plano</TableHead>
                     <TableHead>Referência</TableHead>
@@ -340,6 +481,15 @@ function Financeiro() {
                 <TableBody>
                   {filtrados.map((p) => (
                     <TableRow key={p.id}>
+                      <TableCell>
+                        {p.status === "Pago" ? null : (
+                          <Checkbox
+                            aria-label={`Selecionar a parcela ${p.parcela}/${p.totalParcelas} de ${p.alunoNome}`}
+                            checked={selecionadas.has(p.id)}
+                            onCheckedChange={(v) => marcarUma(p.id, v === true)}
+                          />
+                        )}
+                      </TableCell>
                       <TableCell className="whitespace-nowrap font-medium">{p.alunoNome}</TableCell>
                       <TableCell className="text-sm text-muted-foreground">{p.plano}</TableCell>
                       <TableCell className="text-sm">{p.referencia}</TableCell>
@@ -415,6 +565,33 @@ function Financeiro() {
                             >
                               Marcar pago
                             </Button>
+                            <DropdownMenu modal={false}>
+                              <DropdownMenuTrigger asChild>
+                                <Button
+                                  type="button"
+                                  size="icon"
+                                  variant="outline"
+                                  className="size-8 rounded-full"
+                                  aria-label={`Mais ações da parcela ${p.parcela}/${p.totalParcelas} de ${p.alunoNome}`}
+                                >
+                                  <MoreHorizontal className="size-4" aria-hidden />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end" className="rounded-xl">
+                                <DropdownMenuItem
+                                  onSelect={() => setParcelaParaEditar(p)}
+                                  className="min-h-10 cursor-pointer gap-2"
+                                >
+                                  <Pencil aria-hidden /> Editar parcela
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onSelect={() => setParaExcluir([p])}
+                                  className="min-h-10 cursor-pointer gap-2 text-destructive focus:text-destructive"
+                                >
+                                  <Trash2 aria-hidden /> Excluir parcela
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
                           </div>
                         )}
                       </TableCell>
@@ -437,6 +614,37 @@ function Financeiro() {
         aberto={gerando}
         aoMudarAberto={setGerando}
         aoGerar={recarregarFinanceiro}
+      />
+
+      <EditarParcela
+        parcela={parcelaParaEditar}
+        aoMudarAberto={(aberto) => {
+          if (!aberto) setParcelaParaEditar(null);
+        }}
+        aoSalvar={recarregarFinanceiro}
+      />
+
+      <ConfirmarAcao
+        aberto={paraExcluir !== null}
+        aoMudarAberto={(aberto) => {
+          if (!aberto) setParaExcluir(null);
+        }}
+        titulo={
+          paraExcluir && paraExcluir.length > 1
+            ? `Excluir ${paraExcluir.length} parcelas?`
+            : "Excluir esta parcela?"
+        }
+        descricao={paraExcluir ? descricaoDaExclusao(paraExcluir) : ""}
+        rotuloConfirmar={
+          paraExcluir && paraExcluir.length > 1
+            ? `Excluir ${paraExcluir.length} parcelas`
+            : "Excluir parcela"
+        }
+        destrutivo
+        aoConfirmar={() => {
+          if (paraExcluir) excluir.mutate(paraExcluir.map((p) => p.id));
+          setParaExcluir(null);
+        }}
       />
 
       <ConfirmarAcao
