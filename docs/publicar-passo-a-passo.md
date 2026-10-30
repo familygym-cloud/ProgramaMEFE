@@ -152,10 +152,13 @@ curl -X POST https://<endereço>/api/v1/acessos \
 | ------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Site abre em branco ou "configuração incompleta" | `VITE_SUPABASE_*` ausentes no **build**: ajuste e refaça o deploy.                                                                                                                                                                      |
 | Login funciona mas o painel dá erro              | `SUPABASE_SERVICE_ROLE_KEY` ausente no Worker (Secret).                                                                                                                                                                                 |
+| Não consigo ativar a gestão / "Não foi possível" | Entre no site e abra **/diagnostico**: ele confere as chaves, o banco e o e-mail da gestão e diz o que ajustar, item por item. Use **Copiar resumo para suporte** para me mandar o resultado (não tem nenhuma chave).                   |
 | E-mail de confirmação não chega                  | Limite do e-mail padrão do Supabase; configure SMTP próprio.                                                                                                                                                                            |
 | Link do e-mail leva ao lugar errado              | Site URL / Redirect URLs do Supabase não conferem (passo 3).                                                                                                                                                                            |
 | "Fonte New Order" não aparece                    | O arquivo da fonte é licenciado e **não está no repositório**; o site usa a Urbanist no lugar. Para usar a New Order, o arquivo `public/fonts/NewOrder-Regular.otf` precisa entrar no build (repositório privado e licença confirmada). |
 | Erro ao rodar o SQL                              | Rodou a parte 2 antes da 1, ou rodou uma parte duas vezes.                                                                                                                                                                              |
+
+Primeiro passo para qualquer problema de configuração: abra **/diagnostico** (basta estar logado).
 
 Logs: Cloudflare **Workers & Pages > familygym > Logs** e Supabase **Logs**.
 
