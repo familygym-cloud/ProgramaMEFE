@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import { Hourglass, SearchX, TriangleAlert, UserPlus, UsersRound, X } from "lucide-react";
 import { useMemo, useState } from "react";
 import { EstadoVazio } from "@/components/app/ui";
@@ -119,16 +120,25 @@ export function Alunos({ relatorio, modo }: PropsAba) {
           evitarQuebra={false}
           descricao="Todos os alunos cadastrados. Pesquise, filtre, ordene e abra o relatório individual de cada um, pronto para imprimir."
           acoes={
-            <BotaoExportarCsv
-              arquivo={nomeExportacao(
-                filtrando ? "alunos-filtrados" : "alunos",
-                relatorio.geradoEm,
-                modo,
-              )}
-              gerar={() => csvAlunos(lista)}
-              assunto={`lista de alunos (${pluralizar(lista.length, "aluno")})`}
-              desabilitado={lista.length === 0}
-            />
+            <>
+              {modo === "real" ? (
+                <Button asChild variant="outline" className="h-11 gap-2 rounded-full print:hidden">
+                  <Link to="/alunos">
+                    <UserPlus aria-hidden /> Cadastrar ou importar
+                  </Link>
+                </Button>
+              ) : null}
+              <BotaoExportarCsv
+                arquivo={nomeExportacao(
+                  filtrando ? "alunos-filtrados" : "alunos",
+                  relatorio.geradoEm,
+                  modo,
+                )}
+                gerar={() => csvAlunos(lista)}
+                assunto={`lista de alunos (${pluralizar(lista.length, "aluno")})`}
+                desabilitado={lista.length === 0}
+              />
+            </>
           }
         >
           <div className="space-y-4">

@@ -13,6 +13,7 @@ import {
   Ruler,
   ShieldCheck,
   Tags,
+  UserPlus,
   UserRound,
   Wallet,
 } from "lucide-react";
@@ -28,6 +29,7 @@ const CLASSE_CHIP =
   "min-h-11 shrink-0 gap-2 rounded-full border-brand-yellow/40 bg-transparent px-3 text-xs uppercase tracking-wider text-brand-onblack hover:bg-brand-yellow hover:text-brand-black sm:px-4 sm:tracking-widest";
 
 const FERRAMENTAS = [
+  { to: "/alunos", rotulo: "Alunos", Icone: UserPlus, area: "alunos" },
   { to: "/aulas", rotulo: "Aulas", Icone: CalendarCheck, area: "aulas" },
   { to: "/financeiro", rotulo: "Financeiro", Icone: Wallet, area: "financeiro" },
   { to: "/planos", rotulo: "Planos", Icone: Tags, area: "planos" },

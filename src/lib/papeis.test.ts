@@ -16,6 +16,7 @@ describe("podeAcessar", () => {
   it("a recepção não vê treinos nem avaliações físicas", () => {
     expect(podeAcessar(["recepcao"], "financeiro")).toBe(true);
     expect(podeAcessar(["recepcao"], "vinculos")).toBe(true);
+    expect(podeAcessar(["recepcao"], "alunos")).toBe(true);
     expect(podeAcessar(["recepcao"], "planos")).toBe(true);
     expect(podeAcessar(["recepcao"], "treinos")).toBe(false);
     expect(podeAcessar(["recepcao"], "avaliacoes")).toBe(false);
@@ -29,6 +30,7 @@ describe("podeAcessar", () => {
     expect(podeAcessar(["professor"], "financeiro")).toBe(false);
     expect(podeAcessar(["professor"], "planos")).toBe(false);
     expect(podeAcessar(["professor"], "vinculos")).toBe(false);
+    expect(podeAcessar(["professor"], "alunos")).toBe(false);
     expect(podeAcessar(["professor"], "relatorios")).toBe(false);
   });
 
@@ -85,6 +87,11 @@ describe("areaDaRota", () => {
     expect(areaDaRota("/")).toBeNull();
   });
 
+  it("protege /alunos com a área alunos (gestão e recepção)", () => {
+    expect(areaDaRota("/alunos")).toBe("alunos");
+    expect(areaDaRota("/alunos/")).toBe("alunos");
+  });
+
   it("deixa /vinculos de fora: é onde a conta autorizada ativa o perfil da equipe", () => {
     expect(areaDaRota("/vinculos")).toBeNull();
   });
@@ -93,7 +100,7 @@ describe("areaDaRota", () => {
 describe("destinoDaEquipe", () => {
   it("leva cada perfil para uma tela que ele pode abrir", () => {
     expect(destinoDaEquipe(["staff"])).toBe("/dashboard");
-    expect(destinoDaEquipe(["recepcao"])).toBe("/vinculos");
+    expect(destinoDaEquipe(["recepcao"])).toBe("/alunos");
     expect(destinoDaEquipe(["professor"])).toBe("/prescricao-treinos");
     for (const papel of ["staff", "recepcao", "professor"]) {
       const destino = destinoDaEquipe([papel]);

@@ -52,6 +52,7 @@ const BLOQUEADAS = [
   "/interessados",
   "/dados-pessoais",
   "/diagnostico",
+  "/alunos",
   "/equipe-demo",
   "/relatorio-aluno",
   "/api/",

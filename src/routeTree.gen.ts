@@ -24,6 +24,7 @@ import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as TermosDeUsoRouteImport } from './routes/termos-de-uso'
 import { Route as ValoresRouteImport } from './routes/valores'
+import { Route as AuthenticatedAlunosRouteImport } from './routes/_authenticated/alunos'
 import { Route as AuthenticatedAulasRouteImport } from './routes/_authenticated/aulas'
 import { Route as AuthenticatedDadosPessoaisRouteImport } from './routes/_authenticated/dados-pessoais'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
@@ -133,6 +134,11 @@ const ValoresRoute = ValoresRouteImport.update({
   id: '/valores',
   path: '/valores',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedAlunosRoute = AuthenticatedAlunosRouteImport.update({
+  id: '/alunos',
+  path: '/alunos',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedAulasRoute = AuthenticatedAulasRouteImport.update({
   id: '/aulas',
@@ -334,6 +340,7 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/termos-de-uso': typeof TermosDeUsoRoute
   '/valores': typeof ValoresRoute
+  '/alunos': typeof AuthenticatedAlunosRoute
   '/aulas': typeof AuthenticatedAulasRoute
   '/dados-pessoais': typeof AuthenticatedDadosPessoaisRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
@@ -384,6 +391,7 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/termos-de-uso': typeof TermosDeUsoRoute
   '/valores': typeof ValoresRoute
+  '/alunos': typeof AuthenticatedAlunosRoute
   '/aulas': typeof AuthenticatedAulasRoute
   '/dados-pessoais': typeof AuthenticatedDadosPessoaisRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
@@ -437,6 +445,7 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/termos-de-uso': typeof TermosDeUsoRoute
   '/valores': typeof ValoresRoute
+  '/_authenticated/alunos': typeof AuthenticatedAlunosRoute
   '/_authenticated/aulas': typeof AuthenticatedAulasRoute
   '/_authenticated/dados-pessoais': typeof AuthenticatedDadosPessoaisRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
@@ -490,6 +499,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/termos-de-uso'
     | '/valores'
+    | '/alunos'
     | '/aulas'
     | '/dados-pessoais'
     | '/dashboard'
@@ -540,6 +550,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/termos-de-uso'
     | '/valores'
+    | '/alunos'
     | '/aulas'
     | '/dados-pessoais'
     | '/dashboard'
@@ -592,6 +603,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/termos-de-uso'
     | '/valores'
+    | '/_authenticated/alunos'
     | '/_authenticated/aulas'
     | '/_authenticated/dados-pessoais'
     | '/_authenticated/dashboard'
@@ -760,6 +772,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/valores'
       preLoaderRoute: typeof ValoresRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/alunos': {
+      id: '/_authenticated/alunos'
+      path: '/alunos'
+      fullPath: '/alunos'
+      preLoaderRoute: typeof AuthenticatedAlunosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/aulas': {
       id: '/_authenticated/aulas'
@@ -1010,6 +1029,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAlunosRoute: typeof AuthenticatedAlunosRoute
   AuthenticatedAulasRoute: typeof AuthenticatedAulasRoute
   AuthenticatedDadosPessoaisRoute: typeof AuthenticatedDadosPessoaisRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
@@ -1028,6 +1048,7 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAlunosRoute: AuthenticatedAlunosRoute,
   AuthenticatedAulasRoute: AuthenticatedAulasRoute,
   AuthenticatedDadosPessoaisRoute: AuthenticatedDadosPessoaisRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,

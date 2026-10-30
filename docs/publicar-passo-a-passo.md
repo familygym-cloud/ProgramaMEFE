@@ -104,6 +104,12 @@ Com o endereço do site em mãos (`https://familygym.<seu-usuario>.workers.dev`)
    uma cria a conta e confirma o e-mail antes).
 7. Quando terminar, **apague** a variável `STAFF_BOOTSTRAP_EMAIL` na Cloudflare.
 
+## Passo 4b — Cadastrar os alunos
+
+Com a gestão ativa, abra **Alunos** (`/alunos`) e cadastre o primeiro aluno ou **importe a planilha** que a academia já
+tem (veja `docs/cadastro-de-alunos.md`). Peça aos alunos para criar o acesso em `/auth` com o mesmo e-mail da ficha:
+a conta se liga sozinha.
+
 ## Passo 5 — Roteiro de testes
 
 Marque cada item. Anote o que falhar (com captura de tela) e me envie.

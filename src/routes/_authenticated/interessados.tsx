@@ -2,7 +2,7 @@ import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { ArrowLeft, Loader2, MessageCircle } from "lucide-react";
+import { ArrowLeft, Loader2, MessageCircle, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 import { BrandLogo } from "@/components/BrandLogo";
 import { Badge } from "@/components/ui/badge";
@@ -78,6 +78,24 @@ function Cartao({ i }: { i: InteressadoListado }) {
             <span className="sr-only"> (abre em outra aba)</span>
           </a>
         </Button>
+        {i.status !== "matriculado" ? (
+          <Button asChild size="sm" variant="outline" className="min-h-11 gap-2 rounded-full">
+            <Link
+              to="/alunos"
+              search={{
+                novo: true,
+                nome: i.nome,
+                telefone: i.telefone,
+                interesse: i.interesse,
+                interessado: i.id,
+                ...(i.email ? { email: i.email } : {}),
+              }}
+            >
+              <UserPlus className="size-4" aria-hidden /> Cadastrar como aluno
+              <span className="sr-only"> ({i.nome})</span>
+            </Link>
+          </Button>
+        ) : null}
         {STATUS_DO_INTERESSADO.filter((s) => s !== i.status).map((s) => (
           <Button
             key={s}

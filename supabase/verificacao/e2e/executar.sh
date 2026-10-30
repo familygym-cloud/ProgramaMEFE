@@ -37,10 +37,14 @@ verificar() { # $1 = título, resto = argumentos de fumaca.mjs
 }
 
 CHAVES="--var SUPABASE_SERVICE_ROLE_KEY:sb_secret_teste --var STAFF_BOOTSTRAP_EMAIL:gestor@exemplo.com"
-TELAS="/dashboard,/dashboard?aba=aulas,/dashboard?aba=treinos,/dashboard?aba=captacao,/dashboard?aba=catraca,/dashboard?aba=seguranca,/vinculos,/dados-pessoais,/interessados,/integracoes,/financeiro,/aulas,/termos,/planos,/prescricao-treinos,/registrar-avaliacao,/formularios-mefe,/diagnostico"
+TELAS="/dashboard,/dashboard?aba=aulas,/dashboard?aba=treinos,/dashboard?aba=captacao,/dashboard?aba=catraca,/dashboard?aba=seguranca,/vinculos,/dados-pessoais,/interessados,/integracoes,/financeiro,/aulas,/termos,/planos,/prescricao-treinos,/registrar-avaliacao,/formularios-mefe,/diagnostico,/alunos"
 
 subir "CHAVE_SECRETA=sb_secret_teste PAPEIS=staff" "$CHAVES"
 verificar "equipe (gestão): todas as telas carregam" --rotas "$TELAS"
+
+subir "CHAVE_SECRETA=sb_secret_teste PAPEIS=recepcao" "$CHAVES"
+echo "== recepção: cadastro de alunos (cadastrar, importar, inativar, buscar)"
+node supabase/verificacao/e2e/fluxo-alunos.mjs || FALHAS=$((FALHAS + 1))
 
 subir "CHAVE_SECRETA=sb_secret_teste" "$CHAVES"
 verificar "primeira gestão: diagnóstico tudo certo e vínculos com o botão de ativar" --sem-aal2 \
