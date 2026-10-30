@@ -205,7 +205,7 @@ await passo("exclui mais de 100 parcelas de uma vez (em lotes) sem tocar nas pag
   });
 
   await p.goto(`${SITE}/financeiro`);
-  await ver("Teste 230");
+  await ver("Teste 230", 30000);
   await p
     .getByRole("checkbox", { name: "Selecionar todas as parcelas em aberto desta lista" })
     .check();

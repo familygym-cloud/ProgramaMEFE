@@ -54,6 +54,22 @@ excluída: se precisar mexer nela, use **Reabrir** antes.
 - **Não há "desfazer"**: a parcela excluída é apagada de vez. Para gerar de novo, use **Lançar** ou **Gerar mensalidades
   do mês**.
 
+## Recibo
+
+Toda parcela **paga** tem recibo. Na lista do Financeiro, o botão **Recibo** aparece ao lado de _Reabrir_; no app do
+aluno, **Meu plano** mostra o link **Recibo** nas parcelas pagas (o aluno só vê os dele).
+
+- O recibo traz o número (`FG-` e os 8 primeiros caracteres do código da parcela, sempre o mesmo para a mesma
+  parcela), o valor e o **valor por extenso**, o nome do aluno e o plano, a que se refere (mensalidade do mês ou a
+  descrição da cobrança avulsa), a parcela, a data e a forma de pagamento, e o rodapé da academia (nome, CNPJ,
+  endereço e WhatsApp, os mesmos do site).
+- **Imprimir / salvar PDF** usa a impressão do navegador: sai em uma folha A4, sem botões e sem fundo colorido. Para
+  mandar pelo WhatsApp, salve em PDF.
+- **Não é nota fiscal.** O rodapé diz "Recibo de pagamento, sem valor fiscal". Se a academia precisar emitir nota,
+  isso continua sendo feito no sistema fiscal dela.
+- Parcela em aberto não tem recibo (a tela avisa). Se uma parcela paga for reaberta, o recibo some junto; ao dar
+  baixa de novo, o recibo volta com a nova data e forma de pagamento.
+
 ## Preços
 
 O site público nunca mostra preços, e esta tela também não consulta a tabela de valores dos planos: **o valor é
@@ -72,6 +88,10 @@ continua separada.
   "Staff gerencia pagamentos": gestão e recepção; o professor não acessa).
 - Não há atualização de banco nova: as parcelas usam a tabela `pagamentos` e as restrições que ela já tem
   (`status` Pago/Pendente, `valor >= 0`, `parcela` entre 1 e o total).
+- Recibo: `src/lib/recibo.ts` (dados e frase) e `src/lib/extenso.ts` (números e reais por extenso, até R$ 999.999.999,99),
+  puros e testados; `obterRecibo` em `src/lib/recibo.functions.ts` lê com a permissão de quem pediu (RLS: a equipe do
+  financeiro vê todos, o aluno só os dele, e quem não pode vê "Recibo não encontrado", sem saber se existe); página em
+  `src/routes/_authenticated/recibo.$pagamentoId.tsx`. O CNPJ é o mesmo da chave Pix (`src/lib/pix.ts`).
 - Código: regras puras e testadas em `src/lib/mensalidades.ts`; funções do servidor em
   `src/lib/mensalidades.functions.ts` (`lancarMensalidades`, `previaMensalidadesDoMes`, `gerarMensalidadesDoMes`);
   telas em `src/routes/_authenticated/financeiro.tsx` e `src/components/financeiro/`.

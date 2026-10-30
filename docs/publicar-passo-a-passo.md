@@ -144,6 +144,8 @@ Marque cada item. Anote o que falhar (com captura de tela) e me envie.
       **Gerar mensalidades do mês** mostra a prévia dos alunos ativos já cobrados antes (`docs/financeiro.md`).
 - [ ] Financeiro: no menu **⋯** de uma parcela em aberto, **Editar parcela** muda o valor e **Excluir parcela** apaga a
       de teste (parcelas pagas não têm esse menu).
+- [ ] Financeiro: dê baixa na parcela de teste e abra o **Recibo**: confira nome, valor por extenso, CNPJ e endereço, e
+      imprima/salve em PDF (uma folha). No app do aluno de teste, **Meu plano** mostra o link Recibo na parcela paga.
 
 **Integração (catraca)**
 

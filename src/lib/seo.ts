@@ -55,6 +55,7 @@ const BLOQUEADAS = [
   "/alunos",
   "/equipe-demo",
   "/relatorio-aluno",
+  "/recibo",
   "/api/",
 ];
 

@@ -14,7 +14,14 @@ FUMACA=supabase/verificacao/e2e/fumaca.mjs
 SITE=http://127.0.0.1:8787
 FALHAS=0
 
-parar() { for porta in 54321 8787; do kill $(lsof -ti:$porta) 2>/dev/null; done; }
+# Matar só quem escuta a porta deixa para trás os "pais" do wrangler (bunx, node) e o workerd, que se
+# acumulam a cada cenário e sobrecarregam a máquina. Os colchetes evitam casar com este próprio comando.
+parar() {
+  for porta in 54321 8787; do kill $(lsof -ti:$porta) 2>/dev/null; done
+  pkill -f "[w]rangler dev --config .output/server/wrangler.json" 2>/dev/null
+  pkill -f "[w]orkerd serve" 2>/dev/null
+  return 0
+}
 trap parar EXIT
 
 # Sem E2E_SO roda tudo; com E2E_SO=alunos,financeiro roda só esses cenários (útil ao mexer numa tela).
@@ -61,6 +68,8 @@ if quero financeiro; then
   node supabase/verificacao/e2e/fluxo-financeiro.mjs || FALHAS=$((FALHAS + 1))
   echo "== recepção: financeiro (editar e excluir parcelas, em lote, sem tocar nas pagas)"
   node supabase/verificacao/e2e/fluxo-correcoes.mjs || FALHAS=$((FALHAS + 1))
+  echo "== recepção: recibo de pagamento (conteúdo, impressão em uma folha, parcela em aberto, id inválido)"
+  node supabase/verificacao/e2e/fluxo-recibo.mjs || FALHAS=$((FALHAS + 1))
 fi
 
 if quero diagnostico; then

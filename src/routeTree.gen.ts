@@ -48,6 +48,7 @@ import { Route as AppSegurancaRouteImport } from './routes/app/seguranca'
 import { Route as AppValoresRouteImport } from './routes/app/valores'
 import { Route as AuthenticatedFormulariosMefeIndexRouteImport } from './routes/_authenticated/formularios-mefe.index'
 import { Route as AuthenticatedFormulariosMefeTipoRouteImport } from './routes/_authenticated/formularios-mefe.$tipo'
+import { Route as AuthenticatedReciboPagamentoIdRouteImport } from './routes/_authenticated/recibo.$pagamentoId'
 import { Route as AuthenticatedRelatorioAlunoAlunoIdRouteImport } from './routes/_authenticated/relatorio-aluno.$alunoId'
 import { Route as ApiV1AcessosRouteImport } from './routes/api.v1.acessos'
 import { Route as ApiV1AlunosRouteImport } from './routes/api.v1.alunos'
@@ -263,6 +264,12 @@ const AuthenticatedFormulariosMefeTipoRoute =
     path: '/formularios-mefe/$tipo',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedReciboPagamentoIdRoute =
+  AuthenticatedReciboPagamentoIdRouteImport.update({
+    id: '/recibo/$pagamentoId',
+    path: '/recibo/$pagamentoId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedRelatorioAlunoAlunoIdRoute =
   AuthenticatedRelatorioAlunoAlunoIdRouteImport.update({
     id: '/relatorio-aluno/$alunoId',
@@ -363,6 +370,7 @@ export interface FileRoutesByFullPath {
   '/app/valores': typeof AppValoresRoute
   '/app/': typeof AppIndexRoute
   '/formularios-mefe/$tipo': typeof AuthenticatedFormulariosMefeTipoRoute
+  '/recibo/$pagamentoId': typeof AuthenticatedReciboPagamentoIdRoute
   '/relatorio-aluno/$alunoId': typeof AuthenticatedRelatorioAlunoAlunoIdRoute
   '/api/v1/acessos': typeof ApiV1AcessosRouteWithChildren
   '/api/v1/alunos': typeof ApiV1AlunosRouteWithChildren
@@ -414,6 +422,7 @@ export interface FileRoutesByTo {
   '/app/valores': typeof AppValoresRoute
   '/app': typeof AppIndexRoute
   '/formularios-mefe/$tipo': typeof AuthenticatedFormulariosMefeTipoRoute
+  '/recibo/$pagamentoId': typeof AuthenticatedReciboPagamentoIdRoute
   '/relatorio-aluno/$alunoId': typeof AuthenticatedRelatorioAlunoAlunoIdRoute
   '/api/v1/acessos': typeof ApiV1AcessosRouteWithChildren
   '/api/v1/alunos': typeof ApiV1AlunosRouteWithChildren
@@ -468,6 +477,7 @@ export interface FileRoutesById {
   '/app/valores': typeof AppValoresRoute
   '/app/': typeof AppIndexRoute
   '/_authenticated/formularios-mefe/$tipo': typeof AuthenticatedFormulariosMefeTipoRoute
+  '/_authenticated/recibo/$pagamentoId': typeof AuthenticatedReciboPagamentoIdRoute
   '/_authenticated/relatorio-aluno/$alunoId': typeof AuthenticatedRelatorioAlunoAlunoIdRoute
   '/api/v1/acessos': typeof ApiV1AcessosRouteWithChildren
   '/api/v1/alunos': typeof ApiV1AlunosRouteWithChildren
@@ -522,6 +532,7 @@ export interface FileRouteTypes {
     | '/app/valores'
     | '/app/'
     | '/formularios-mefe/$tipo'
+    | '/recibo/$pagamentoId'
     | '/relatorio-aluno/$alunoId'
     | '/api/v1/acessos'
     | '/api/v1/alunos'
@@ -573,6 +584,7 @@ export interface FileRouteTypes {
     | '/app/valores'
     | '/app'
     | '/formularios-mefe/$tipo'
+    | '/recibo/$pagamentoId'
     | '/relatorio-aluno/$alunoId'
     | '/api/v1/acessos'
     | '/api/v1/alunos'
@@ -626,6 +638,7 @@ export interface FileRouteTypes {
     | '/app/valores'
     | '/app/'
     | '/_authenticated/formularios-mefe/$tipo'
+    | '/_authenticated/recibo/$pagamentoId'
     | '/_authenticated/relatorio-aluno/$alunoId'
     | '/api/v1/acessos'
     | '/api/v1/alunos'
@@ -941,6 +954,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedFormulariosMefeTipoRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/recibo/$pagamentoId': {
+      id: '/_authenticated/recibo/$pagamentoId'
+      path: '/recibo/$pagamentoId'
+      fullPath: '/recibo/$pagamentoId'
+      preLoaderRoute: typeof AuthenticatedReciboPagamentoIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/relatorio-aluno/$alunoId': {
       id: '/_authenticated/relatorio-aluno/$alunoId'
       path: '/relatorio-aluno/$alunoId'
@@ -1043,6 +1063,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedTermosRoute: typeof AuthenticatedTermosRoute
   AuthenticatedVinculosRoute: typeof AuthenticatedVinculosRoute
   AuthenticatedFormulariosMefeTipoRoute: typeof AuthenticatedFormulariosMefeTipoRoute
+  AuthenticatedReciboPagamentoIdRoute: typeof AuthenticatedReciboPagamentoIdRoute
   AuthenticatedRelatorioAlunoAlunoIdRoute: typeof AuthenticatedRelatorioAlunoAlunoIdRoute
   AuthenticatedFormulariosMefeIndexRoute: typeof AuthenticatedFormulariosMefeIndexRoute
 }
@@ -1062,6 +1083,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedTermosRoute: AuthenticatedTermosRoute,
   AuthenticatedVinculosRoute: AuthenticatedVinculosRoute,
   AuthenticatedFormulariosMefeTipoRoute: AuthenticatedFormulariosMefeTipoRoute,
+  AuthenticatedReciboPagamentoIdRoute: AuthenticatedReciboPagamentoIdRoute,
   AuthenticatedRelatorioAlunoAlunoIdRoute:
     AuthenticatedRelatorioAlunoAlunoIdRoute,
   AuthenticatedFormulariosMefeIndexRoute:
