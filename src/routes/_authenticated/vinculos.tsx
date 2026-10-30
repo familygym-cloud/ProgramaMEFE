@@ -210,6 +210,24 @@ function Vinculos() {
         ) : semPermissao ? (
           <div className="space-y-3 rounded-lg border border-border bg-card p-4 text-sm">
             <p>Esta tela é exclusiva da equipe da academia, e a sua conta não tem esse perfil.</p>
+            <p className="text-muted-foreground">
+              Não consegue ativar o perfil da equipe?{" "}
+              <Link
+                to="/diagnostico"
+                className="font-semibold text-foreground underline underline-offset-4"
+              >
+                Abra o diagnóstico
+              </Link>{" "}
+              para ver o que falta configurar.
+            </p>
+            {podeAtivar.isError ? (
+              <p
+                role="alert"
+                className="rounded-md border border-destructive/40 bg-destructive/10 p-3"
+              >
+                {traduzErroServidor(podeAtivar.error)}
+              </p>
+            ) : null}
             {podeAtivar.data === true ? (
               <div className="space-y-2">
                 <p className="text-muted-foreground">
@@ -234,9 +252,15 @@ function Vinculos() {
             )}
           </div>
         ) : error ? (
-          <p className="rounded-lg border border-destructive/40 bg-destructive/10 p-4 text-sm">
-            {traduzErroServidor(error)}
-          </p>
+          <div className="space-y-2 rounded-lg border border-destructive/40 bg-destructive/10 p-4 text-sm">
+            <p>{traduzErroServidor(error)}</p>
+            <p>
+              <Link to="/diagnostico" className="font-semibold underline underline-offset-4">
+                Abrir o diagnóstico
+              </Link>{" "}
+              mostra o que está faltando na configuração.
+            </p>
+          </div>
         ) : (
           <>
             <div className="flex flex-wrap items-center gap-3 rounded-xl border border-border bg-card p-4">

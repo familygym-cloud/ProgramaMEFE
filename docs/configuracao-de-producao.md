@@ -126,3 +126,20 @@ da migration `20261011000500_interessados.sql`.
   carga e as repetições usadas; o app calcula o recorde pela carga estimada para 1 repetição (fórmula de Epley) e
   mostra a evolução em **Resultados > Cargas**. Professores e gestão leem os registros; recepção não. A exportação e a
   anonimização/exclusão da LGPD já incluem as cargas.
+
+## 11. Diagnóstico e teste de ponta a ponta
+
+- **/diagnostico** (qualquer conta logada): confere, sem nunca mostrar uma chave, se o endereço e as chaves do
+  Supabase estão certos (a pública no lugar da pública, a secreta no lugar da secreta), se o Supabase aceita a
+  chave secreta, se o banco tem todas as tabelas e perfis, se a função que ativa a gestão responde e se a conta
+  atual pode virar gestão (`STAFF_BOOTSTRAP_EMAIL`). Cada item traz o que fazer, e o botão "Copiar resumo para
+  suporte" gera um texto sem segredo. Limite de 6 consultas por minuto por conta.
+- As telas de vínculos e do painel apontam para o diagnóstico quando algo de configuração falha, e a tradução
+  dos erros do servidor (`src/lib/erros-servidor.ts`) reconhece chave recusada e tabela ausente.
+- **Consultas HEAD** (`head: true` do supabase-js) não são usadas: numa requisição HEAD o servidor não devolve
+  corpo, então um erro chega sem mensagem e uma tabela inexistente parece existir.
+- **`bun run e2e`**: constrói o site apontando para um Supabase de mentira
+  (`supabase/verificacao/e2e/supabase-falso.mjs`), sobe o servidor de produção local (`wrangler dev`) e abre todas as
+  telas da equipe e o diagnóstico em cenários de configuração errada (sem chave secreta, chave pública colada no
+  lugar da secreta, tabelas faltando, e-mail da gestão diferente). Precisa do Playwright (`npm i -g playwright`) e não
+  toca em nenhum serviço real. Leva alguns minutos.

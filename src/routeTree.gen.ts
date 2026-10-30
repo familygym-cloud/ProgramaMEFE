@@ -27,6 +27,7 @@ import { Route as ValoresRouteImport } from './routes/valores'
 import { Route as AuthenticatedAulasRouteImport } from './routes/_authenticated/aulas'
 import { Route as AuthenticatedDadosPessoaisRouteImport } from './routes/_authenticated/dados-pessoais'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedDiagnosticoRouteImport } from './routes/_authenticated/diagnostico'
 import { Route as AuthenticatedFinanceiroRouteImport } from './routes/_authenticated/financeiro'
 import { Route as AuthenticatedIntegracoesRouteImport } from './routes/_authenticated/integracoes'
 import { Route as AuthenticatedInteressadosRouteImport } from './routes/_authenticated/interessados'
@@ -149,6 +150,12 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedDiagnosticoRoute =
+  AuthenticatedDiagnosticoRouteImport.update({
+    id: '/diagnostico',
+    path: '/diagnostico',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedFinanceiroRoute = AuthenticatedFinanceiroRouteImport.update({
   id: '/financeiro',
   path: '/financeiro',
@@ -330,6 +337,7 @@ export interface FileRoutesByFullPath {
   '/aulas': typeof AuthenticatedAulasRoute
   '/dados-pessoais': typeof AuthenticatedDadosPessoaisRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/diagnostico': typeof AuthenticatedDiagnosticoRoute
   '/financeiro': typeof AuthenticatedFinanceiroRoute
   '/integracoes': typeof AuthenticatedIntegracoesRoute
   '/interessados': typeof AuthenticatedInteressadosRoute
@@ -379,6 +387,7 @@ export interface FileRoutesByTo {
   '/aulas': typeof AuthenticatedAulasRoute
   '/dados-pessoais': typeof AuthenticatedDadosPessoaisRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/diagnostico': typeof AuthenticatedDiagnosticoRoute
   '/financeiro': typeof AuthenticatedFinanceiroRoute
   '/integracoes': typeof AuthenticatedIntegracoesRoute
   '/interessados': typeof AuthenticatedInteressadosRoute
@@ -431,6 +440,7 @@ export interface FileRoutesById {
   '/_authenticated/aulas': typeof AuthenticatedAulasRoute
   '/_authenticated/dados-pessoais': typeof AuthenticatedDadosPessoaisRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/diagnostico': typeof AuthenticatedDiagnosticoRoute
   '/_authenticated/financeiro': typeof AuthenticatedFinanceiroRoute
   '/_authenticated/integracoes': typeof AuthenticatedIntegracoesRoute
   '/_authenticated/interessados': typeof AuthenticatedInteressadosRoute
@@ -483,6 +493,7 @@ export interface FileRouteTypes {
     | '/aulas'
     | '/dados-pessoais'
     | '/dashboard'
+    | '/diagnostico'
     | '/financeiro'
     | '/integracoes'
     | '/interessados'
@@ -532,6 +543,7 @@ export interface FileRouteTypes {
     | '/aulas'
     | '/dados-pessoais'
     | '/dashboard'
+    | '/diagnostico'
     | '/financeiro'
     | '/integracoes'
     | '/interessados'
@@ -583,6 +595,7 @@ export interface FileRouteTypes {
     | '/_authenticated/aulas'
     | '/_authenticated/dados-pessoais'
     | '/_authenticated/dashboard'
+    | '/_authenticated/diagnostico'
     | '/_authenticated/financeiro'
     | '/_authenticated/integracoes'
     | '/_authenticated/interessados'
@@ -767,6 +780,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/diagnostico': {
+      id: '/_authenticated/diagnostico'
+      path: '/diagnostico'
+      fullPath: '/diagnostico'
+      preLoaderRoute: typeof AuthenticatedDiagnosticoRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/financeiro': {
@@ -993,6 +1013,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAulasRoute: typeof AuthenticatedAulasRoute
   AuthenticatedDadosPessoaisRoute: typeof AuthenticatedDadosPessoaisRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedDiagnosticoRoute: typeof AuthenticatedDiagnosticoRoute
   AuthenticatedFinanceiroRoute: typeof AuthenticatedFinanceiroRoute
   AuthenticatedIntegracoesRoute: typeof AuthenticatedIntegracoesRoute
   AuthenticatedInteressadosRoute: typeof AuthenticatedInteressadosRoute
@@ -1010,6 +1031,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAulasRoute: AuthenticatedAulasRoute,
   AuthenticatedDadosPessoaisRoute: AuthenticatedDadosPessoaisRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedDiagnosticoRoute: AuthenticatedDiagnosticoRoute,
   AuthenticatedFinanceiroRoute: AuthenticatedFinanceiroRoute,
   AuthenticatedIntegracoesRoute: AuthenticatedIntegracoesRoute,
   AuthenticatedInteressadosRoute: AuthenticatedInteressadosRoute,

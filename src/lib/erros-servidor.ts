@@ -10,11 +10,21 @@ const REGRAS: { casa: RegExp; mensagem: string }[] = [
   { casa: /^unauthorized\b|jwt expired|invalid jwt|invalid token/i, mensagem: MSG_SESSAO_EXPIRADA },
   {
     casa: /missing supabase environment|configuração do supabase incompleta/i,
-    mensagem: "O sistema não está configurado corretamente no servidor. Avise a equipe técnica.",
+    mensagem:
+      "O sistema não está configurado corretamente no servidor. Abra /diagnostico para ver o que falta.",
   },
   {
     casa: /failed to fetch|networkerror|network request failed|load failed/i,
     mensagem: MSG_SEM_CONEXAO,
+  },
+  {
+    casa: /invalid api key|user not allowed|not_admin/i,
+    mensagem:
+      "O servidor não conseguiu entrar no Supabase com a chave secreta. Abra /diagnostico para ver o que ajustar.",
+  },
+  {
+    casa: /could not find the table|schema cache|relation "?[\w.]+"? does not exist/i,
+    mensagem: "Falta aplicar uma atualização do banco de dados. Abra /diagnostico para ver qual.",
   },
   {
     casa: /invalid input syntax for type uuid/i,
@@ -43,9 +53,27 @@ const REGRAS: { casa: RegExp; mensagem: string }[] = [
  * (as mensagens que nós mesmos escrevemos no servidor) passam como estão.
  */
 export function traduzErroServidor(erro: unknown): string {
-  const mensagem = (
-    erro instanceof Error ? erro.message : typeof erro === "string" ? erro : ""
-  ).trim();
+  const mensagem = textoDoErro(erro).trim();
   if (mensagem === "") return MSG_ERRO_GENERICO;
   return REGRAS.find((r) => r.casa.test(mensagem))?.mensagem ?? mensagem;
+}
+
+/**
+ * Texto de um erro vindo do servidor. Além de `Error` e texto, aceita o objeto simples
+ * `{ message }` (que o Supabase e a serialização às vezes devolvem no lugar de um `Error`) e uma
+ * `Response` recusada (401 e 403 viram sessão expirada ou falta de permissão).
+ */
+function textoDoErro(erro: unknown): string {
+  if (erro instanceof Error) return erro.message;
+  if (typeof erro === "string") return erro;
+  if (typeof Response !== "undefined" && erro instanceof Response) {
+    if (erro.status === 401) return MSG_SESSAO_EXPIRADA;
+    if (erro.status === 403) return "Seu acesso não permite esta ação.";
+    return "";
+  }
+  if (erro && typeof erro === "object" && "message" in erro) {
+    const m = (erro as { message?: unknown }).message;
+    if (typeof m === "string") return m;
+  }
+  return "";
 }

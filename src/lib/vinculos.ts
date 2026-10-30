@@ -167,6 +167,14 @@ export function emailAutorizadoParaBootstrap(
 
 type ErroBanco = { code?: string | undefined; message?: string | undefined };
 
+/** O Supabase recusou a chave do servidor (chave pública no lugar da secreta, chave de outro projeto…). */
+export function pareceChaveRecusada(erro: ErroBanco): boolean {
+  if (erro.code === "42501" || erro.code === "PGRST301" || erro.code === "PGRST302") return true;
+  return /invalid api key|permission denied|jwt|not allowed|not_admin|unauthorized/i.test(
+    erro.message ?? "",
+  );
+}
+
 /**
  * Mensagens escritas por nós nas funções SQL (RAISE EXCEPTION, SQLSTATE P0001) já estão em
  * português e são seguras para o usuário. Qualquer outro erro vira texto genérico, com o detalhe
@@ -186,5 +194,13 @@ export function erroDoRpc(erro: ErroBanco, acao: string): Error {
       "Esta conta já está vinculada a outro aluno. Atualize a página e tente de novo.",
     );
   }
-  return new Error(`Não foi possível ${acao}. Tente novamente em instantes.`);
+  if (pareceChaveRecusada(erro)) {
+    return new Error(
+      "O servidor não tem permissão para fazer isso no Supabase: a chave secreta " +
+        "(SUPABASE_SERVICE_ROLE_KEY) provavelmente está errada ou é a chave pública. " +
+        "Abra /diagnostico para ver o que ajustar.",
+    );
+  }
+  const codigo = erro.code ? ` Se continuar, informe o código ${erro.code}.` : "";
+  return new Error(`Não foi possível ${acao}. Tente novamente em instantes.${codigo}`);
 }

@@ -34,12 +34,15 @@ export const podeAtivarPerfilStaff = createServerFn({ method: "GET" })
     if (!emailAutorizadoParaBootstrap(emailDeBootstrap(), context.claims.email)) return false;
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { count, error } = await supabaseAdmin
+    // Consulta normal (não HEAD): numa requisição HEAD o servidor não devolve corpo, e um erro chegaria
+    // sem mensagem nenhuma.
+    const { data, error } = await supabaseAdmin
       .from("user_roles")
-      .select("id", { count: "exact", head: true })
-      .eq("role", "staff");
+      .select("id")
+      .eq("role", "staff")
+      .limit(1);
     if (error) throw error;
-    return (count ?? 0) === 0;
+    return (data ?? []).length === 0;
   });
 
 /**

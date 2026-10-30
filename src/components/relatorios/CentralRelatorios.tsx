@@ -14,6 +14,7 @@ import { Saude } from "@/components/relatorios/Saude";
 import { Seguranca } from "@/components/relatorios/Seguranca";
 import { Termos } from "@/components/relatorios/Termos";
 import { Treinos } from "@/components/relatorios/Treinos";
+import { PanoramaOperacao } from "@/components/relatorios/operacao/PanoramaOperacao";
 import type { PropsAba } from "@/components/relatorios/tipos";
 import { useImpressao } from "@/components/relatorios/useImpressao";
 import { VisaoGeral } from "@/components/relatorios/VisaoGeral";
@@ -37,7 +38,37 @@ const FORMATO_HORA = new Intl.DateTimeFormat("pt-BR", {
   timeZone: "America/Sao_Paulo",
 });
 
+/** Abas calculadas sobre os alunos: sem nenhum cadastro não há o que mostrar nelas. */
+const ABAS_DE_ALUNOS: readonly AbaRelatorio[] = [
+  "visao-geral",
+  "financeiro",
+  "frequencia",
+  "saude",
+  "termos",
+  "alunos",
+];
+
+function SemAlunos() {
+  return (
+    <EstadoVazio
+      icone={<UsersRound />}
+      titulo="Nenhum aluno cadastrado ainda"
+      texto="Assim que houver alunos, pagamentos e treinos registrados, esta seção aparece aqui. As seções de aulas, captação, catraca e equipe já funcionam."
+    />
+  );
+}
+
 function ConteudoDaAba({ aba, relatorio, modo }: PropsAba & { aba: AbaRelatorio }) {
+  if (relatorio.kpis.alunosTotal === 0 && ABAS_DE_ALUNOS.includes(aba)) {
+    return aba === "visao-geral" ? (
+      <div className="space-y-4 sm:space-y-6">
+        <SemAlunos />
+        <PanoramaOperacao relatorio={relatorio} modo={modo} />
+      </div>
+    ) : (
+      <SemAlunos />
+    );
+  }
   switch (aba) {
     case "visao-geral":
       return <VisaoGeral relatorio={relatorio} modo={modo} />;
@@ -213,8 +244,6 @@ export function CentralRelatorios({
     return () => window.cancelAnimationFrame(quadro);
   }, [aba]);
 
-  const semAlunos = relatorio.kpis.alunosTotal === 0;
-
   return (
     <div ref={raiz} data-relatorio-raiz className="space-y-6 sm:space-y-8">
       {modo === "demo" ? <BannerDemonstracao /> : null}
@@ -228,50 +257,42 @@ export function CentralRelatorios({
         aoImprimir={imprimir}
       />
 
-      {semAlunos ? (
-        <EstadoVazio
-          icone={<UsersRound />}
-          titulo="Nenhum aluno cadastrado ainda"
-          texto="Assim que houver alunos, pagamentos e treinos registrados, os relatórios aparecem aqui."
-        />
-      ) : (
-        <Tabs
-          value={aba}
-          onValueChange={(valor) => {
-            if (ehAba(valor)) aoMudarAba(valor);
-          }}
-          className={cn(completo && "print:hidden")}
-        >
-          <div className="print:hidden">
-            <TabsList
-              aria-label="Seções do relatório"
-              className="sem-barra-rolagem h-auto w-full justify-start gap-1 overflow-x-auto rounded-full bg-foreground/[0.05] p-1 sm:w-fit sm:max-w-full"
-            >
-              {ABAS_RELATORIO.map((id) => (
-                <TabsTrigger
-                  key={id}
-                  value={id}
-                  className="min-h-11 shrink-0 rounded-full px-4 text-sm text-muted-foreground hover:text-foreground data-[state=active]:bg-brand-yellow data-[state=active]:font-semibold data-[state=active]:text-brand-black data-[state=active]:shadow-none"
-                >
-                  {ROTULO_ABA[id]}
-                </TabsTrigger>
-              ))}
-            </TabsList>
-          </div>
-          {ABAS_RELATORIO.map((id) => (
-            <TabsContent
-              key={id}
-              value={id}
-              className="mt-5 rounded-3xl outline-none focus-visible:ring-offset-background sm:mt-6"
-            >
-              <TituloDaSecao aba={id} />
-              <ConteudoDaAba aba={id} relatorio={relatorio} modo={modo} />
-            </TabsContent>
-          ))}
-        </Tabs>
-      )}
+      <Tabs
+        value={aba}
+        onValueChange={(valor) => {
+          if (ehAba(valor)) aoMudarAba(valor);
+        }}
+        className={cn(completo && "print:hidden")}
+      >
+        <div className="print:hidden">
+          <TabsList
+            aria-label="Seções do relatório"
+            className="sem-barra-rolagem h-auto w-full justify-start gap-1 overflow-x-auto rounded-full bg-foreground/[0.05] p-1 sm:w-fit sm:max-w-full"
+          >
+            {ABAS_RELATORIO.map((id) => (
+              <TabsTrigger
+                key={id}
+                value={id}
+                className="min-h-11 shrink-0 rounded-full px-4 text-sm text-muted-foreground hover:text-foreground data-[state=active]:bg-brand-yellow data-[state=active]:font-semibold data-[state=active]:text-brand-black data-[state=active]:shadow-none"
+              >
+                {ROTULO_ABA[id]}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </div>
+        {ABAS_RELATORIO.map((id) => (
+          <TabsContent
+            key={id}
+            value={id}
+            className="mt-5 rounded-3xl outline-none focus-visible:ring-offset-background sm:mt-6"
+          >
+            <TituloDaSecao aba={id} />
+            <ConteudoDaAba aba={id} relatorio={relatorio} modo={modo} />
+          </TabsContent>
+        ))}
+      </Tabs>
 
-      {completo && !semAlunos ? (
+      {completo ? (
         <div className="hidden print:block">
           {ABAS_RELATORIO.map((id, indice) => (
             <section key={id} className={cn(indice > 0 && "print:break-before-page")}>

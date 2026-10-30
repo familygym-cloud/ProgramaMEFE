@@ -102,7 +102,7 @@ function CartaoConquista({ conquista: c }: { conquista: Conquista }) {
         )}
       </div>
       <div className="space-y-1">
-        <h3 className="font-display text-lg font-semibold leading-tight">{c.titulo}</h3>
+        <h2 className="font-display text-lg font-semibold leading-tight">{c.titulo}</h2>
         <p className="text-sm text-muted-foreground">{c.descricao}</p>
       </div>
       {c.desbloqueada ? null : (

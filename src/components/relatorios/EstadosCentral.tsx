@@ -93,6 +93,13 @@ export function SemPerfil() {
               className="inline-flex min-h-11 items-center gap-1.5 font-semibold text-brand-yellow underline underline-offset-4"
             >
               <Link2 className="size-4" aria-hidden /> Abrir vínculos
+            </Link>{" "}
+            Algo não funciona?{" "}
+            <Link
+              to="/diagnostico"
+              className="inline-flex min-h-11 items-center gap-1.5 font-semibold text-brand-yellow underline underline-offset-4"
+            >
+              Ver diagnóstico
             </Link>
           </p>
         }

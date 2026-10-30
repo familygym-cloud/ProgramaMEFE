@@ -252,7 +252,11 @@ export function AppShell({
 
       <div className="lg:pl-72">
         {demo ? (
-          <div className="flex items-center justify-center gap-2 bg-brand-yellow px-4 py-2 text-center text-xs font-semibold text-brand-black">
+          <div
+            role="region"
+            aria-label="Aviso de demonstração"
+            className="flex items-center justify-center gap-2 bg-brand-yellow px-4 py-2 text-center text-xs font-semibold text-brand-black"
+          >
             <Activity className="size-3.5 shrink-0" />
             Modo demonstração — todos os dados desta área são fictícios.
             <button type="button" onClick={sair} className="underline underline-offset-2">

@@ -37,6 +37,7 @@ bun run dev                  # http://localhost:8080
 | `bun run build`     | build de produção em `.output/` (Cloudflare Workers via Nitro) |
 | `bun run build:dev` | build em modo desenvolvimento                                  |
 | `bun run preview`   | serve o build localmente                                       |
+| `bun run e2e`       | teste de ponta a ponta do build, com Supabase de mentira       |
 | `bun run typecheck` | `tsc --noEmit`                                                 |
 | `bun run lint`      | ESLint (com Prettier)                                          |
 | `bun run format`    | Prettier em todo o projeto                                     |
