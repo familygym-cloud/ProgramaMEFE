@@ -187,3 +187,27 @@ da migration `20261011000500_interessados.sql`.
   dia todo e só fariam barulho).
 - Código: `src/lib/registro-de-erros.ts` (puro, testado) e o middleware em `src/start.ts`. O teste de ponta a ponta
   (`bun run e2e`) confere que a falha aparece no log do Worker e que a linha não vaza chave nem e-mail.
+
+## 14. Segredos fora do repositório
+
+- **`bun run segredos`** confere todos os arquivos versionados atrás de chaves e senhas: chave secreta do Supabase
+  (`sb_secret_`), JWT `service_role`, chave da API da academia (`fgk_`), tokens do GitHub, da Cloudflare e de
+  outros serviços, chaves privadas, endereços de banco com senha, variáveis de nome sensível (`...TOKEN`,
+  `...SECRET`, `...PASSWORD`, `...SERVICE_ROLE_KEY`) com valor de verdade, e arquivos que não podem ir ao git
+  (`.env`, preços reais, SQL privado). A **CI roda esse comando** em todo PR e em todo commit na `main`.
+  `bun run segredos --historico` confere também todos os commits já feitos (auditoria).
+- Chaves **públicas** (`sb_publishable_...`, JWT `anon`) são feitas para ir ao navegador e não são acusadas.
+- **Se a verificação acusar uma chave de verdade**: revogue ou troque a chave **agora** no serviço de origem
+  (Supabase: Project Settings > API Keys; GitHub e Cloudflare: o token). Apagar o arquivo não basta, porque o
+  commit antigo continua no histórico. Se for só um exemplo da documentação, troque o texto ou acrescente
+  `segredo-ok` na linha.
+- **Auditoria feita**: a verificação do histórico completo (todos os commits) não encontrou nenhuma chave
+  secreta, token nem senha.
+- **O arquivo `.env` versionado**: ele só tem valores **públicos** (endereço e chave pública do Supabase e o
+  identificador do projeto), então não há nada a revogar. Mesmo assim ele não devia estar no git (o `.gitignore`
+  não afeta arquivo já versionado), e a verificação avisa sobre ele a cada rodada. Como o build do Vite lê esse
+  arquivo, **não o remova antes de definir as variáveis no build da Cloudflare**: em **Settings > Build >
+  Variables and secrets**, crie `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY` e `VITE_SITE_URL`, faça um
+  **Retry build** e confira o site; só então peça para tirar o `.env` do git (`git rm --cached .env`).
+  Se algum dia entrar um valor sensível nele, a verificação passa a falhar.
+- Código: `src/lib/segredos.ts` (regras, puro e testado) e `scripts/verificar-segredos.ts` (o comando).

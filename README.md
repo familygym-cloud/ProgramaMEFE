@@ -42,6 +42,7 @@ bun run dev                  # http://localhost:8080
 | `bun run lint`      | ESLint (com Prettier)                                          |
 | `bun run format`    | Prettier em todo o projeto                                     |
 | `bun run test`      | Vitest (`src/**/*.test.ts`, ambiente Node, só lógica pura)     |
+| `bun run segredos`  | procura chaves, tokens e senhas esquecidos nos arquivos do git |
 
 ## Variáveis de ambiente
 
@@ -233,6 +234,7 @@ A Central de Relatórios da equipe também tem demonstração pública, com alun
 bun run test        # Vitest: lógica pura em src/**/*.test.ts
 bun run typecheck
 bun run lint
+bun run segredos    # chaves, tokens e senhas esquecidos (a CI também roda)
 ```
 
 Os testes do banco (RLS, permissões, regras de reserva) estão em `supabase/verificacao/` e rodam à parte, como descrito acima.

@@ -28,6 +28,10 @@ jobs:
         with:
           bun-version: 1.3.14
 
+      # Primeiro e sem instalar nada: se alguém commitar uma chave, a CI avisa em segundos.
+      - name: Segredos esquecidos no repositório
+        run: bun run segredos
+
       - name: Instalar dependências
         run: bun install --frozen-lockfile
 
